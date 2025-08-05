@@ -12,7 +12,6 @@
 
             <div id="tify" style="height: 500px"></div>
             {% get_current_language as LANGUAGE_CODE %}
-
             <script>
                 let selected_manifest_id = getUrlParameter('manifest', '0')
                 if (selected_manifest_id == '0') {
@@ -24,7 +23,6 @@
                           pages: [ getUrlParameter('page', 1) ]
                         });
                 }
-                /*
                 let req_url = '/ndr_core/manifest/id/' + selected_manifest_id + '/'
                 $.ajax({
                     url: req_url,
@@ -38,7 +36,6 @@
                         });
                     }
                 });
-                */
             </script>
         {% endif %}
     {% endwith %}

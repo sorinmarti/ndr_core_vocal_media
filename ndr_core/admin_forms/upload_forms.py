@@ -59,7 +59,7 @@ class ManifestUploadForm(forms.ModelForm):
 
     class Meta:
         model = NdrCoreManifest
-        fields = ['title', 'file', 'manifest_group']
+        fields = ['identifier', 'title', 'file', 'manifest_group']
 
     @property
     def helper(self):
@@ -71,6 +71,7 @@ class ManifestUploadForm(forms.ModelForm):
 
         form_row = Row(
             Column('manifest_group', css_class='form-group col-md-6 mb-0'),
+            Column('identifier', css_class='form-group col-md-6 mb-0'),
             css_class='form-row'
         )
         layout.append(form_row)

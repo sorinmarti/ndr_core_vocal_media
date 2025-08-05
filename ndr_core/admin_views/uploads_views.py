@@ -25,7 +25,8 @@ class ConfigureUploads(AdminViewMixin, LoginRequiredMixin, View):
         """GET request for this view. """
 
         context = {'files': NdrCoreUpload.objects.all(),
-                   'manifests': NdrCoreManifest.objects.all()}
+                   'manifests': NdrCoreManifest.objects.all(),
+                   'manifest_groups': NdrCoreManifestGroup.objects.all()}
         return render(self.request, template_name='ndr_core/admin_views/overview/configure_uploads.html',
                       context=context)
 

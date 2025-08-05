@@ -33,7 +33,7 @@ from ndr_core.admin_views.uploads_views import (
     ManifestUploadCreateView,
     ManifestUploadEditView,
     ManifestUploadDeleteView,
-    ManifestGroupCreateView,
+    ManifestGroupCreateView, ManifestGroupEditView, ManifestGroupDeleteView,
 )
 from ndr_core.admin_views.export_views import (
     export_color_palette,
@@ -180,6 +180,8 @@ urlpatterns = [
     path('configure/manifest/uploads/delete/<str:pk>/', ManifestUploadDeleteView.as_view(),
          name='delete_manifest_upload'),
     path('configure/manifest/groups/create/', ManifestGroupCreateView.as_view(), name='create_manifest_group'),
+    path('configure/manifest/groups/edit/<int:pk>/', ManifestGroupEditView.as_view(), name='edit_manifest_group'),
+    path('configure/manifest/groups/delete/<int:pk>/', ManifestGroupDeleteView.as_view(), name='delete_manifest_group'),
 
     # TRANSLATIONS
     path('configure/translations/', ConfigureTranslations.as_view(), name='configure_translations'),

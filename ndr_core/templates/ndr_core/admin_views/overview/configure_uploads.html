@@ -86,6 +86,52 @@
         </div>
     </div>
 
+    <!-- Second row - manifest groups on the left -->
+      <div class="card-deck">
+          <div class="card bg-light mb-3">
+              <div class="card-body">
+                  <h5 class="card-title">Manifest Groups</h5>
+                  <ul class="list-group">
+                      {% for group in manifest_groups %}
+                          <li class="list-group-item list-group-item-action d-flex py-2">
+                              <p class="p-0 m-0 flex-grow-1">
+                                  <i class="fa-regular fa-folder"></i> {{ group.title }}
+                                  <br/>
+                                  <small class="text-muted">
+                                      {% if group.order_value_1_title %}{{ group.order_value_1_title }}{% endif %}
+                                      {% if group.order_value_2_title %} | {{ group.order_value_2_title }}{% endif %}
+                                      {% if group.order_value_3_title %} | {{ group.order_value_3_title }}{% endif %}
+                                  </small>
+                              </p>
+
+                              <p class="p-0 m-0">
+                                  {% if group.pk %}
+                                      <a href="{% url 'ndr_core:edit_manifest_group' group.pk %}" class="btn btn-sm btn-secondary">
+                                          <i class="fa-regular fa-pen-to-square"></i>
+                                      </a>
+                                      <a href="{% url 'ndr_core:delete_manifest_group' group.pk %}" class="btn btn-sm btn-danger">
+                                          <i class="fa-regular fa-delete-left"></i>
+                                      </a>
+                                  {% endif %}
+                              </p>
+                          </li>
+                      {% empty %}
+                          <li class="list-group-item">
+                              <small class="text-muted"><i class="fa-regular fa-info-circle"></i> No manifest groups created yet.</small>
+                          </li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+
+          <!-- Empty card to maintain grid layout (optional) -->
+          <div class="card bg-light mb-3" style="opacity: 0; pointer-events: none;">
+              <div class="card-body">
+                  <h5 class="card-title">&nbsp;</h5>
+              </div>
+          </div>
+      </div>
+
     {% if file is not None %}
        <div class="card bg-light mb-3">
             <div class="card-body">
