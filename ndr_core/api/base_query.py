@@ -18,7 +18,7 @@ class BaseQuery(ABC):
     search_config = None
     page = 1
 
-    def __init__(self, search_configuration, page=1):
+    def __init__(self, search_configuration, page=1, request=None):
         self.search_config = search_configuration
         self.page = page
 

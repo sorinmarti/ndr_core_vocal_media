@@ -52,6 +52,16 @@ class SitemapFileView(AdminViewMixin, LoginRequiredMixin, View):
         return render(request, self.template_name, {'sitemap_xml': sitemap_file})
 
 
+class GoogleVerificationFileUpoloadView(AdminViewMixin, LoginRequiredMixin, View):
+    """View to upload the Google Verification file."""
+
+    template_name = 'ndr_core/admin_views/overview/configure_seo.html'
+
+    def get(self, request, *args, **kwargs):
+        """Render the robots.txt file."""
+        return render(request, self.template_name, {'google_verification': 'Upload Google Verification File Here'})
+
+
 class GoogleSearchConsoleVerificationView(AdminViewMixin, LoginRequiredMixin, View):
     """View to preview the Google Search Console verification file."""
 

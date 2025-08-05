@@ -3,6 +3,7 @@ import json
 import re
 from string import Formatter
 
+import html
 from django.utils.safestring import mark_safe
 
 from ndr_core.ndr_templatetags.filters import get_get_filter_class
@@ -67,19 +68,79 @@ class TemplateStringVariable:
 
             self.filter_configurations = []
             for i, my_filter in enumerate(self.value_filters):
-                p = my_filter.split(':')
+                p = self._split_filter_with_quotes(my_filter, ':')
                 self.value_filters[i] = p[0]
                 self.filter_configurations.append({})
                 if len(p) > 1:
-                    configs = p[1].split(',')
+                    configs = self._split_filter_with_quotes(p[1], ',')
                     for cn, config in enumerate(configs):
                         if '=' in config:
-                            k, v = config.split('=')
+                            k, v = config.split('=', 1)  # Split only on first =
+                            # Remove quotes if present
+                            v = self._remove_quotes(v)
                             self.filter_configurations[i][k] = v
                         else:
+                            config = self._remove_quotes(config)
                             self.filter_configurations[i][f"o{cn}"] = config
         else:
             self.variable = variable
+
+        # Temporary debug - remove this later
+        self.debug_parsing()
+
+    def debug_parsing(self):
+        """Debug method to see how filters are being parsed."""
+        print(f"Raw variable: {self.raw_variable}")
+        print(f"Variable name: {self.variable}")
+        print(f"Filters: {self.value_filters}")
+        print(f"Filter configs: {self.filter_configurations}")
+        print("---")
+
+    def _split_filter_with_quotes(self, text, delimiter):
+        """Split text by delimiter, but respect quoted strings."""
+        parts = []
+        current_part = ""
+        in_quotes = False
+        quote_char = None
+        i = 0
+
+        while i < len(text):
+            char = text[i]
+
+            if char in ['"', "'"] and not in_quotes:
+                in_quotes = True
+                quote_char = char
+                current_part += char
+            elif char == quote_char and in_quotes:
+                # Check if it's escaped
+                if i > 0 and text[i - 1] == '\\':
+                    current_part += char
+                else:
+                    in_quotes = False
+                    quote_char = None
+                    current_part += char
+            elif char == delimiter and not in_quotes:
+                if current_part.strip():
+                    parts.append(current_part.strip())
+                current_part = ""
+            else:
+                current_part += char
+
+            i += 1
+
+        if current_part.strip():
+            parts.append(current_part.strip())
+
+        return parts
+
+    def _remove_quotes(self, text):
+        """Remove surrounding quotes from text."""
+        text = text.strip()
+        if len(text) >= 2:
+            if (text.startswith('"') and text.endswith('"')) or \
+                    (text.startswith("'") and text.endswith("'")):
+                return text[1:-1]
+        return text
 
     def get_raw_value(self, data):
         """Returns the value of the variable."""
@@ -99,11 +160,11 @@ class TemplateStringVariable:
                 if isinstance(raw_value, list):
                     filtered_values = []
                     for value in raw_value:
-                        applied = self.apply_filters(value)
+                        applied = self.apply_filters(value, data)
                         if applied is not None:
                             filtered_values.append(applied)
                     return filtered_values
-                return self.apply_filters(self.get_raw_value(data))
+                return self.apply_filters(self.get_raw_value(data), data)
             return raw_value
         except IndexError as e:
             raise IndexError(f"Key not found in list: {e}") from e
@@ -129,13 +190,13 @@ class TemplateStringVariable:
                 raise KeyError(f"Nested key not found: {e}") from e
         return value
 
-    def apply_filters(self, value):
+    def apply_filters(self, value, data_context=None):
         """Returns the value of the variable with the filter applied."""
         for i, my_filter in enumerate(self.value_filters):
             filter_class = get_get_filter_class(my_filter)
             if filter_class is None:
                 raise ValueError(f"Filter {my_filter} not found.")
-            value = filter_class(my_filter, value, self.filter_configurations[i]).get_rendered_value()
+            value = filter_class(my_filter, value, self.filter_configurations[i], data_context).get_rendered_value()
 
         return value
 
@@ -183,7 +244,16 @@ class TemplateString:
     variables = []
 
     def __init__(self, string, data, show_errors=False):
-        self.string = string
+        """Initializes the TemplateString class.
+        Parses the string and extracts the variables.
+        Raises a ValueError if the string is malformed."""
+        print("Problem:", string, data, show_errors)
+
+        if string is not None:
+            self.string = html.unescape(string)
+        else:
+            self.string = ""
+
         self.data = data
         self.variables = self.get_variables()
         self.show_errors = show_errors

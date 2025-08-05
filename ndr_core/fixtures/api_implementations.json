@@ -38,5 +38,19 @@
       "supports_advanced": true,
       "supports_single_result": false
     }
+  },
+  {
+    "model": "ndr_core.NdrCoreApiImplementation",
+    "fields": {
+      "name": "nodegoat",
+      "label": "Nodegoat",
+      "url": "https://nodegoat.net/",
+      "description": "",
+      "connection_string_example": "https://nodegoat.net/",
+      "supports_simple": true,
+      "supports_simple_and_or": false,
+      "supports_advanced": true,
+      "supports_single_result": true
+    }
   }
 ]

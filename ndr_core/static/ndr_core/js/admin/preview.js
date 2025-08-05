@@ -10,19 +10,21 @@
  * @param field_count - The number of fields to loop through. The default is 20.
  * @param row_field_id - The id of the row field. It is used to get the value of the row field.
  * @param column_field_id - The id of the column field. It is used to get the value of the column field.
- * @param size_field_id - The id of the size field. It is used to get the value of the size field.
+ * @param row_span_field_id - The id of the row span field. It is used to get the value of the row span field.
+ * @param col_span_field_id - The id of the column span field. It is used to get the value of the column span field.
  * @returns {*} - The masked url for the preview image.
  */
 function getMaskedUrl(baseUrl, dropdown_field_id, field_count=20,
-                      row_field_id, column_field_id, size_field_id) {
+                      row_field_id, column_field_id, row_span_field_id, col_span_field_id) {
 
     let data_array = [];
     for (let i = 0; i < field_count; i++) {
         let row_field =  $(row_field_id + '_' +i);
         let column_field =  $(column_field_id + '_' +i);
-        let size_field = $(size_field_id + '_'+i);
+        let row_span_field =  $(row_span_field_id + '_' +i);
+        let col_span_field =  $(col_span_field_id + '_' +i);
         let dropdown_field = $(dropdown_field_id+'_'+i);
-        data_array[i]=row_field.val()+"~"+column_field.val()+"~"+size_field.val()+"~"+dropdown_field.val();
+        data_array[i]=row_field.val()+"~"+column_field.val()+"~"+row_span_field.val()+"~"+col_span_field.val()+"~"+dropdown_field.val();
     }
     return baseUrl.replace("image_string", data_array);
 }
@@ -63,10 +65,11 @@ function configureDropdown(selectElement, totalElements, updateFunc, dropdown_fi
  * @param image_field_id - The id of the preview image. It is used to update the src attribute.
  * @param row_field_id - The id of the row field. It is used to get the value of the row field.
  * @param column_field_id - The id of the column field. It is used to get the value of the column field.
- * @param size_field_id - The id of the size field. It is used to get the value of the size field.
+ * @param row_span_field_id - The id of the row span field. It is used to get the value of the row span field.
+ * @param col_span_field_id - The id of the column span field. It is used to get the value of the column span field.
  */
 function configureRows(number, imageBaseUrl, dropdown_field_id, image_field_id,
-                       row_field_id, column_field_id, size_field_id) {
+                       row_field_id, column_field_id, row_span_field_id, col_span_field_id) {
     /**
      * This function is used to update the preview image. It gets the masked url and updates the src attribute of the
      * preview image.
@@ -74,7 +77,7 @@ function configureRows(number, imageBaseUrl, dropdown_field_id, image_field_id,
     let updateFunc = function updateImage() {
         let previewImage = $(image_field_id);
         let maskedUrl = getMaskedUrl(imageBaseUrl, dropdown_field_id, 20,
-                                     row_field_id, column_field_id, size_field_id);
+                                     row_field_id, column_field_id, row_span_field_id, col_span_field_id);
         previewImage.attr('src', maskedUrl);
     }
 
@@ -84,7 +87,8 @@ function configureRows(number, imageBaseUrl, dropdown_field_id, image_field_id,
 
         $(row_field_id+'_'+i).on('change', updateFunc);
         $(column_field_id+'_'+i).on('change', updateFunc);
-        $(size_field_id+'_'+i).on('change', updateFunc);
+        $(row_span_field_id+'_'+i).on('change', updateFunc);
+        $(col_span_field_id+'_'+i).on('change', updateFunc);
     }
 }
 
@@ -97,11 +101,12 @@ function configureRows(number, imageBaseUrl, dropdown_field_id, image_field_id,
  * @param remove_button_id - The id of the remove button. It is used to remove a row.
  * @param row_field_id - The id of the row field. It is used to get the value of the row field.
  * @param column_field_id - The id of the column field. It is used to get the value of the column field.
- * @param size_field_id - The id of the size field. It is used to get the value of the size field.
+ * @param row_span_field_id - The id of the row span field. It is used to get the value of the row span field.
+ * @param col_span_field_id - The id of the column span field. It is used to get the value of the column span field.
  */
 function initializeAddAndRemoveButtons(row_id, dropdown_id, visible_buttons=1,
                                        add_button_id, remove_button_id,
-                                       row_field_id, column_field_id, size_field_id) {
+                                       row_field_id, column_field_id, row_span_field_id, col_span_field_id) {
     let addButton = $(add_button_id);
     let removeButton = $(remove_button_id);
 
@@ -125,7 +130,8 @@ function initializeAddAndRemoveButtons(row_id, dropdown_id, visible_buttons=1,
             sField.change();
             $(row_field_id + '_'+visible_buttons).val("");
             $(column_field_id + '_'+visible_buttons).val("");
-            $(size_field_id + '_'+visible_buttons).val("");
+            $(row_span_field_id + '_'+visible_buttons).val("");
+            $(col_span_field_id + '_'+visible_buttons).val("");
             $(row_id + '_'+visible_buttons).hide();
 
             if (visible_buttons === 1) {
@@ -140,11 +146,11 @@ function initializeAddAndRemoveButtons(row_id, dropdown_id, visible_buttons=1,
 }
 
 function init_preview(imageBaseUrl, dropdown_field_id, image_field_id, result_field_config_row_stub,
-                      row_field_id, column_field_id, size_field_id,
+                      row_field_id, column_field_id, row_span_field_id, col_span_field_id,
                       add_button_id, remove_button_id) {
 
     configureRows(20, imageBaseUrl, dropdown_field_id, image_field_id,
-                  row_field_id, column_field_id, size_field_id);
+                  row_field_id, column_field_id, row_span_field_id, col_span_field_id);
 
     let visible_buttons = 1;
     for(let i = 1; i < 20; i++){
@@ -158,9 +164,9 @@ function init_preview(imageBaseUrl, dropdown_field_id, image_field_id, result_fi
 
     initializeAddAndRemoveButtons(result_field_config_row_stub, dropdown_field_id, visible_buttons,
                                   add_button_id, remove_button_id,
-                                  row_field_id, column_field_id, size_field_id);
+                                  row_field_id, column_field_id, row_span_field_id, col_span_field_id);
 
-    let maskedUrl = getMaskedUrl(imageBaseUrl, dropdown_field_id, 20, row_field_id, column_field_id, size_field_id);
+    let maskedUrl = getMaskedUrl(imageBaseUrl, dropdown_field_id, 20, row_field_id, column_field_id, row_span_field_id, col_span_field_id);
     let previewImage = $(image_field_id);
     previewImage.attr('src', maskedUrl);
 }

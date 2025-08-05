@@ -18,7 +18,7 @@ class PreviewImage:
     field_color = "#FFFFFF"  # Color of the field
     text_color = "#000000"  # Color of the text
 
-    def get_coordinates(self, row, start_col, width_cols, offset=0):
+    def get_coordinates(self, row, start_col, rowspan, colspan, offset=0):
         """ A form is organized in rows and columns. This function returns the coordinates of a
         rectangle that represents a field in the form. The coordinates are returned as a list of
         tuples. The first tuple contains the coordinates of the top left corner of the rectangle.
@@ -27,7 +27,7 @@ class PreviewImage:
 
         x1 = (start_col - 1) * self.col_width + self.margin
         y1 = (row * self.row_height) - self.row_height + self.margin
-        x2 = x1 + (width_cols * self.col_width - (2 * self.margin))
+        x2 = x1 + (rowspan * self.col_width - (2 * self.margin))
         y2 = y1 + (self.row_height - (2 * self.margin))
         return (x1 + offset, y1 + offset), (x2 + offset, y2 + offset)
 
@@ -154,8 +154,8 @@ class PreviewImage:
         draw = ImageDraw.Draw(img)
 
         for data_point in data:
-            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['size'])
-            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['size'], offset=3)
+            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'])
+            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'], offset=3)
 
             if data_point['type'] != NdrCoreSearchField.FieldType.BOOLEAN:
                 draw.rounded_rectangle(coords_offset, 5, fill=self.shadow_color, outline="#333333")
@@ -178,8 +178,8 @@ class PreviewImage:
         draw = ImageDraw.Draw(img)
 
         for data_point in data:
-            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['size'])
-            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['size'], offset=3)
+            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'])
+            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'], offset=3)
             draw.rounded_rectangle(coords_offset, 5, fill=self.shadow_color, outline="#333333")
             draw.rounded_rectangle(coords, 5, fill=self.field_color, outline="#36454F")
             draw.text((coords[0][0] + 10, coords[0][1] + 5), data_point['text'], (0, 0, 0))

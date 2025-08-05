@@ -28,6 +28,8 @@ class RenderResultNode(template.Node):
 
     def create_card(self, context, result, compact_view):
         """Creates a result card."""
+
+        print("CRRRRRRRRRRREAAAAAATTTTEEE CARD, ", compact_view)
         card_context = {
             "result": result,
             "card_content": self.create_grid(context, result["data"], compact_view),
@@ -41,6 +43,9 @@ class RenderResultNode(template.Node):
     def create_citation(self, context, result):
         """Creates a citation."""
         exp = self.search_config.resolve(context).citation_expression
+        if exp is None or exp == "":
+            return ""  # Return empty string if no citation expression
+
         template_string = TemplateString(exp, result, show_errors=False)
         citation = template_string.get_formatted_string()
         citation = template_string.sanitize_html(citation)

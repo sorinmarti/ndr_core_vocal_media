@@ -9,11 +9,13 @@ class AbstractFilter(ABC):
     filter_name = ""
     value = ""
     filter_configurations = {}
+    data_context = {}
 
-    def __init__(self, filter_name, value, filter_configurations):
+    def __init__(self, filter_name, value, filter_configurations, data_context=None):
         self.filter_name = filter_name
         self.value = value
         self.filter_configurations = filter_configurations
+        self.data_context = data_context or {}
 
         self.check_configuration()
 

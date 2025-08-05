@@ -1,6 +1,6 @@
 from django.urls import path
 
-from ndr_core.views import dispatch, display_schema_or_404, google_search_console_verification_view
+from ndr_core.views import dispatch, display_schema_or_404
 from ndr_core.ndr_settings import NdrSettings
 
 app_name = NdrSettings.APP_NAME
@@ -12,5 +12,6 @@ urlpatterns = [
 
     path('robots.txt', dispatch, name='robots'),
     path('sitemap.xml', dispatch, name='sitemap'),
-    path('google<str:verification_file>.html', google_search_console_verification_view),
+
+    path(r"[\w\d]*\.html", dispatch, name="html_page"),
 ]

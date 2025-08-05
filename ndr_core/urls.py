@@ -19,8 +19,7 @@ from ndr_core.admin_views.search_field_views import (
     SearchFieldDeleteView,
     get_field_list_choices, get_field_list_header
 )
-from ndr_core.admin_views.seo_views import RobotsFileView, SitemapFileView, ConnectWithNdrCoreOrgView, \
-    GoogleSearchConsoleVerificationView, GoogleSearchConsoleVerificationDeleteView
+from ndr_core.admin_views.seo_views import RobotsFileView, SitemapFileView, ConnectWithNdrCoreOrgView
 from ndr_core.admin_views.translation_views import (
     ConfigureTranslations,
     SelectTranslationView,
@@ -275,7 +274,7 @@ urlpatterns = [
     path('configure/search/result/preview/<str:img_config>/', preview_result_card_image,
          name='preview_result_card_image'),
     path('configure/search/ajax/field/<str:field_name>/choices/', get_field_list_choices, name='get_field_choices'),
-    path('configure/search/ajax/field/<int:field_type>/header/', get_field_list_header, name='get_field_header'),
+    path('configure/search/ajax/field/<str:field_name>/header/', get_field_list_header, name='get_field_header'),
 
     # SEARCH STATS
     path('configure/statistics/', StatisticsView.as_view(), name='search_statistics'),
@@ -309,13 +308,12 @@ urlpatterns = [
          name='mark_record'),
 
     # Search Engine Optimization
-    path('configure/seo/', TemplateView.as_view(template_name='ndr_core/admin_views/overview/configure_seo.html'),
+    path('configure/seo/',
+         TemplateView.as_view(template_name='ndr_core/admin_views/overview/configure_seo.html'),
          name='seo'),
     path('configure/seo/robots/', RobotsFileView.as_view(), name='seo_robots'),
     path('configure/seo/sitemap/', SitemapFileView.as_view(), name='seo_sitemap'),
     path('configure/seo/ndrcore-org/', ConnectWithNdrCoreOrgView.as_view(), name='seo_ndrcore_org'),
-    path('configure/seo/google/', GoogleSearchConsoleVerificationView.as_view(), name='seo_google'),
-    path('configure/seo/google/delete/', GoogleSearchConsoleVerificationDeleteView.as_view(), name='seo_google_delete'),
 
     # Language
     path('language/<str:new_language>/', set_language_view, name='set_language'),

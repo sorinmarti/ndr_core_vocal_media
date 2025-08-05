@@ -1,4 +1,6 @@
 """The API factory returns Query and Result classes for a selected API implementation. """
+from ndr_core.api.nodegoat.nodegoat_result import NodegoatResult
+from ndr_core.api.nodegoat.nodegoat_query import NodegoatQuery
 from ndr_core.api.mongodb.mongodb_query import MongoDBQuery
 from ndr_core.api.mongodb.mongodb_result import MongoDBResult
 from ndr_core.api.api_ninjas.api_ninjas_query import ApiNinjasQuery
@@ -15,6 +17,7 @@ class ApiFactory:
         "ndr_core": {"query": NdrCoreQuery, "result": NdrCoreResult},
         "api_ninjas": {"query": ApiNinjasQuery, "result": ApiNinjasResult},
         "mongodb": {"query": MongoDBQuery, "result": MongoDBResult},
+        "nodegoat": {"query": NodegoatQuery, "result": NodegoatResult},
     }
 
     def __init__(self, search_configuration):

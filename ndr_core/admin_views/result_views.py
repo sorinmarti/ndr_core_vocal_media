@@ -53,7 +53,8 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
         return [(f'result_field_{row}', 'result_field'),
                 (f'row_field_{row}', 'field_row'),
                 (f'column_field_{row}', 'field_column'),
-                (f'size_field_{row}', 'field_size')]
+                (f'column_span_field_{row}', 'field_column_span'),
+                (f'row_span_field_{row}', 'field_row_span')]
 
     @staticmethod
     def get_compact_row_fields(row):
@@ -61,7 +62,8 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
         return [(f'cpct_result_field_{row}', 'result_field'),
                 (f'cpct_row_field_{row}', 'field_row'),
                 (f'cpct_column_field_{row}', 'field_column'),
-                (f'cpct_size_field_{row}', 'field_size')]
+                (f'cpct_column_span_field_{row}', 'field_column_span'),
+                (f'cpct_row_span_field_{row}', 'field_row_span')]
 
     def get_context_data(self, **kwargs):
         """Adds the search configuration to the context. """
@@ -80,7 +82,10 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
         for field in normal_fields:
             row_fields = self.get_row_fields(form_row)
             for field_name, model_field in row_fields:
-                form.fields[field_name].initial = getattr(field, model_field)
+                try:
+                    form.fields[field_name].initial = getattr(field, model_field)
+                except KeyError:
+                    print("KeyError: ", field_name, model_field, " not found in form fields.")
             form_row += 1
 
         form_row = 0
@@ -99,6 +104,7 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
         all_fields = conf_object.result_card_fields.all()
         all_fields.delete()
 
+        # Process normal view fields
         for row in range(20):
             fields = self.get_row_fields(row)
             field_names = [x[0] for x in fields]
@@ -106,34 +112,37 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
             if all(field in form.cleaned_data for field in field_names) and \
                     all(form.cleaned_data[x] is not None for x in field_names):
 
-                # There is a valid row of configuration. Check if it already exists in the database.
+                # There is a valid row of configuration
                 conf_line, created = conf_object.result_card_fields.get_or_create(
                     result_card_group='normal',
                     result_field=form.cleaned_data[f'result_field_{row}'])
 
                 conf_line.field_row = form.cleaned_data[f'row_field_{row}']
                 conf_line.field_column = form.cleaned_data[f'column_field_{row}']
-                conf_line.field_size = form.cleaned_data[f'size_field_{row}']
+                conf_line.field_column_span = form.cleaned_data[f'column_span_field_{row}']  # Add this
+                conf_line.field_row_span = form.cleaned_data[f'row_span_field_{row}']  # Add this
                 conf_line.result_card_group = 'normal'
                 conf_line.save()
 
                 if created:
                     conf_object.result_card_fields.add(conf_line)
 
+            # Process compact view fields
             compact_fields = self.get_compact_row_fields(row)
             compact_field_names = [x[0] for x in compact_fields]
 
             if all(field in form.cleaned_data for field in compact_field_names) and \
                     all(form.cleaned_data[x] is not None for x in compact_field_names):
 
-                # There is a valid row of configuration. Check if it already exists in the database.
+                # There is a valid row of configuration
                 conf_line, created = conf_object.result_card_fields.get_or_create(
                     result_card_group='compact',
                     result_field=form.cleaned_data[f'cpct_result_field_{row}'])
 
                 conf_line.field_row = form.cleaned_data[f'cpct_row_field_{row}']
                 conf_line.field_column = form.cleaned_data[f'cpct_column_field_{row}']
-                conf_line.field_size = form.cleaned_data[f'cpct_size_field_{row}']
+                conf_line.field_column_span = form.cleaned_data[f'cpct_column_span_field_{row}']  # Add this
+                conf_line.field_row_span = form.cleaned_data[f'cpct_row_span_field_{row}']  # Add this
                 conf_line.result_card_group = 'compact'
                 conf_line.save()
 
@@ -150,11 +159,12 @@ def preview_result_card_image(request, img_config):
     for row in config_rows:
         config_row = row.split("~")
         if '' not in config_row:
-            field = NdrCoreResultField.objects.get(pk=config_row[3])
+            field = NdrCoreResultField.objects.get(pk=config_row[4])
             data.append({
                 'row': int(config_row[0]),
                 'col': int(config_row[1]),
-                'size': int(config_row[2]),
+                'rowspan': int(config_row[2]),
+                'colspan': int(config_row[3]),
                 'text': field.label})
     image_data = PreviewImage().create_result_card_image_from_raw_data(data)
     return HttpResponse(image_data, content_type="image/png")

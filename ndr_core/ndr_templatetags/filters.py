@@ -1,12 +1,10 @@
-import json
-from abc import ABC, abstractmethod
+import re
 from datetime import datetime
-
-from django.utils.translation import get_language
 
 from ndr_core.models import NdrCoreSearchField
 from ndr_core.ndr_templatetags.abstract_filter import AbstractFilter
 from ndr_core.ndr_templatetags.html_element import HTMLElement
+from ndr_core.utils import get_nested_value
 
 
 def get_get_filter_class(filter_name):
@@ -25,6 +23,10 @@ def get_get_filter_class(filter_name):
         return DateFilter
     if filter_name == "format":
         return NumberFilter
+    if filter_name == "linkify":
+        return LinkifyFilter
+    if filter_name == "iframe":
+        return IframeFilter
 
     raise ValueError(f"Filter {filter_name} not found.")
 
@@ -262,3 +264,175 @@ class NumberFilter(AbstractFilter):
     def get_value(self):
         """Returns the formatted string."""
         return self.value
+
+
+class LinkifyFilter(AbstractFilter):
+    """A class to represent a linkify template filter that wraps content in an <a> tag."""
+
+    def needed_attributes(self):
+        return ["url"]  # URL is required
+
+    def allowed_attributes(self):
+        return ["url", "target", "class", "title", "rel"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the content wrapped in an <a> tag."""
+
+        # Get the URL and replace placeholders
+        url = self.get_configuration("url")
+        if not url:
+            return self.get_value()
+
+        # Replace square bracket placeholders with actual values from data context
+        url = self.replace_placeholders(url)
+
+        # Create the link element
+        link_element = HTMLElement("a")
+        link_element.add_attribute("href", url)
+
+        # Add optional attributes
+        if self.get_configuration("target"):
+            target = self.get_configuration("target")
+            if target == "blank":
+                target = "_blank"
+            link_element.add_attribute("target", target)
+
+        if self.get_configuration("class"):
+            link_element.add_attribute("class", self.get_configuration("class"))
+
+        if self.get_configuration("title"):
+            link_element.add_attribute("title", self.get_configuration("title"))
+
+        if self.get_configuration("rel"):
+            link_element.add_attribute("rel", self.get_configuration("rel"))
+        elif self.get_configuration("target") == "_blank":
+            # Add security attribute for external links
+            link_element.add_attribute("rel", "noopener noreferrer")
+
+        # Add the content (which could be the result of previous filters)
+        link_element.add_content(str(self.get_value()))
+
+        return str(link_element)
+
+    def replace_placeholders(self, url):
+        """Replace [variable] placeholders in the URL with actual values."""
+
+        # Find all [variable] patterns
+        placeholders = re.findall(r'\[([^\]]+)\]', url)
+
+        # Replace each placeholder with its value
+        for placeholder in placeholders:
+            try:
+                # Get the value from the data context
+                # This assumes self.data_context is available (you might need to pass this)
+                placeholder_value = get_nested_value(self.data_context, placeholder)
+                if placeholder_value is not None:
+                    url = url.replace(f'[{placeholder}]', str(placeholder_value))
+                else:
+                    url = url.replace(f'[{placeholder}]', '')
+            except:
+                # If placeholder can't be resolved, leave it as is or remove it
+                url = url.replace(f'[{placeholder}]', '')
+
+        return url
+
+
+class IframeFilter(AbstractFilter):
+    """A class to represent an iframe template filter that embeds content in an <iframe> tag."""
+
+    def __init__(self, filter_name, value, filter_configurations, data_context=None):
+        super().__init__(filter_name, value, filter_configurations, data_context)
+
+    def needed_attributes(self):
+        return []  # No required attributes
+
+    def allowed_attributes(self):
+        return ["width", "height", "title", "frameborder", "allowfullscreen",
+                "sandbox", "loading", "referrerpolicy", "class", "style", "src"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns an iframe element with the value as src or embedded content."""
+
+        # Get the source URL - could be the filter value or from src parameter
+        src_url = self.get_configuration("src") or self.get_value()
+
+        # Replace placeholders in URL if data context is available
+        if self.data_context and src_url:
+            src_url = self.replace_placeholders(str(src_url))
+
+        # Create the iframe element
+        iframe_element = HTMLElement("iframe")
+        iframe_element.add_attribute("src", src_url)
+
+        # Set default attributes for security and usability
+        iframe_element.add_attribute("frameborder", "0")
+        iframe_element.add_attribute("loading", "lazy")
+
+        # Add optional attributes with defaults
+        width = self.get_configuration("width") or "100%"
+        height = self.get_configuration("height") or "400"
+        iframe_element.add_attribute("width", width)
+        iframe_element.add_attribute("height", height)
+
+        # Add title for accessibility
+        title = self.get_configuration("title") or "Embedded content"
+        iframe_element.add_attribute("title", title)
+
+        # Handle security attributes
+        if self.get_configuration("sandbox"):
+            iframe_element.add_attribute("sandbox", self.get_configuration("sandbox"))
+
+        if self.get_configuration("allowfullscreen"):
+            if self.get_configuration("allowfullscreen").lower() in ["true", "1", "yes"]:
+                iframe_element.add_attribute("allowfullscreen", "")
+
+        # Handle loading attribute
+        if self.get_configuration("loading"):
+            iframe_element.add_attribute("loading", self.get_configuration("loading"))
+
+        # Handle referrer policy
+        if self.get_configuration("referrerpolicy"):
+            iframe_element.add_attribute("referrerpolicy", self.get_configuration("referrerpolicy"))
+
+        # Add CSS class if specified
+        if self.get_configuration("class"):
+            iframe_element.add_attribute("class", self.get_configuration("class"))
+
+        # Add inline styles if specified
+        if self.get_configuration("style"):
+            iframe_element.add_attribute("style", self.get_configuration("style"))
+
+        # Override frameborder if explicitly set
+        if self.get_configuration("frameborder"):
+            iframe_element.add_attribute("frameborder", self.get_configuration("frameborder"))
+
+        return str(iframe_element)
+
+    def replace_placeholders(self, url):
+        """Replace [variable] placeholders in the URL with actual values."""
+        import re
+        from ndr_core.utils import get_nested_value
+
+        # Find all [variable] patterns
+        placeholders = re.findall(r'\[([^\]]+)\]', url)
+
+        # Replace each placeholder with its value
+        for placeholder in placeholders:
+            try:
+                # Get the value from the data context
+                placeholder_value = get_nested_value(self.data_context, placeholder)
+                if placeholder_value is not None:
+                    url = url.replace(f'[{placeholder}]', str(placeholder_value))
+                else:
+                    url = url.replace(f'[{placeholder}]', '')
+            except:
+                # If placeholder can't be resolved, remove it
+                url = url.replace(f'[{placeholder}]', '')
+
+        return url

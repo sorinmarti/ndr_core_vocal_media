@@ -95,6 +95,12 @@ class NdrSettings:
         return dir_name
 
     @staticmethod
+    def get_static_html_path():
+        """Returns the ndr-app's static html path. Convenience method. """
+        dir_name = f'{settings.MEDIA_ROOT}/uploads/html'
+        return dir_name
+
+    @staticmethod
     def get_images_path():
         """Returns the ndr-app's image path. Convenience method. """
         return f"{NdrSettings.get_static_path()}/images"

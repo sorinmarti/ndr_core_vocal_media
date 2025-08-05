@@ -67,6 +67,8 @@ def dispatch(request, ndr_page=None):
         return create_robots_txt_view(request)
     if request.path == reverse_lazy(f'{NdrSettings.APP_NAME}:sitemap'):
         return create_sitemap_view(request)
+    if request.path == reverse_lazy(f'{NdrSettings.APP_NAME}:html_page'):
+        return return_static_html(request)
 
     page_is_under_construction = NdrCoreValue.get_or_initialize("under_construction",
                                                                 init_type=NdrCoreValue.ValueType.BOOLEAN,
@@ -445,6 +447,18 @@ def manifest_url_view(request, manifest_id):
         return JsonResponse({'error': 'Manifest not found.'}, status=404)
 
     return JsonResponse({'manifest_url': manifest.file.url})
+
+
+def return_static_html(request):
+    """Returns a static HTML page. """
+    url_path = request.path
+    file_name = url_path.split('/')[-1]
+    file_path = f'{NdrSettings.get_images_path()}/{file_name}'
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            return HttpResponse(file.read(), content_type='text/html')
+
+    return render(request, 'ndr_core/404.html', status=404)
 
 
 def google_search_console_verification_view(request, verification_file):
