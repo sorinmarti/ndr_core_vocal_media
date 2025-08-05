@@ -18,7 +18,7 @@ class PreviewImage:
     field_color = "#FFFFFF"  # Color of the field
     text_color = "#000000"  # Color of the text
 
-    def get_coordinates(self, row, start_col, rowspan, colspan, offset=0):
+    def get_coordinates(self, row, start_col, colspan, rowspan, offset=0):
         """ A form is organized in rows and columns. This function returns the coordinates of a
         rectangle that represents a field in the form. The coordinates are returned as a list of
         tuples. The first tuple contains the coordinates of the top left corner of the rectangle.
@@ -26,9 +26,9 @@ class PreviewImage:
         in pixels."""
 
         x1 = (start_col - 1) * self.col_width + self.margin
-        y1 = (row * self.row_height) - self.row_height + self.margin
-        x2 = x1 + (rowspan * self.col_width - (2 * self.margin))
-        y2 = y1 + (self.row_height - (2 * self.margin))
+        y1 = (row - 1) * self.row_height + self.margin
+        x2 = x1 + (colspan * self.col_width - (2 * self.margin))
+        y2 = y1 + (rowspan * self.row_height - (2 * self.margin))
         return (x1 + offset, y1 + offset), (x2 + offset, y2 + offset)
 
     @staticmethod
@@ -132,30 +132,31 @@ class PreviewImage:
 
     @staticmethod
     def get_highest_row(data):
-        """ This function returns the highest row number"""
+        """ This function returns the highest row number including rowspan"""
         highest_row = 0
         for data_point in data:
-            if data_point['row'] > highest_row:
-                highest_row = data_point['row']
+            row_end = data_point['row'] + data_point.get('rowspan', 1) - 1
+            if row_end > highest_row:
+                highest_row = row_end
         return highest_row
 
     def create_search_form_image_from_raw_data(self, data):
-        """ This function creates a form preview image from a list of dictionaries. Each dictionary
-        contains the information about a field in the form. The dictionary must contain the following
-        keys: 'row', 'col', 'size', 'text' and type. The 'row' key contains the row number of the field. The
-        'col' key contains the column number of the field. The 'size' key contains the number of columns
-        the field spans. The 'text' key contains the label of the field."""
+        """ This function creates a form preview image from a list of dictionaries."""
 
         self.row_height = 50
         highest_row = self.get_highest_row(data)
 
-        img = Image.new('RGB', ((12 * self.col_width) + self.margin, highest_row * self.row_height + self.margin),
+        img = Image.new('RGB', ((12 * self.col_width) + self.margin, highest_row * self.row_height +
+                                self.margin),
                         color=self.image_background_color)
         draw = ImageDraw.Draw(img)
 
         for data_point in data:
-            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'])
-            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'], offset=3)
+            # Fix: pass parameters in correct order (row, col, colspan, rowspan)
+            coords = self.get_coordinates(data_point['row'], data_point['col'],
+                                          data_point['colspan'], data_point['rowspan'])
+            coords_offset = self.get_coordinates(data_point['row'], data_point['col'],
+                                                 data_point['colspan'], data_point['rowspan'], offset=3)
 
             if data_point['type'] != NdrCoreSearchField.FieldType.BOOLEAN:
                 draw.rounded_rectangle(coords_offset, 5, fill=self.shadow_color, outline="#333333")
@@ -173,13 +174,17 @@ class PreviewImage:
         """ This function creates a result card preview image"""
         highest_row = self.get_highest_row(data)
 
-        img = Image.new('RGB', ((12 * self.col_width) + self.margin, highest_row * self.row_height + self.margin),
+        img = Image.new('RGB', ((12 * self.col_width) + self.margin, highest_row * self.row_height +
+                                self.margin),
                         color=self.image_background_color)
         draw = ImageDraw.Draw(img)
 
         for data_point in data:
-            coords = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'])
-            coords_offset = self.get_coordinates(data_point['row'], data_point['col'], data_point['rowspan'], data_point['colspan'], offset=3)
+            # Fix: pass parameters in correct order (row, col, colspan, rowspan)
+            coords = self.get_coordinates(data_point['row'], data_point['col'],
+                                          data_point['colspan'], data_point['rowspan'])
+            coords_offset = self.get_coordinates(data_point['row'], data_point['col'],
+                                                 data_point['colspan'], data_point['rowspan'], offset=3)
             draw.rounded_rectangle(coords_offset, 5, fill=self.shadow_color, outline="#333333")
             draw.rounded_rectangle(coords, 5, fill=self.field_color, outline="#36454F")
             draw.text((coords[0][0] + 10, coords[0][1] + 5), data_point['text'], (0, 0, 0))
@@ -187,3 +192,4 @@ class PreviewImage:
         output = io.BytesIO()
         img.save(output, "PNG")
         return output.getvalue()
+

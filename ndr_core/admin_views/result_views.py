@@ -158,13 +158,25 @@ def preview_result_card_image(request, img_config):
     config_rows = img_config.split(",")
     for row in config_rows:
         config_row = row.split("~")
-        if '' not in config_row:
-            field = NdrCoreResultField.objects.get(pk=config_row[4])
-            data.append({
-                'row': int(config_row[0]),
-                'col': int(config_row[1]),
-                'rowspan': int(config_row[2]),
-                'colspan': int(config_row[3]),
-                'text': field.label})
-    image_data = PreviewImage().create_result_card_image_from_raw_data(data)
-    return HttpResponse(image_data, content_type="image/png")
+        if '' not in config_row and len(config_row) >= 6:  # Updated: expect 6 values now
+            try:
+                field = NdrCoreResultField.objects.get(pk=config_row[0])  # field_id is first
+                data.append({
+                    'row': int(config_row[1]),  # field_row
+                    'col': int(config_row[2]),  # field_column
+                    'colspan': int(config_row[3]),  # field_column_span
+                    'rowspan': int(config_row[4]),  # field_row_span
+                    'text': field.label if hasattr(field, 'label') and field.label else str(field)
+                })
+            except (NdrCoreResultField.DoesNotExist, ValueError, IndexError):
+                # Skip invalid configurations
+                continue
+
+    if data:  # Only create image if we have valid data
+        image_data = PreviewImage().create_result_card_image_from_raw_data(data)
+        return HttpResponse(image_data, content_type="image/png")
+    else:
+        # Return empty/placeholder image if no valid data
+        placeholder_data = [{'row': 1, 'col': 1, 'colspan': 12, 'rowspan': 1, 'text': 'No fields configured'}]
+        image_data = PreviewImage().create_result_card_image_from_raw_data(placeholder_data)
+        return HttpResponse(image_data, content_type="image/png")

@@ -1,3 +1,8 @@
-<div class="col col-md-{{ size }} {{ classes }}">
-    {{ field_content }}
-</div>
+  <div class="result-card-field"
+       data-column="{{ field_column }}"
+       data-row="{{ field_row }}"
+       data-colspan="{{ field_column_span }}"
+       data-rowspan="{{ field_row_span }}"
+       class="{{ classes }}">
+      {{ field_content }}
+  </div>

@@ -29,7 +29,6 @@ class RenderResultNode(template.Node):
     def create_card(self, context, result, compact_view):
         """Creates a result card."""
 
-        print("CRRRRRRRRRRREAAAAAATTTTEEE CARD, ", compact_view)
         card_context = {
             "result": result,
             "card_content": self.create_grid(context, result["data"], compact_view),
@@ -52,33 +51,30 @@ class RenderResultNode(template.Node):
         return mark_safe(citation)
 
     def create_grid(self, context, data, compact_view):
-        """Creates a grid of result fields."""
-        row_template = "ndr_core/result_renderers/elements/result_row.html"
+        """Creates a CSS Grid of result fields."""
         result_card_fields = self.search_config.resolve(
             context
-        ).result_card_fields.filter(result_card_group=compact_view)
-        max_row = result_card_fields.aggregate(Max("field_row"))
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
 
-        card_grid_str = ""
-        for row in range(max_row["field_row__max"]):
-            row += 1
-            fields = []
-            for column in result_card_fields.filter(field_row=row).order_by(
-                "field_column"
-            ):
-                field_html = self.create_field(column, data)
-                fields.append(field_html)
-            row_context = {"fields": fields}
-            row_template_str = get_template(row_template).render(row_context)
-            card_grid_str += row_template_str
+        if not result_card_fields.exists():
+            return ""
 
-        return mark_safe(card_grid_str)
+        # Create CSS Grid container
+        grid_html = '<div class="result-grid">'
+
+        for field_config in result_card_fields:
+            field_html = self.create_field(field_config, data)
+            grid_html += field_html
+
+        grid_html += '</div>'
+        return mark_safe(grid_html)
 
     @staticmethod
-    def create_field(field, data):
-        """Creates a result field."""
+    def create_field(field_config, data):
+        """Creates a result field with CSS Grid positioning."""
         field_template = "ndr_core/result_renderers/elements/result_field.html"
-        result_field = field.result_field
+        result_field = field_config.result_field
+
         template_string = TemplateString(
             result_field.rich_expression, data, show_errors=True
         )
@@ -86,7 +82,11 @@ class RenderResultNode(template.Node):
         field_content = template_string.sanitize_html(field_content)
 
         field_context = {
-            "size": field.field_size,
+            # Remove old Bootstrap size, add CSS Grid properties
+            "field_row": field_config.field_row,
+            "field_column": field_config.field_column,
+            "field_column_span": field_config.field_column_span,
+            "field_row_span": field_config.field_row_span,
             "classes": result_field.field_classes,
             "field_content": field_content,
         }
@@ -100,8 +100,8 @@ class RenderResultNode(template.Node):
 
         compact_view = "normal"
         if (
-            result_object.request.GET.get(f"compact_view_{conf.conf_name}_simple", "off") == "on"
-            or result_object.request.GET.get(f"compact_view_{conf.conf_name}", "off") == "on"
+                result_object.request.GET.get(f"compact_view_{conf.conf_name}_simple", "off") == "on"
+                or result_object.request.GET.get(f"compact_view_{conf.conf_name}", "off") == "on"
         ):
             compact_view = "compact"
 

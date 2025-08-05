@@ -6,7 +6,8 @@ function init_result_preview(imageBaseUrl) {
         '#result_field_config_row',
         '#id_row_field',
         '#id_column_field',
-        '#id_size_field',
+        '#id_row_span_field',
+        '#id_column_span_field',
         '#button-id-add_row',
         '#button-id-remove_row');
 }
@@ -19,7 +20,8 @@ function init_cpct_result_preview(imageBaseUrl) {
         '#cpct_result_field_config_row',
         '#id_cpct_row_field',
         '#id_cpct_column_field',
-        '#id_cpct_size_field',
+        '#id_cpct_row_span_field',
+        '#id_cpct_column_span_field',
         '#button-id-cpct_add_row',
         '#button-id-cpct_remove_row');
 }

@@ -69,6 +69,10 @@ class NodegoatResult(BaseResult):
             # Group by object_sub_details_id and collect all sub-objects for each type
             result_sub_objects = result.get("object_subs", {})
 
+            # Handle case where object_subs is an empty list instead of dict
+            if isinstance(result_sub_objects, list):
+                result_sub_objects = {}  # Convert empty list to empty dict
+
             for sub_id, sub_data in result_sub_objects.items():
                 # Get the object_sub metadata
                 object_sub = sub_data.get("object_sub", {})

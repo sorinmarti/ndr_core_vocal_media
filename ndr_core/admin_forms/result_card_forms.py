@@ -68,7 +68,7 @@ class SearchConfigurationResultEditForm(forms.Form):
         form_row.append(Div(HTML('Result Field'), css_class='col-md-4'))
         form_row.append(Div(HTML('Row (1-?)'), css_class='col-md-2'))
         form_row.append(Div(HTML('Column (1-12)'), css_class='col-md-2'))
-        form_row.append(Div(HTML('Width (1-10)'), css_class='col-md-2'))
+        form_row.append(Div(HTML('Width (1-12)'), css_class='col-md-2'))
         form_row.append(Div(HTML('Height (1-10)'), css_class='col-md-2'))
         tab.append(form_row)
 
@@ -76,7 +76,7 @@ class SearchConfigurationResultEditForm(forms.Form):
         form_row.append(Div(HTML('Compact Result Field'), css_class='col-md-4'))
         form_row.append(Div(HTML('Row (1-?)'), css_class='col-md-2'))
         form_row.append(Div(HTML('Column (1-12)'), css_class='col-md-2'))
-        form_row.append(Div(HTML('Width (1-10)'), css_class='col-md-2'))
+        form_row.append(Div(HTML('Width (1-12)'), css_class='col-md-2'))
         form_row.append(Div(HTML('Height (1-10)'), css_class='col-md-2'))
         cpct_tab.append(form_row)
 
@@ -124,14 +124,14 @@ class SearchConfigurationResultEditForm(forms.Form):
             form_row.append(form_field_result_field)
             form_row.append(form_field_row_field)
             form_row.append(form_field_column_field)
-            form_row.append(form_field_row_span_field)
             form_row.append(form_field_column_span_field)
+            form_row.append(form_field_row_span_field)
 
             cpct_form_row.append(cpct_form_field_result_field)
             cpct_form_row.append(cpct_form_field_row_field)
             cpct_form_row.append(cpct_form_field_column_field)
-            cpct_form_row.append(cpct_form_field_row_span_field)
             cpct_form_row.append(cpct_form_field_column_span_field)
+            cpct_form_row.append(cpct_form_field_row_span_field)
 
             tab.append(form_row)
             cpct_tab.append(cpct_form_row)

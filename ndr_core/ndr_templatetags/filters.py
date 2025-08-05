@@ -28,6 +28,7 @@ def get_get_filter_class(filter_name):
     if filter_name == "iframe":
         return IframeFilter
 
+
     raise ValueError(f"Filter {filter_name} not found.")
 
 
@@ -191,30 +192,91 @@ class BadgeTemplateFilter(AbstractFilter):
 
 
 class ImageTemplateFilter(AbstractFilter):
+    def __init__(self, filter_name, value, filter_configurations, data_context=None):
+        super().__init__(filter_name, value, filter_configurations, data_context)
+
     def needed_attributes(self):
         return []
 
     def allowed_attributes(self):
-        return ["iiif_resize"]
+        return ["url", "iiif_resize", "width", "height", "alt", "class", "style", "title"]
 
     def needed_options(self):
         return []
 
     def get_rendered_value(self):
-        url = self.value
+        # Determine the image URL
+        if self.get_configuration("url"):
+            # Use provided URL (with potential placeholders)
+            url = self.get_configuration("url")
+            if self.data_context:
+                url = self.replace_placeholders(url)
+        else:
+            # Use the filter value as URL
+            url = str(self.get_value())
 
-        if self.get_configuration("iiif_resize"):
+        # Handle IIIF resize if specified
+        if self.get_configuration("iiif_resize") and url:
             url = url.replace(
                 "/full/0/default.",
-                f'/pct:{self.filter_configurations["iiif_resize"]}/0/default.',
+                f'/pct:{self.get_configuration("iiif_resize")}/0/default.',
             )
 
+        # Create the image element
         element = HTMLElement("img")
         element.add_attribute("src", url)
+
+        # Set default attributes
         element.add_attribute("class", "img-fluid")
-        element.add_attribute("alt", "Responsive image")
+        element.add_attribute("alt", "Image")
+
+        # Add optional attributes
+        if self.get_configuration("width"):
+            element.add_attribute("width", self.get_configuration("width"))
+
+        if self.get_configuration("height"):
+            element.add_attribute("height", self.get_configuration("height"))
+
+        if self.get_configuration("alt"):
+            element.add_attribute("alt", self.get_configuration("alt"))
+
+        if self.get_configuration("class"):
+            # Replace default class if custom class provided
+            element.add_attribute("class", self.get_configuration("class"))
+
+        if self.get_configuration("style"):
+            element.add_attribute("style", self.get_configuration("style"))
+
+        if self.get_configuration("title"):
+            element.add_attribute("title", self.get_configuration("title"))
 
         return str(element)
+
+    def replace_placeholders(self, url):
+        """Replace [variable] placeholders in the URL with actual values."""
+        import re
+        from ndr_core.utils import get_nested_value
+
+        # Find all [variable] patterns
+        placeholders = re.findall(r'\[([^\]]+)\]', url)
+
+        # Replace each placeholder with its value
+        for placeholder in placeholders:
+            try:
+                # Get the value from the data context
+                placeholder_value = get_nested_value(self.data_context, placeholder)
+                if placeholder_value is not None:
+                    # Handle arrays - take first element if it's a list
+                    if isinstance(placeholder_value, list) and len(placeholder_value) > 0:
+                        placeholder_value = placeholder_value[0]
+                    url = url.replace(f'[{placeholder}]', str(placeholder_value))
+                else:
+                    url = url.replace(f'[{placeholder}]', '')
+            except:
+                # If placeholder can't be resolved, remove it
+                url = url.replace(f'[{placeholder}]', '')
+
+        return url
 
 
 class DateFilter(AbstractFilter):
