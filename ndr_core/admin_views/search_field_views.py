@@ -58,11 +58,12 @@ def preview_search_form_image(request, img_config):
     for row in config_rows:
         config_row = row.split("~")
         if '' not in config_row:
-            field = NdrCoreSearchField.objects.get(pk=config_row[3])
+            field = NdrCoreSearchField.objects.get(pk=config_row[0])
             data.append({
-                'row': int(config_row[0]),
-                'col': int(config_row[1]),
-                'size': int(config_row[2]),
+                'row': int(config_row[1]),
+                'col': int(config_row[2]),
+                'colspan': int(config_row[3]),
+                'rowspan': int(config_row[4]),
                 'text': field.field_label,
                 'type': field.field_type})
     image_data = PreviewImage().create_search_form_image_from_raw_data(data)

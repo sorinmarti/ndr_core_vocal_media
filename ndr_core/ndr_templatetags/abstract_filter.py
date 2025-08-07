@@ -51,6 +51,7 @@ class AbstractFilter(ABC):
                 attribute not in self.allowed_attributes()
                 and attribute not in self.needed_attributes()
                 and attribute not in self.needed_options()
+                and attribute != "default"  # Allow default parameter for all filters
             ):
                 raise ValueError(
                     f"Filter {self.filter_name} does not allow attribute {attribute}."
@@ -69,6 +70,10 @@ class AbstractFilter(ABC):
         except AttributeError:
             return None
         return value
+    
+    def get_default_value(self):
+        """Returns the default value if configured."""
+        return self.get_configuration("default")
 
     @staticmethod
     def replace_key_values(value):

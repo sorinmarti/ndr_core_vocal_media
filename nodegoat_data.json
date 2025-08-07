@@ -1,0 +1,954 @@
+{
+    "info": "Welcome to the nodegoat Data API. For more information visit https://documentation.nodegoat.net/API.",
+    "timestamp": "2025-08-06T08:58:53+00:00",
+    "authenticated": true,
+    "data": {
+        "objects": {
+            "12051267": {
+                "object": {
+                    "nodegoat_id": "ngBI6r78mDIN9CoF2CU52qIKyCbYrNIsoDF",
+                    "type_id": 11679,
+                    "object_id": 12051267,
+                    "object_name": "Otto Horn",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Horn",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169489": {
+                        "object_sub": {
+                            "object_sub_id": 18169489,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 12016978,
+                                "object_sub_definition_value": "D.S.B.",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 12041458,
+                                "object_sub_definition_value": "Oberregistrator",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051340": {
+                "object": {
+                    "nodegoat_id": "ngAH4E08lCRMlBny5BJ81pHXxBUXqMHFnCO",
+                    "type_id": 11679,
+                    "object_id": 12051340,
+                    "object_name": "Otto Baumgärtner",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Baumgärtner",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169585": {
+                        "object_sub": {
+                            "object_sub_id": 18169585,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051356": {
+                "object": {
+                    "nodegoat_id": "ngQX5C68bRXC8RdE1QJ47fXJnRqNgCXDdRU",
+                    "type_id": 11679,
+                    "object_id": 12051356,
+                    "object_name": "Otto Weisser",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Weisser",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169617": {
+                        "object_sub": {
+                            "object_sub_id": 18169617,
+                            "object_sub_details_id": 12323,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": "{\"type\": \"Point\", \"coordinates\": [8.05238, 47.56214]}",
+                            "object_sub_location_geometry_ref_object_id": 11876517,
+                            "object_sub_location_geometry_ref_type_id": 11682,
+                            "object_sub_location_ref_object_id": 11876517,
+                            "object_sub_location_ref_type_id": 11682,
+                            "object_sub_location_ref_object_sub_details_id": 12326,
+                            "object_sub_location_ref_object_name": "Rhina",
+                            "object_sub_location_type": "reference",
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": []
+                    },
+                    "18169618": {
+                        "object_sub": {
+                            "object_sub_id": 18169618,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051381": {
+                "object": {
+                    "nodegoat_id": "ngPW8f18aPmB5QcT6Q295eWYmQpMfBWgcPj",
+                    "type_id": 11679,
+                    "object_id": 12051381,
+                    "object_name": "Otto Schiess",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Schiess",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169649": {
+                        "object_sub": {
+                            "object_sub_id": 18169649,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051382": {
+                "object": {
+                    "nodegoat_id": "ngQX8g28bQnC6Rdo7QJ02fXVnRKNgCXhdQk",
+                    "type_id": 11679,
+                    "object_id": 12051382,
+                    "object_name": "Otto Laule",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Laule",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169650": {
+                        "object_sub": {
+                            "object_sub_id": 18169650,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051388": {
+                "object": {
+                    "nodegoat_id": "ngWD8O88hWNIgXjW3YP6ilDLtYQS8IFhjWA",
+                    "type_id": 11679,
+                    "object_id": 12051388,
+                    "object_name": "Otto Thomann",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Thomann",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169656": {
+                        "object_sub": {
+                            "object_sub_id": 18169656,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051391": {
+                "object": {
+                    "nodegoat_id": "ngZG9x18kAmLmAmD6BI95oGMwATWpLGymAj",
+                    "type_id": 11679,
+                    "object_id": 12051391,
+                    "object_name": "Otto Kern",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Kern",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169659": {
+                        "object_sub": {
+                            "object_sub_id": 18169659,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876533,
+                                "object_sub_definition_value": "Passivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051415": {
+                "object": {
+                    "nodegoat_id": "ngBI1J58mByN0CoN0C63mqIOyMVX6NIYoDF",
+                    "type_id": 11679,
+                    "object_id": 12051415,
+                    "object_name": "Otto Bossert",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Bossert",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169702": {
+                        "object_sub": {
+                            "object_sub_id": 18169702,
+                            "object_sub_details_id": 12319,
+                            "object_sub_date_start": "1908-03-27",
+                            "object_sub_date_end": "1908-03-27",
+                            "object_sub_date_chronology": "{\"type\":\"point\",\"span\":{\"period_amount\":0,\"period_unit\":null,\"cycle_object_id\":0},\"start\":{\"start\":{\"offset_amount\":0,\"offset_unit\":null,\"cycle_object_id\":0,\"cycle_direction\":null,\"date_value\":\"1908-03-27\",\"date_object_sub_id\":null,\"date_direction\":\"\"}}}",
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": []
+                    },
+                    "18169703": {
+                        "object_sub": {
+                            "object_sub_id": 18169703,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876532,
+                                "object_sub_definition_value": "Aktivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051422": {
+                "object": {
+                    "nodegoat_id": "ngIP2I28tIPU5Jvc7Ih02xPdfICFyUPJvIM",
+                    "type_id": 11679,
+                    "object_id": 12051422,
+                    "object_name": "Otto Lüthy",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Lüthy",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169717": {
+                        "object_sub": {
+                            "object_sub_id": 18169717,
+                            "object_sub_details_id": 12319,
+                            "object_sub_date_start": "1904-03-29",
+                            "object_sub_date_end": "1904-03-29",
+                            "object_sub_date_chronology": "{\"type\":\"point\",\"span\":{\"period_amount\":0,\"period_unit\":null,\"cycle_object_id\":0},\"start\":{\"start\":{\"offset_amount\":0,\"offset_unit\":null,\"cycle_object_id\":0,\"cycle_direction\":null,\"date_value\":\"1904-03-29\",\"date_object_sub_id\":null,\"date_direction\":\"\"}}}",
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": []
+                    },
+                    "18169718": {
+                        "object_sub": {
+                            "object_sub_id": 18169718,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876532,
+                                "object_sub_definition_value": "Aktivmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051438": {
+                "object": {
+                    "nodegoat_id": "ngYF3G88jYPKkZlU3YH62nFpvYyVoKFHlYM",
+                    "type_id": 11679,
+                    "object_id": 12051438,
+                    "object_name": "Otto Bolliger",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:21:06Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Bolliger",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169749": {
+                        "object_sub": {
+                            "object_sub_id": 18169749,
+                            "object_sub_details_id": 12319,
+                            "object_sub_date_start": "1877-05-24",
+                            "object_sub_date_end": "1877-05-24",
+                            "object_sub_date_chronology": "{\"type\":\"point\",\"span\":{\"period_amount\":0,\"period_unit\":null,\"cycle_object_id\":0},\"start\":{\"start\":{\"offset_amount\":0,\"offset_unit\":null,\"cycle_object_id\":0,\"cycle_direction\":null,\"date_value\":\"1877-05-24\",\"date_object_sub_id\":null,\"date_direction\":\"\"}}}",
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": []
+                    },
+                    "18169750": {
+                        "object_sub": {
+                            "object_sub_id": 18169750,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": "1922",
+                            "object_sub_date_end": "1922",
+                            "object_sub_date_chronology": "{\"type\":\"period\",\"span\":{\"period_amount\":0,\"period_unit\":null,\"cycle_object_id\":0},\"start\":{\"start\":{\"offset_amount\":0,\"offset_unit\":null,\"cycle_object_id\":0,\"cycle_direction\":null,\"date_value\":\"1922\",\"date_object_sub_id\":null,\"date_direction\":null}},\"end\":{\"end\":{\"offset_amount\":0,\"offset_unit\":null,\"cycle_object_id\":0,\"cycle_direction\":null,\"date_value\":\"1922\",\"date_object_sub_id\":null,\"date_direction\":null}}}",
+                            "object_sub_location_geometry": null,
+                            "object_sub_location_geometry_ref_object_id": null,
+                            "object_sub_location_geometry_ref_type_id": null,
+                            "object_sub_location_ref_object_id": 0,
+                            "object_sub_location_ref_type_id": 0,
+                            "object_sub_location_ref_object_sub_details_id": 0,
+                            "object_sub_location_ref_object_name": "",
+                            "object_sub_location_type": null,
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 11876504,
+                                "object_sub_definition_value": "Männerchor Murg",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 11876523,
+                                "object_sub_definition_value": "Ehrenmitglied",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            },
+            "12051462": {
+                "object": {
+                    "nodegoat_id": "ngWD6E28hWDIhXjE7WP0ilDrtYQTmIDFjWA",
+                    "type_id": 11679,
+                    "object_id": 12051462,
+                    "object_name": "Otto Ganter",
+                    "object_name_plain": null,
+                    "object_name_style": [],
+                    "object_sources": [],
+                    "object_style": [],
+                    "object_state": "",
+                    "object_dating": "2025-07-30T09:54:32Z"
+                },
+                "object_definitions": {
+                    "34189": {
+                        "object_description_id": 34189,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Otto",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34191": {
+                        "object_description_id": 34191,
+                        "object_definition_ref_object_id": null,
+                        "object_definition_value": "Ganter",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    },
+                    "34531": {
+                        "object_description_id": 34531,
+                        "object_definition_ref_object_id": 12018278,
+                        "object_definition_value": "Männlich",
+                        "object_definition_sources": [],
+                        "object_definition_style": []
+                    }
+                },
+                "object_subs": {
+                    "18169823": {
+                        "object_sub": {
+                            "object_sub_id": 18169823,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": "{\"type\": \"Point\", \"coordinates\": [8.018540299136687, 47.55349733754515]}",
+                            "object_sub_location_geometry_ref_object_id": 11876503,
+                            "object_sub_location_geometry_ref_type_id": 11682,
+                            "object_sub_location_ref_object_id": 11876503,
+                            "object_sub_location_ref_type_id": 11682,
+                            "object_sub_location_ref_object_sub_details_id": 12326,
+                            "object_sub_location_ref_object_name": "Murg",
+                            "object_sub_location_type": "reference",
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 12016964,
+                                "object_sub_definition_value": "NSDAP",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 12018211,
+                                "object_sub_definition_value": "Ortsgruppenleiter",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    },
+                    "18169824": {
+                        "object_sub": {
+                            "object_sub_id": 18169824,
+                            "object_sub_details_id": 12328,
+                            "object_sub_date_start": 0,
+                            "object_sub_date_end": 0,
+                            "object_sub_date_chronology": null,
+                            "object_sub_location_geometry": "{\"type\": \"Point\", \"coordinates\": [8.018540299136687, 47.55349733754515]}",
+                            "object_sub_location_geometry_ref_object_id": 11876503,
+                            "object_sub_location_geometry_ref_type_id": 11682,
+                            "object_sub_location_ref_object_id": 11876503,
+                            "object_sub_location_ref_type_id": 11682,
+                            "object_sub_location_ref_object_sub_details_id": 12326,
+                            "object_sub_location_ref_object_name": "Murg",
+                            "object_sub_location_type": "reference",
+                            "object_sub_sources": [],
+                            "object_sub_style": [],
+                            "object_sub_state": ""
+                        },
+                        "object_sub_definitions": {
+                            "9723": {
+                                "object_sub_description_id": 9723,
+                                "object_sub_definition_ref_object_id": 12016964,
+                                "object_sub_definition_value": "NSDAP",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            },
+                            "9721": {
+                                "object_sub_description_id": 9721,
+                                "object_sub_definition_ref_object_id": 12018211,
+                                "object_sub_definition_value": "Ortsgruppenleiter",
+                                "object_sub_definition_sources": [],
+                                "object_sub_definition_style": []
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

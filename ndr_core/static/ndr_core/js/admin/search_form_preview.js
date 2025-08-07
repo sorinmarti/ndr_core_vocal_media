@@ -15,6 +15,7 @@ function init_search_form_preview(imageBaseUrl) {
        result_field_config_row_stub,
        row_field_id,
        column_field_id,
+       null,
        size_field_id,
        add_button_id,
        remove_button_id);

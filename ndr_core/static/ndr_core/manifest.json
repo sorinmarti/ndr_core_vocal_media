@@ -1,0 +1,363 @@
+
+
+{
+   "metadata" : [
+      {
+         "label" : "Publication Date",
+         "value" : "1836"
+      }
+   ],
+   "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/manifest",
+   "description" : "Bound folio Wöchentliche Nachrichten aus dem Bericht-Haus zu Basel (1836)",
+   "sequences" : [
+      {
+         "label" : "Current Page Order",
+         "@type" : "sc:Sequence",
+         "startCanvas" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0003.tif",
+         "viewingDirection" : "left-to-right",
+         "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/sequence/default",
+         "canvases" : [
+            {
+               "height" : 5998,
+               "width" : 4925,
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0445.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "images" : [
+                  {
+                     "resource" : {
+                        "height" : 5998,
+                        "width" : 4925,
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0445.tif"
+                        },
+                        "@type" : "dctypes:Image",
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0445.tif/full/full/0/default.png"
+                     },
+                     "motivation" : "sc:painting",
+                     "@type" : "oa:Annotation",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0445.tif"
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0445.tif"
+            },
+            {
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0446.tif",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0446.tif",
+                     "resource" : {
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0446.tif"
+                        },
+                        "width" : 4988,
+                        "height" : 6025,
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0446.tif/full/full/0/default.png",
+                        "format" : "image/tiff",
+                        "@type" : "dctypes:Image"
+                     },
+                     "motivation" : "sc:painting",
+                     "@type" : "oa:Annotation",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json"
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0446.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "height" : 6025,
+               "width" : 4988
+            },
+            {
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0447.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0447.tif",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "motivation" : "sc:painting",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0447.tif"
+                        },
+                        "height" : 6005,
+                        "width" : 4942,
+                        "@type" : "dctypes:Image",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0447.tif/full/full/0/default.png",
+                        "format" : "image/tiff"
+                     }
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0447.tif",
+               "width" : 4942,
+               "height" : 6005
+            },
+            {
+               "width" : 4946,
+               "height" : 5975,
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0448.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0448.tif",
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0448.tif/full/full/0/default.png",
+                        "@type" : "dctypes:Image",
+                        "width" : 4946,
+                        "height" : 5975,
+                        "service" : {
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0448.tif",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "profile" : "http://iiif.io/api/image/2/level1.json"
+                        }
+                     }
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0448.tif"
+            },
+            {
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0449.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "images" : [
+                  {
+                     "resource" : {
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0449.tif/full/full/0/default.png",
+                        "format" : "image/tiff",
+                        "@type" : "dctypes:Image",
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0449.tif"
+                        },
+                        "width" : 5101,
+                        "height" : 6236
+                     },
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "@type" : "oa:Annotation",
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0449.tif"
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0449.tif",
+               "width" : 5101,
+               "height" : 6236
+            },
+            {
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "@type" : "sc:Canvas",
+               "images" : [
+                  {
+                     "resource" : {
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0450.tif"
+                        },
+                        "width" : 4966,
+                        "height" : 5956,
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0450.tif/full/full/0/default.png",
+                        "format" : "image/tiff",
+                        "@type" : "dctypes:Image"
+                     },
+                     "@type" : "oa:Annotation",
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0450.tif"
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0450.tif",
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0450.tif",
+               "width" : 4966,
+               "height" : 5956
+            },
+            {
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "@type" : "sc:Canvas",
+               "label" : "BAU_1_000178563_1836_0451.tif",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0451.tif",
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0451.tif/full/full/0/default.png",
+                        "format" : "image/tiff",
+                        "@type" : "dctypes:Image",
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0451.tif",
+                           "@context" : "http://iiif.io/api/image/2/context.json"
+                        },
+                        "height" : 5999,
+                        "width" : 4940
+                     }
+                  }
+               ],
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0451.tif",
+               "height" : 5999,
+               "width" : 4940
+            },
+            {
+               "height" : 5961,
+               "width" : 4954,
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0452.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "label" : "BAU_1_000178563_1836_0452.tif",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0452.tif",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "motivation" : "sc:painting",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "@type" : "dctypes:Image",
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0452.tif/full/full/0/default.png",
+                        "height" : 5961,
+                        "width" : 4954,
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0452.tif"
+                        }
+                     }
+                  }
+               ]
+            },
+            {
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0453.tif",
+                     "resource" : {
+                        "service" : {
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0453.tif",
+                           "profile" : "http://iiif.io/api/image/2/level1.json"
+                        },
+                        "height" : 6251,
+                        "width" : 5016,
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0453.tif/full/full/0/default.png",
+                        "format" : "image/tiff",
+                        "@type" : "dctypes:Image"
+                     },
+                     "motivation" : "sc:painting",
+                     "@type" : "oa:Annotation",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json"
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0453.tif",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "@type" : "sc:Canvas",
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0453.tif",
+               "height" : 6251,
+               "width" : 5016
+            },
+            {
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0454.tif",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0454.tif",
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0454.tif/full/full/0/default.png",
+                        "@type" : "dctypes:Image",
+                        "width" : 4947,
+                        "height" : 5959,
+                        "service" : {
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0454.tif",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "profile" : "http://iiif.io/api/image/2/level1.json"
+                        }
+                     }
+                  }
+               ],
+               "label" : "BAU_1_000178563_1836_0454.tif",
+               "@type" : "sc:Canvas",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "height" : 5959,
+               "width" : 4947
+            },
+            {
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0455.tif",
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "@type" : "sc:Canvas",
+               "label" : "BAU_1_000178563_1836_0455.tif",
+               "images" : [
+                  {
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0455.tif",
+                     "resource" : {
+                        "@type" : "dctypes:Image",
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0455.tif/full/full/0/default.png",
+                        "width" : 4887,
+                        "height" : 6000,
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0455.tif",
+                           "@context" : "http://iiif.io/api/image/2/context.json"
+                        }
+                     },
+                     "@type" : "oa:Annotation",
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json"
+                  }
+               ],
+               "width" : 4887,
+               "height" : 6000
+            },
+            {
+               "width" : 4947,
+               "height" : 5960,
+               "label" : "BAU_1_000178563_1836_0456.tif",
+               "images" : [
+                  {
+                     "motivation" : "sc:painting",
+                     "@context" : "http://iiif.io/api/presentation/2/context.json",
+                     "@type" : "oa:Annotation",
+                     "resource" : {
+                        "@type" : "dctypes:Image",
+                        "format" : "image/tiff",
+                        "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0456.tif/full/full/0/default.png",
+                        "height" : 5960,
+                        "width" : 4947,
+                        "service" : {
+                           "profile" : "http://iiif.io/api/image/2/level1.json",
+                           "@context" : "http://iiif.io/api/image/2/context.json",
+                           "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97:BAU_1_000178563_1836_0456.tif"
+                        }
+                     },
+                     "on" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0456.tif"
+                  }
+               ],
+               "@context" : "http://iiif.io/api/presentation/2/context.json",
+               "@type" : "sc:Canvas",
+               "@id" : "https://avisblatt.dg-basel.hasdai.org/api/iiif/record:zzwee-5yt97/canvas/BAU_1_000178563_1836_0456.tif"
+            }
+         ],
+         "viewingHint" : "paged"
+      }
+   ],
+   "label" : "Wöchentliche Nachrichten aus dem Bericht-Haus zu Basel (1836), issue 48",
+   "@type" : "sc:Manifest",
+   "@context" : "http://iiif.io/api/presentation/2/context.json"
+}

@@ -1,0 +1,87 @@
+[
+    {
+        "meta": {
+            "dossier": "102",
+            "page": "002",
+            "image_id": "Akte_102_S002.jpg",
+            "transkribus_id": "6489805",
+            "document_type": "Zeitungsartikel"
+        },
+        "content": {
+            "transcription": "Die Volksstimme, 2. Februar 1919, S. 2"
+        },
+        "ner": {
+            "persons": [
+                {
+                    "transcription": "Petir Muster",
+                    "identifier": {
+                        "id": "sdfsl345iu3h45u3h45i3u4",
+                        "type": "nodegoat"
+                    },
+                    "label": "Muster, Peter",
+                    "mention_type": "author"
+                }
+            ],
+            "places": [],
+            "organizations": [],
+            "events": [],
+            "dates": []
+        },
+        "display": {
+            "iiif": "http://localhost:8182/iiif/2/Akte_102_S002.jpg/full/full/0/default.jpg"
+        },
+        "tags": [
+            "hist",
+            "ns",
+            "news",
+            "finances",
+            "health",
+            "choir",
+            "social",
+            "death"
+        ]
+    },
+    {
+        "meta": {
+            "dossier": "116",
+            "nodegoat_id": "6489803",
+            "page": "001",
+            "image_id": "Akte_116_S001.jpg",
+            "transkribus_id": "6489803",
+            "document_type": "Brief",
+            "image_exists": false
+        },
+        "attributes": {},
+        "display": {
+            "iiif": "http://localhost:8182/iiif/2/Akte_116_S001.jpg/full/full/0/default.jpg"
+        },
+        "tags": [
+            "personal",
+            "hist",
+            "choir",
+            "club",
+            "environment"
+        ]
+    },
+    {
+        "meta": {
+            "dossier": "109",
+            "nodegoat_id": "6489804",
+            "page": "001",
+            "image_id": "Akte_109_S001.jpg",
+            "transkribus_id": "6489804",
+            "document_type": "Brief",
+            "image_exists": false
+        },
+        "attributes": {},
+        "display": {
+            "iiif": "http://localhost:8182/iiif/2/Akte_109_S001.jpg/full/full/0/default.jpg"
+        },
+        "tags": [
+            "personal",
+            "finances",
+            "hist",
+            "club"
+        ]
+    }
+]

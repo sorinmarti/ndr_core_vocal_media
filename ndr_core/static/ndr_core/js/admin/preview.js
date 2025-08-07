@@ -21,10 +21,14 @@ function getMaskedUrl(baseUrl, dropdown_field_id, field_count=20,
     for (let i = 0; i < field_count; i++) {
         let row_field =  $(row_field_id + '_' +i);
         let column_field =  $(column_field_id + '_' +i);
-        let row_span_field =  $(row_span_field_id + '_' +i);
+        let row_span_field_value = '1';
+        if(row_span_field_id!=null) {
+            let row_span_field = $(row_span_field_id + '_' + i);
+            row_span_field_value = row_span_field.val();
+        }
         let col_span_field =  $(col_span_field_id + '_' +i);
         let dropdown_field = $(dropdown_field_id+'_'+i);
-        data_array[i]=dropdown_field.val()+"~"+row_field.val()+"~"+column_field.val()+"~"+col_span_field.val()+"~"+row_span_field.val()+"~normal";
+        data_array[i]=dropdown_field.val()+"~"+row_field.val()+"~"+column_field.val()+"~"+col_span_field.val()+"~"+row_span_field_value+"~normal";
     }
     return baseUrl.replace("image_string", data_array);
 }

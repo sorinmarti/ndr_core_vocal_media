@@ -78,12 +78,16 @@ class NodegoatResult(BaseResult):
                 object_sub = sub_data.get("object_sub", {})
                 object_sub_details_id = str(object_sub.get("object_sub_details_id", ""))
 
+                # Process geometry data
+                geometry_raw = object_sub.get("object_sub_location_geometry", "")
+                geometry_data = self.parse_geometry_data(geometry_raw)
+                
                 # Create the cleaned sub-object
                 clean_object_sub = {
                     "object_sub_id": object_sub.get("object_sub_id"),
                     "start": object_sub.get("object_sub_date_start", ""),
                     "end": object_sub.get("object_sub_date_end", ""),
-                    "geometry": object_sub.get("object_sub_location_geometry", ""),
+                    "geometry": geometry_data,
                     "location": object_sub.get("object_sub_location_ref_object_name", ""),
                     "object_sub_definitions": {}
                 }
@@ -109,6 +113,62 @@ class NodegoatResult(BaseResult):
             cleaned_results.append(clean_result)
 
         return cleaned_results
+
+    def parse_geometry_data(self, geometry_raw):
+        """Parses geometry data from JSON string to a more readable format."""
+        if not geometry_raw or geometry_raw == "":
+            return {
+                "type": None,
+                "coordinates": None,
+                "latitude": None,
+                "longitude": None,
+                "raw": geometry_raw
+            }
+        
+        try:
+            # Parse the JSON string
+            geometry_json = json.loads(geometry_raw)
+            geometry_type = geometry_json.get("type")
+            coordinates = geometry_json.get("coordinates", [])
+            
+            # Extract readable coordinates based on geometry type
+            if geometry_type == "Point" and len(coordinates) == 2:
+                longitude, latitude = coordinates
+                return {
+                    "type": geometry_type,
+                    "coordinates": coordinates,
+                    "longitude": longitude,
+                    "latitude": latitude,
+                    "raw": geometry_raw
+                }
+            elif geometry_type in ["LineString", "Polygon", "MultiPoint", "MultiLineString", "MultiPolygon"]:
+                # For complex geometries, just provide the parsed JSON with raw backup
+                return {
+                    "type": geometry_type,
+                    "coordinates": coordinates,
+                    "latitude": None,
+                    "longitude": None,
+                    "raw": geometry_raw
+                }
+            else:
+                # Unknown geometry type, return parsed JSON with raw backup
+                return {
+                    "type": geometry_type,
+                    "coordinates": coordinates,
+                    "latitude": None,
+                    "longitude": None,
+                    "raw": geometry_raw
+                }
+        
+        except (json.JSONDecodeError, TypeError, ValueError):
+            # If parsing fails, return the raw data with error indication
+            return {
+                "type": "parse_error",
+                "coordinates": None,
+                "latitude": None,
+                "longitude": None,
+                "raw": geometry_raw
+            }
 
     def fill_search_result_meta_data(self):
         """Fills the search result metadata. In the download_result method, the raw result is created and the

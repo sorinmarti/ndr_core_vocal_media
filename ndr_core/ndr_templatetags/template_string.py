@@ -85,16 +85,6 @@ class TemplateStringVariable:
         else:
             self.variable = variable
 
-        # Temporary debug - remove this later
-        self.debug_parsing()
-
-    def debug_parsing(self):
-        """Debug method to see how filters are being parsed."""
-        print(f"Raw variable: {self.raw_variable}")
-        print(f"Variable name: {self.variable}")
-        print(f"Filters: {self.value_filters}")
-        print(f"Filter configs: {self.filter_configurations}")
-        print("---")
 
     def _split_filter_with_quotes(self, text, delimiter):
         """Split text by delimiter, but respect quoted strings."""
@@ -247,7 +237,6 @@ class TemplateString:
         """Initializes the TemplateString class.
         Parses the string and extracts the variables.
         Raises a ValueError if the string is malformed."""
-        print("Problem:", string, data, show_errors)
 
         if string is not None:
             self.string = html.unescape(string)
@@ -295,14 +284,31 @@ class TemplateString:
                 if isinstance(data, list):
                     data = self.join_list(variable, data)
                 formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", str(data))
-            except IndexError as e:
-                formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", self.get_error(e))
-            except KeyError as e:
-                formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", self.get_error(e))
+            except (IndexError, KeyError) as e:
+                # Check if any filter has a default value
+                default_value = self.get_default_value_from_variable(variable)
+                if default_value is not None:
+                    # Apply filters to the default value if there are any
+                    if len(variable.value_filters) > 0:
+                        try:
+                            default_value = variable.apply_filters(default_value, self.data)
+                        except Exception:
+                            # If filter fails on default value, use raw default
+                            pass
+                    formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", str(default_value))
+                else:
+                    formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", self.get_error(e))
             except ValueError as e:
                 formatted_string = formatted_string.replace(f"{{{variable.raw_variable}}}", self.get_error(e))
 
         return mark_safe(formatted_string)
+
+    def get_default_value_from_variable(self, variable):
+        """Check if any filter in the variable has a default value configured."""
+        for filter_config in variable.filter_configurations:
+            if 'default' in filter_config:
+                return filter_config['default']
+        return None
 
     @staticmethod
     def join_list(variable, data):

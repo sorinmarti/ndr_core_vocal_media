@@ -1,0 +1,21 @@
+You will be presented a german text from the first half of the 20th century. All the texts are from the same male singing club. I want to create a list of topical tags. Named Entities and document types are extracted in a different workflow and I am only interested in discussed topics. The following CSV-formatted list shows the available tags:
+
+id;label;detailed_tags
+club;Club Administration & Governance;club life,club management,club administration,general meeting,general assembly,invitation,organization,data collection,activity,report,conflict,internal affairs,draft,absence,discipline,dispute,apology
+hist;Historical & Political Context;war,world war ii,home front,military,eastern front,conscription,politics,war memory
+ns;NS-Tags;nazism,national socialism,vda,propaganda,Party rally,Rally
+choir;Choir Activities & Performances;concert,rehearsal,performance,choir performances,Serenade,cinema,movie,singing
+social;Social & Cultural Events;excursion,travel,transportation,birthday,celebration,easter,christmas,postponement,film screening,wedding
+finances;Fundraising & Finances;fundraising,donation,choir finances,finances,charity,winterhilfswerk,sponsorship
+personal;Personal Correspondence & Emotions;personal correspondence,correspondence,love,longing,separation,poetry,memory,thank-you,friendship
+death;Death & Bereavement;death,obituary,funeral,tribute,memorial service,condolence letter,fallen comrades,fallen soldiers,war dead
+health;Health, Welfare & Social Support;social welfare,health,care package,support for soldiers,tobacco,comradeship,military hospital,field hospital
+news;Local & Institutional News;local news,company news,school,municipal bulletin
+environment;Environment & Miscellaneous;weather,infrastructure,street
+
+Note: The first column is the tag ID, the second column is the label, and the third column contains a comma-separated list of example topics in that group.
+You will be presented with a text that contains a transcription of a document.
+
+Your answer must be a parseable JSON array of strings, where each string is a topical tag relevant to the content of the document. The tags should be in lowercase and concise, capturing the essence of the topics discussed in the text.
+
+CONTEXT:
