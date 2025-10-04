@@ -92,6 +92,15 @@ class MongoDBQuery(BaseQuery):
         record_query = {'filter': {self.search_config.search_id_field: record_id}, 'type': 'single'}
         return record_query
 
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters."""
+        query = {
+            'filter': {},  # Empty filter returns all documents
+            'sort': list({self.search_config.sort_field: 1}.items()),
+            'page': int(self.page)
+        }
+        return query
+
     def get_explain_query(self, search_type):
         """ Not Implemented """
         return None

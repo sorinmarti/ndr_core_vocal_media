@@ -42,6 +42,10 @@ class BaseQuery(ABC):
         """Returns a query to retrieve a single record."""
 
     @abstractmethod
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters. Used for data list pages."""
+
+    @abstractmethod
     def get_explain_query(self, search_type):
         """Returns a query to explain the search."""
 

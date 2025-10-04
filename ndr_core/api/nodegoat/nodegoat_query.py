@@ -60,6 +60,18 @@ class NodegoatQuery(BaseQuery):
         record_query = None
         return record_query
 
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters."""
+        query = self.search_config.api_connection_url
+        query += '/object?'
+
+        if add_page_and_size:
+            query += f'limit={self.search_config.page_size}&offset=' + str((self.page - 1) * self.search_config.page_size)
+        else:
+            query += 'limit=100&offset=0'
+
+        return query
+
     def get_explain_query(self, search_type):
         """ Not Implemented """
         return None

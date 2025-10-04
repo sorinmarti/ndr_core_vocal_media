@@ -622,6 +622,9 @@ class NdrCorePage(TranslatableMixin, models.Model):
         SEARCH = 3, "Search Page"
         """A search page features a configured search form which contains a number of search fields"""
 
+        DATA_LIST = 4, "Data List Page"
+        """A data list page displays a list of data entries."""
+
         CONTACT = 5, "Contact Form"
         """A contact from page displays a form to send a message to the project team"""
 

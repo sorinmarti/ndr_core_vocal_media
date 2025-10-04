@@ -22,6 +22,10 @@ class ApiNinjasQuery(BaseQuery):
         """ Not Implemented """
         return None
 
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters. Not Implemented."""
+        return None
+
     def get_explain_query(self, search_type):
         """ Not Implemented """
         return None

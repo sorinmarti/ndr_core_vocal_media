@@ -82,6 +82,13 @@ class PageForm(forms.ModelForm):
             if search_configs.count() == 0:
                 msg = "You must provide at least one Search configuration for Search pages."
                 self.add_error('search_configs', msg)
+        elif page_type == NdrCorePage.PageType.DATA_LIST:
+            if search_configs.count() == 0:
+                msg = "You must provide exactly one Search configuration for Data List pages."
+                self.add_error('search_configs', msg)
+            elif search_configs.count() > 1:
+                msg = "You can only provide one Search configuration for Data List pages."
+                self.add_error('search_configs', msg)
         elif page_type == NdrCorePage.PageType.CONTACT:
             if NdrCorePage.objects.filter(page_type=NdrCorePage.PageType.CONTACT).count() > 0:
                 if self.instance.pk is None:

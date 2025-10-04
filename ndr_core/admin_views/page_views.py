@@ -228,6 +228,8 @@ def get_base_file_name(page_type):
         base_file = finders.find('ndr_core/app_init/template.html')
     elif page_type == NdrCorePage.PageType.SEARCH:
         base_file = finders.find('ndr_core/app_init/search.html')
+    elif page_type == NdrCorePage.PageType.DATA_LIST:
+        base_file = finders.find('ndr_core/app_init/data_list.html')
     elif page_type == NdrCorePage.PageType.CONTACT:
         base_file = finders.find('ndr_core/app_init/contact.html')
     elif page_type == NdrCorePage.PageType.FLIP_BOOK:

@@ -15,5 +15,9 @@ class SimpleAttrsQuery(BaseQuery):
     def get_record_query(self, record_id):
         pass
 
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters. Not Implemented."""
+        pass
+
     def get_explain_query(self, search_type):
         pass

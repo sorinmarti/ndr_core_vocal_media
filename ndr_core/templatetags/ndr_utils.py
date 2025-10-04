@@ -10,6 +10,43 @@ from ndr_core.ndr_templatetags.template_string import TemplateString
 
 register = template.Library()
 
+@register.tag(name="render_data_list")
+def render_data_list_tag(parser, token):
+    """Renders a result object. The token is expected to be in the following format:
+    {% render_result result search_config result_card_group %}"""
+    token_list = token.split_contents()
+    return RenderDataListNode(token_list[1], token_list[2])
+
+class RenderDataListNode(template.Node):
+    """Renders a result object."""
+
+    def __init__(self, result, search_config):
+        self.result = template.Variable(result)
+        self.search_config = template.Variable(search_config)
+
+    def create_entry(self, context, result):
+        """Creates a result card."""
+
+        card_context = {
+            "result": result,
+            "card_content": result["data"],
+        }
+        card_template = "ndr_core/result_renderers/data_list_template.html"
+
+        card_template_str = get_template(card_template).render(card_context)
+        return mark_safe(card_template_str)
+
+    def render(self, context):
+        """Renders a result object."""
+        result_object = self.result.resolve(context)
+        conf = self.search_config.resolve(context)
+
+        html_string = ""
+        for result in result_object.results:
+                html_string += self.create_entry(context, result)
+
+        return mark_safe(html_string)
+
 
 @register.tag(name="render_result")
 def render_result_tag(parser, token):

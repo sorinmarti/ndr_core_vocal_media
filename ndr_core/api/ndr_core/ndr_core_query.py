@@ -53,6 +53,10 @@ class NdrCoreQuery(BaseQuery):
         query += f"?id={record_id}"
         return query
 
+    def get_all_items_query(self, add_page_and_size=True):
+        """Returns a query to retrieve all items without filters. Not Implemented."""
+        return None
+
     def get_explain_query(self, search_type):
         if search_type == BaseQuery.Q_SIMPLE:
             query = self.get_simple_query(self.search_term, add_page_and_size=False)

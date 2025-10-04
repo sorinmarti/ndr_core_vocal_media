@@ -29,11 +29,12 @@ function setComponents(select_value) {
                 info_text.text('Creates a page with one or multiple custom search forms. You need to create these forms ' +
                                'before you can use this page type. Multiple forms are displayed in tabs.')
                 break;
-            case '4':   // Combined Search
+            case '4':   // Data List
                 search_configs.show();
-                template_text.hide();
-                info_text.text('Creates a page with tabs with a simple and a custom search form. Refer to the help pages ' +
-                               'on how to create search forms.')
+                template_text.show();
+                info_text.text('Creates a page that displays a paginated list of all items from a search configuration. ' +
+                               'The compact result card defines list items, the detailed card defines the detail view. ' +
+                               'Simple search fields define filters. Requires exactly one search configuration.')
                 break;
             case '7':   // Flip Book
                 search_configs.hide();

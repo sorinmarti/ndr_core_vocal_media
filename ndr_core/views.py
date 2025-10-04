@@ -42,6 +42,7 @@ def get_page_type_view_class(page_type):
     translator = {
         NdrCorePage.PageType.TEMPLATE: NdrTemplateView,
         NdrCorePage.PageType.SEARCH: SearchView,
+        NdrCorePage.PageType.DATA_LIST: DataListView,
         NdrCorePage.PageType.CONTACT: ContactView,
         NdrCorePage.PageType.FLIP_BOOK: FlipBookView,
         NdrCorePage.PageType.ABOUT_PAGE: AboutUsView,
@@ -413,6 +414,71 @@ class AboutUsView(_NdrCoreView):
 
         team_members = NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.PEOPLE)
         context['data'] = {'team_members': team_members}
+
+        return render(request, self.template_name, context)
+
+
+class DataListView(_NdrCoreSearchView):
+    """A view to display a paginated list of all items from a search configuration.
+    Uses compact result cards for list items, detailed cards for detail view,
+    and simple search fields for filters."""
+
+    form_class = AdvancedSearchForm
+
+    def get(self, request, *args, **kwargs):
+        """Display paginated list with optional filters."""
+        context = self.get_ndr_context_data()
+
+        # Get the single search config for this page
+        search_config = self.ndr_page.search_configs.first()
+
+        if not search_config:
+            messages.error(request, _('No search configuration found for this data list page.'))
+            return render(request, self.template_name, context)
+
+        # Initialize form for filters
+        form = self.form_class(ndr_page=self.ndr_page, search_config=search_config)
+
+        # Create API factory and query
+        api_factory = ApiFactory(search_config)
+        query_obj = api_factory.get_query_instance(page=request.GET.get("page", 1))
+
+        # Check if filters are applied from GET parameters
+        has_filters = False
+        if request.GET:
+            form = self.form_class(request.GET, ndr_page=self.ndr_page, search_config=search_config)
+            if form.is_valid():
+                for field in form.fields:
+                    if field.startswith(search_config.conf_name):
+                        actual_key = field[len(search_config.conf_name) + 1:]
+                        if form.cleaned_data.get(field) not in [None, '', []]:
+                            has_filters = True
+                            if search_config.search_form_fields.filter(search_field__field_name=actual_key).count() > 0:
+                                query_obj.set_value(actual_key, form.cleaned_data[field])
+                            elif actual_key.endswith('_condition'):
+                                query_obj.set_value(actual_key, form.cleaned_data[field])
+
+        # Get query string - use advanced query if filters, otherwise get all items
+        if has_filters:
+            query_string = query_obj.get_advanced_query()
+        else:
+            # Get all items - implementation depends on your API
+            query_string = query_obj.get_all_items_query()
+
+        # Create result object and load results
+        result = api_factory.get_result_instance(query_string, self.request)
+        print("Query String: ", query_string)
+        print("Result: ", result)
+        result.load_result()
+
+        # Add to context
+        context.update({
+            'form': form,
+            'search_config': search_config,
+            'result': result,
+            'result_card_group': 'compact',  # Always use compact view for list
+            'has_filters': has_filters,
+        })
 
         return render(request, self.template_name, context)
 
