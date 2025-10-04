@@ -35,3 +35,36 @@
           grid-row: auto;
       }
   }
+
+ .rc-scrollable-container {
+    max-height: 150vh; /* 25% of viewport height */
+    overflow-y: auto;
+    padding-right: 0.5rem; /* space so text isn't hidden by scrollbar */
+    scrollbar-width: none; /* hide by default in Firefox */
+}
+
+/* Show scrollbar only on hover */
+.rc-scrollable-container:hover {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* WebKit browsers (Chrome, Edge, Safari) - hide by default */
+.rc-scrollable-container::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+
+.rc-scrollable-container::-webkit-scrollbar-thumb {
+    background-color: transparent; /* hidden until hover */
+    border-radius: 4px;
+}
+
+/* On hover: show thumb */
+.rc-scrollable-container:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.rc-scrollable-container:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.35);
+}

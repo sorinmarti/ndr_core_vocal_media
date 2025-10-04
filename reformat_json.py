@@ -39,7 +39,7 @@ def send_prompt(document_text, execute=True):
     prompt_text += "\n" + document_text
 
     if not execute:
-        print(prompt_text)
+        #print(prompt_text)
         return '```json["tag1", "tag2", "tag3"]```'
 
     try:
@@ -48,18 +48,18 @@ def send_prompt(document_text, execute=True):
         )
 
         resulting_json_list_string = response.text
-        print(resulting_json_list_string)
+        # print(resulting_json_list_string)
         return resulting_json_list_string
 
     except Exception as e:
         print(f"Error generating content: {e}")
-        exit()
 
 
 ################################################################################
 # Load the Transkribus IDs from the CSV file
 df = pd.read_csv(TRANSKRIBUS_ID_FILE, sep=";")
 akte_to_transkribus = dict(zip(df["AkteNummer"].astype(str).str.zfill(3), df["Transkribus-ID"].astype(str)))
+akte_to_title = dict(zip(df["AkteNummer"].astype(str).str.zfill(3), df["Titel"].astype(str)))
 
 with open(INPUT_FILE, encoding='utf-8') as json_file:
     data = json.load(json_file)
@@ -74,20 +74,24 @@ for dossier_key, dossier_value in data.items():
         print("KEY ERROR:", dossier_key)
     # Dossier data entry is generally valid
     else:
+        print("Processing dossier:", raw_meta[2])
+
         # 1: Get dossier transcription
         page_transcriptions = []
         for page_key, page_value in dossier_value.items():
             page_transcriptions.append(page_value["content_transcription"])
         dossier_transcription = "\n".join(page_transcriptions)
+        print(">> Dossier transcription length:", len(dossier_transcription))
 
         # 2: Get Dossier tags
         tags = []
-        llm_tags = send_prompt(dossier_transcription, execute=True)
+        llm_tags = send_prompt(dossier_transcription, execute=False)
         match = re.search(r'```json\s*(\[.*?\])\s*```', llm_tags, re.DOTALL)
         if match:
             tags = json.loads(match.group(1))
         else:
             print("No valid JSON found.")
+        print(">> Tags extracted:", tags)
 
         # 3: Create the page object
         page_object = {"meta":{},
@@ -103,10 +107,12 @@ for dossier_key, dossier_value in data.items():
             image_id = f"Akte_{raw_meta[2]}_S{page_key}.jpg"
 
             page_object["meta"]["dossier"] = akte_nummer
-            page_object["meta"]["nodegoat_id"] = raw_meta[0]
+            page_object["meta"]["nodegoat_id"] = ""
             page_object["meta"]["page"] = page_key
             page_object["meta"]["image_id"] = image_id
             page_object["meta"]["transkribus_id"] = transkribus_id
+
+            page_object["attributes"]["title"] = akte_to_title.get(akte_nummer, "Unknown Title")
 
             page_object["display"]["iiif"] = f"http://localhost:8182/iiif/2/{image_id}/full/full/0/default.jpg"
 
@@ -114,7 +120,7 @@ for dossier_key, dossier_value in data.items():
                 page_object["meta"]["document_type"] = page_value["attributes"]["document_type"]
 
             # Check if the image exists in C:\Users\sorin\Downloads\iiif-images
-            image_path = f"C:\\Users\\sorin\\Downloads\\iiif-images\\{page_object['meta']['image_id']}"
+            image_path = f"C:\\Users\\sorin\\Pictures\\cantaloupe\\mmma\\{page_object['meta']['image_id']}"
             try:
                 with open(image_path, 'rb') as img_file:
                     page_object["meta"]["image_exists"] = True

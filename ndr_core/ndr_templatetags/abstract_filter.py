@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from django.utils.translation import get_language
-
+from ndr_core.utils import get_nested_value
 
 class AbstractFilter(ABC):
     """A class to represent a filter."""
@@ -51,7 +51,7 @@ class AbstractFilter(ABC):
                 attribute not in self.allowed_attributes()
                 and attribute not in self.needed_attributes()
                 and attribute not in self.needed_options()
-                and attribute != "default"  # Allow default parameter for all filters
+                and attribute not in ["default", "subfield", "limit"]  # Allow default, subfield, and limit parameters for all filters
             ):
                 raise ValueError(
                     f"Filter {self.filter_name} does not allow attribute {attribute}."
@@ -59,7 +59,18 @@ class AbstractFilter(ABC):
 
     def get_value(self):
         """Returns the formatted string."""
-        return self.value
+        value = self.value
+
+        # Handle subfield extraction for lists
+        subfield = self.get_configuration("subfield")
+        if subfield and isinstance(value, dict):
+            try:
+                nested_value = get_nested_value(value, subfield)
+                return str(nested_value)
+            except (KeyError, TypeError):
+                return value
+        
+        return value
 
     def get_configuration(self, name):
         """Returns the configuration value."""

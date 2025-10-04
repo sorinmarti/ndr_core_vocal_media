@@ -15,10 +15,9 @@ class SearchFieldForm(forms.ModelForm):
         """Initializes the form with the provided arguments."""
         super().__init__(*args, **kwargs)
 
-        """self.fields['list_choices'] = forms.CharField(widget=CSVTextEditorWidget(
-            attrs={'instance': kwargs.get('instance', None), 'type_field_id': 'id_field_type'}
-        ))""" # TODO This makes problems
-        self.fields['list_choices'] = forms.CharField()
+        self.fields['list_choices'] = forms.CharField(widget=CSVTextEditorWidget(
+            attrs={'instance': kwargs.get('instance', None), 'type_field_id': 'id_field_type'}),
+            help_text="key, value, value_{lang}, is_searchable, is_printable, info, info_{lang}")
 
     class Meta:
         """Configure the model form. Provide model class and form fields."""

@@ -70,24 +70,28 @@
                                     {% endfor %}
                                 </ul>
                             </div>
-                            <i class="fa-solid fa-globe" style="color: rgb(128,128,128);"></i>&nbsp;
 
-                            <ul class="nav navbar-nav navbar-right">
-                                {% get_current_language as LANGUAGE_CODE %}
-                                {% ndr_available_languages as LANGUAGES %}
-                                {% get_language_info_list for LANGUAGES as languages %}
-                                {% for language in languages %}
-                                    {% if language.code == LANGUAGE_CODE %}
-                                        <li>{{ language.code }}</li>
-                                    {% else %}
-                                        <li><a data-toggle="tooltip" data-placement="top" title="{{ language.name_local}}"
-                                               href="{% url 'ndr_core:set_language' language.code %}">{{ language.code }}</a> </li>
-                                    {% endif %}
-                                    {% if not forloop.last %}
-                                        <span style="margin-left: 2px; margin-right: 2px;">&#183;</span>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% ndr_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+
+                            {% if languages|length > 1 %}
+                                <i class="fa-solid fa-globe" style="color: rgb(128,128,128);"></i>&nbsp;
+
+                                <ul class="nav navbar-nav navbar-right">
+                                    {% for language in languages %}
+                                        {% if language.code == LANGUAGE_CODE %}
+                                            <li>{{ language.code }}</li>
+                                        {% else %}
+                                            <li><a data-toggle="tooltip" data-placement="top" title="{{ language.name_local}}"
+                                                   href="{% url 'ndr_core:set_language' language.code %}">{{ language.code }}</a> </li>
+                                        {% endif %}
+                                        {% if not forloop.last %}
+                                            <span style="margin-left: 2px; margin-right: 2px;">&#183;</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </nav>
 
                     <div class="collapse py-1 mb-2 ml-0 d-xl-none d-lg-none" id="links"> <!-- mobile - all other sizes -->

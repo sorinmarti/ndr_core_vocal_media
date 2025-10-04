@@ -3,7 +3,70 @@
         <div class="card-body">
             <h5 class="card-title">Result Rendering</h5>
             <p class="card-text">
-                Text not available yet.
+                NDR Core uses a powerful template system to display search results. You can use variables, filters, and parameters to format your data exactly how you want it.
+            </p>
+
+            <h6>Template Variables</h6>
+            <p class="card-text">
+                Variables are written in curly brackets: <code>{variable_name}</code><br>
+                For nested data use dots: <code>{object.nested.value}</code><br>
+                For arrays use index: <code>{list.0.item}</code>
+            </p>
+
+            <h6>Universal Parameters</h6>
+            <p class="card-text">
+                These parameters work with all filters:<br>
+                <strong>default:</strong> <code>{missing_key|filter:default=fallback_value}</code><br>
+                <strong>subfield:</strong> <code>{list_of_objects|filter:subfield=nested.field}</code><br>
+                <strong>limit:</strong> <code>{long_list|filter:limit=10}</code>
+            </p>
+
+            <h6>Available Filters</h6>
+
+            <h7>Text Filters</h7>
+            <p class="card-text">
+                <strong>String manipulation:</strong> <code>{text|upper}</code>, <code>{text|lower}</code>, <code>{text|title}</code>, <code>{text|capitalize}</code><br>
+                <strong>Text truncation:</strong> <code>{long_text|truncate:length=200,expandable=true,expand_text=Read more}</code><br>
+                <strong>Default values:</strong> <code>{missing_value|default:value=Not available}</code>
+            </p>
+
+            <h7>Visual Filters</h7>
+            <p class="card-text">
+                <strong>Badges:</strong> <code>{status|badge:color=primary}</code>, <code>{status|pill:color=success}</code><br>
+                <strong>Images:</strong> <code>{image_url|img:width=200,height=150,alt=Description}</code><br>
+                <strong>Images with placeholders:</strong> <code>{image_id|img:url="https://example.com/[image_id].jpg",default=No image}</code>
+            </p>
+
+            <h7>Interactive Filters</h7>
+            <p class="card-text">
+                <strong>Links:</strong> <code>{url|linkify:text=Click here}</code><br>
+                <strong>Links with placeholders:</strong> <code>{record_id|linkify:url="https://example.com/[record_id]",text=View details}</code><br>
+                <strong>Maps:</strong> <code>{coordinates|map:width=400px,height=300px,zoom=15}</code><br>
+                <strong>Maps with groups:</strong> <code>{object_subs|map:groups="Founded:12321:red,Work:12331:green"}</code><br>
+                <strong>Embedded content:</strong> <code>{embed_url|iframe:width=100%,height=400}</code>
+            </p>
+
+            <h7>Data Filters</h7>
+            <p class="card-text">
+                <strong>Booleans:</strong> <code>{is_active|bool:Yes,No}</code><br>
+                <strong>Dates:</strong> <code>{date_field|date:format=%Y-%m-%d}</code><br>
+                <strong>Numbers:</strong> <code>{price|format:decimal_places=2}</code><br>
+                <strong>Field templates:</strong> <code>{field_name|fieldify}</code>
+            </p>
+
+            <h6>Complex Examples</h6>
+            <p class="card-text">
+                <strong>List with subfields:</strong> <code>{author_list|badge:subfield=profile.name,limit=5}</code><br>
+                <strong>Multiple parameters:</strong> <code>{description|truncate:length=150,expandable=true,default=No description available}</code><br>
+                <strong>Map with legend:</strong> <code>{locations|map:width=600px,height=400px,groups="Founded:12321:red,Closed:12322:gray",legend=true}</code><br>
+                <strong>Image fallback:</strong> <code>{thumbnail_id|img:url="https://images.example.com/[thumbnail_id].jpg",width=150,default=<em>No image available</em>}</code>
+            </p>
+
+            <h6>Parameter Syntax</h6>
+            <p class="card-text">
+                Parameters are separated by commas: <code>{value|filter:param1=value1,param2=value2}</code><br>
+                Use quotes for complex values: <code>{data|filter:groups="Group1:key1:red,Group2:key2:blue"}</code><br>
+                Chain filters: <code>{text|upper|badge:color=primary}</code>
             </p>
         </div>
     </div>

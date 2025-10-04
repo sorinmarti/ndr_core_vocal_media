@@ -70,7 +70,7 @@
     }
 
     function parseCSV(csvString, separator) {
-        const validColumns = ["key", "value", "info", "is_searchable", "is_displayable", "condition"];
+        const validColumns = ["key", "value", "info", "is_searchable", "is_printable", "condition"];
         const validPatterns = [
             "value_[a-z]{2}", // Matches 'value_' followed by any two lowercase letters
             "info_[a-z]{2}" // Matches 'info_' followed by any two lowercase letters

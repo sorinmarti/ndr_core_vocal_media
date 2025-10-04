@@ -15,10 +15,11 @@ class ManifestSelectionForm(_NdrCoreForm):
 
     def __init__(self, *args, **kwargs):
         """Initialises the form fields. """
+        manifest_group = kwargs.pop('manifest_group')
         super().__init__(*args, **kwargs)
 
         self.fields['manifest'] = forms.ModelChoiceField(label=_('Manifest'),
-                                                         queryset=NdrCoreManifest.objects.all(),
+                                                         queryset=NdrCoreManifest.objects.filter(manifest_group=manifest_group),
                                                          required=True,
                                                          help_text=_('Choose the manifest to display.'),
                                                          widget=s2forms.Select2Widget())

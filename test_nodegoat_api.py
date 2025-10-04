@@ -8,8 +8,8 @@ url = "https://api.nodegoat.dasch.swiss/data/type/11679/?search=adolf&limit=10&o
 url = "https://api.nodegoat.dasch.swiss/data/type/11679/object?search=adolf&limit=10&offset=0&order=element:ASC"  # Success
 url = 'https://api.nodegoat.dasch.swiss/data/type/11679/object?filter={"form": {"filter_1": {"type_id": 11679, "object_definitions": {"34189": [{"equality": "=", "value": "Elise"}], "34531": [12018279]}}}}'  #
 
-url = "https://api.nodegoat.dasch.swiss/model/type/11680/"
-url = ' https://api.nodegoat.dasch.swiss/data/type/11679/object?filter={"form": {"filter_1": {"type_id": "11679", "object_definitions": {"34189": [{"equality": "*", "value": "otto"}]}}}}'
+url = "https://api.nodegoat.dasch.swiss/model/type/11679/"
+#url = ' https://api.nodegoat.dasch.swiss/data/type/11679/object?filter={"form": {"filter_1": {"type_id": "11679", "object_definitions": {"34189": [{"equality": "*", "value": "otto"}]}}}}'
 
 token = "hX9Prrif0H0AKQgSthdSbmhv80Ix0Y0M3CidzhKm6kl2dF3tXP"  # Replace with your actual bearer token
 

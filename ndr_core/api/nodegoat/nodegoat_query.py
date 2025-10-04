@@ -40,6 +40,9 @@ class NodegoatQuery(BaseQuery):
             if field.field_type == 'string':
                 object_definition["equality"] = "*"
                 object_definition["value"] = field.value
+            elif field.field_type == 'list':
+                object_definition["equality"] = "*"
+                object_definition["value"] = field.value
 
             obj_filter["form"]["filter_1"]["object_definitions"][field.parameter] = [object_definition]
 

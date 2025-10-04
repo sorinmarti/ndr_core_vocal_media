@@ -156,7 +156,7 @@ class BaseResult(ABC):
         # Open Repository
         if self.search_configuration.repository_url is not None:
             result_options.append({
-                "href": result['source']['collection'],
+                "href": self.search_configuration.repository_url,
                 "target": "_blank",
                 "label": '<i class="fa-regular fa-vault"></i>',
                 "class": "btn btn-sm btn-secondary",

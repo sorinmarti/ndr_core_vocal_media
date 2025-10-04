@@ -132,8 +132,28 @@ class TemplateStringVariable:
                 return text[1:-1]
         return text
 
+    def is_literal_string(self):
+        """Returns True if the variable is a quoted literal string."""
+        if not self.variable:
+            return False
+        variable = self.variable.strip()
+        return (len(variable) >= 2 and
+                ((variable.startswith('"') and variable.endswith('"')) or
+                 (variable.startswith("'") and variable.endswith("'"))))
+
+    @property
+    def literal_value(self):
+        """Returns the unquoted literal value if this is a literal string."""
+        if self.is_literal_string():
+            return self._remove_quotes(self.variable)
+        return None
+
     def get_raw_value(self, data):
         """Returns the value of the variable."""
+        # Handle literal strings first
+        if self.is_literal_string():
+            return self.literal_value
+
         if self.is_nested():
             return self._get_nested_value(data)
 
@@ -148,6 +168,10 @@ class TemplateStringVariable:
             raw_value = self.get_raw_value(data)
             if len(self.value_filters) > 0:
                 if isinstance(raw_value, list):
+                    # Check for limit parameter in any filter configuration
+                    limit = self.get_limit_from_filters()
+                    if limit:
+                        raw_value = raw_value[:limit]
                     filtered_values = []
                     for value in raw_value:
                         applied = self.apply_filters(value, data)
@@ -180,6 +204,16 @@ class TemplateStringVariable:
                 raise KeyError(f"Nested key not found: {e}") from e
         return value
 
+    def get_limit_from_filters(self):
+        """Check if any filter has a limit parameter and return the first one found."""
+        for filter_config in self.filter_configurations:
+            if 'limit' in filter_config:
+                try:
+                    return int(filter_config['limit'])
+                except (ValueError, TypeError):
+                    continue
+        return None
+
     def apply_filters(self, value, data_context=None):
         """Returns the value of the variable with the filter applied."""
         for i, my_filter in enumerate(self.value_filters):
@@ -192,10 +226,17 @@ class TemplateStringVariable:
 
     def is_nested(self):
         """Returns True if the variable is nested."""
+        # Literal strings are never nested
+        if self.is_literal_string():
+            return False
         return len(self.keys) > 1
 
     def get_keys(self):
         """Returns all nested keys in a key-string."""
+        # Handle literal strings - they don't have keys in the data sense
+        if self.is_literal_string():
+            return [self.variable]
+
         if re.match(r"^(\w+)(\[\w+?\])+$", self.variable):
             return self.get_keys_from_bracket_string()
         if re.match(r"^(\w+)(\.\w+)+$", self.variable):
@@ -306,8 +347,12 @@ class TemplateString:
     def get_default_value_from_variable(self, variable):
         """Check if any filter in the variable has a default value configured."""
         for filter_config in variable.filter_configurations:
+            # Check for universal 'default' parameter
             if 'default' in filter_config:
                 return filter_config['default']
+            # Check for DefaultFilter's 'value' parameter
+            if 'value' in filter_config:
+                return filter_config['value']
         return None
 
     @staticmethod

@@ -56,7 +56,7 @@ class AdvancedSearchForm(_NdrCoreForm):
             if search_config.search_has_compact_result:
                 self.fields[
                     f"compact_view_{search_config.conf_name}"
-                ] = self.get_compact_view_field()
+                ] = self.get_compact_view_field(search_config)
 
             # Add the fields of the search configuration to the form.
             for field in search_config.search_form_fields.all():
@@ -205,12 +205,13 @@ class AdvancedSearchForm(_NdrCoreForm):
                         ] = condition_form_field
 
     @staticmethod
-    def get_compact_view_field():
+    def get_compact_view_field(search_config):
         """Returns the compact view field for the given search configuration."""
         return forms.BooleanField(
             required=False,
             widget=BootstrapSwitchWidget(attrs={"label": _("Compact Result View")}),
             label="",
+            initial=search_config.compact_result_is_default
         )
 
     def init_simple_search_fields(self, search_config):
@@ -232,7 +233,7 @@ class AdvancedSearchForm(_NdrCoreForm):
         if search_config.search_has_compact_result:
             self.fields[
                 f"compact_view_{search_config.conf_name}_simple"
-            ] = self.get_compact_view_field()
+            ] = self.get_compact_view_field(search_config)
 
     @staticmethod
     def get_simple_search_layout_fields(search_config):
@@ -378,13 +379,14 @@ class AdvancedSearchForm(_NdrCoreForm):
                 tab.append(self.get_search_button(search_config))
                 tabs.append(tab)
 
-            if (
-                search_config.has_simple_search
-                and not search_config.simple_search_first
-            ):
+            if search_config.has_simple_search and not search_config.simple_search_first:
                 tabs.append(tab_simple)
 
-        layout.append(tabs)
+        if len(tabs) == 1:
+            # "Only one tab, removing tab holder."
+            layout.append(tabs[0])
+        else:
+            layout.append(tabs)
 
         helper.form_show_labels = True
 

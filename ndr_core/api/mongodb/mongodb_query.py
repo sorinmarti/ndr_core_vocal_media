@@ -80,7 +80,7 @@ class MongoDBQuery(BaseQuery):
                 date_to = self.values[field_name][1].strftime('%Y-%m-%d')
                 value = {"$gte": date_from, "$lte": date_to}"""
 
-        #print(query)
+        print(query)
         return query
 
     def get_list_query(self, list_name, add_page_and_size=True, search_term=None, tags=None):

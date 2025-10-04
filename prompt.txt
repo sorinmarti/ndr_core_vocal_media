@@ -16,6 +16,6 @@ environment;Environment & Miscellaneous;weather,infrastructure,street
 Note: The first column is the tag ID, the second column is the label, and the third column contains a comma-separated list of example topics in that group.
 You will be presented with a text that contains a transcription of a document.
 
-Your answer must be a parseable JSON array of strings, where each string is a topical tag relevant to the content of the document. The tags should be in lowercase and concise, capturing the essence of the topics discussed in the text.
+Your answer must be a parseable JSON array of strings, where each string is a topical tag ID relevant to the content of the document. Only tags from the provided list should be used. If no tags are relevant, return an empty array.
 
 CONTEXT:

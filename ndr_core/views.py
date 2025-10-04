@@ -254,6 +254,45 @@ class NdrMarkForCorrectionView(View):
 class SearchView(_NdrCoreSearchView):
     """A view to search for records in the configured API. """
 
+    def build_search_explanation(self, form, requested_search, search_config):
+        """Build a human-readable explanation of what was searched for."""
+        explanations = []
+
+        for field_name, value in form.cleaned_data.items():
+            if field_name.startswith(requested_search) and value not in [None, '', []]:
+                # Remove the search config prefix to get the actual field name
+                actual_field_name = field_name[len(requested_search) + 1:]
+
+                # Skip condition fields as they're modifiers, not search terms
+                if actual_field_name.endswith('_condition'):
+                    continue
+
+                # Get the field configuration for human-readable label
+                try:
+                    field_config = search_config.search_form_fields.get(
+                        search_field__field_name=actual_field_name
+                    )
+                    field_label = field_config.search_field.field_label
+
+                    # Format the value appropriately
+                    if isinstance(value, list):
+                        if len(value) == 1:
+                            formatted_value = f"'{value[0]}'"
+                        else:
+                            formatted_value = " or ".join(f"'{v}'" for v in value)
+                    else:
+                        formatted_value = f"'{value}'"
+
+                    explanations.append(f"{field_label} {formatted_value}")
+                except:
+                    # If we can't find the field config, skip it
+                    continue
+
+        if explanations:
+            return " with ".join(explanations)
+        else:
+            return "all available fields"
+
     def get(self, request, *args, **kwargs):
         """A view to search for records in the configured API. """
         requested_search = None
@@ -321,6 +360,10 @@ class SearchView(_NdrCoreSearchView):
                     if is_compact == "on":
                         is_compact = 'compact'
                     context.update({'result_card_group': is_compact})
+
+                    # Add search explanation for results summary
+                    search_explanation = self.build_search_explanation(form, requested_search, search_config)
+                    context.update({'search_explanation': search_explanation})
         else:
             if "refine" in request.GET.keys():
                 form = self.form_class(request.GET, ndr_page=self.ndr_page)

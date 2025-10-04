@@ -24,12 +24,12 @@ class Command(BaseCommand):
                 # Open json file
                 with open(os.path.join(directory, filename), "r", encoding='utf-8') as f:
                     data = json.load(f)
-                    issue_id = data["@id"]
+                    # issue_id = data["@id"]
                     title = data["label"]
 
-                NdrCoreManifest.objects.create(identifier=f"akte-{akte_nummer}",
+                NdrCoreManifest.objects.create(identifier=f"id-{akte_nummer}",
                                                title=title,
                                                file=f"uploads/manifests/{filename}",
-                                               manifest_group_id=4,
+                                               manifest_group_id=5,
                                                order_value_1=akte_nummer)
                 self.stdout.write(self.style.SUCCESS(f"Created: {akte_nummer}: {title}"))

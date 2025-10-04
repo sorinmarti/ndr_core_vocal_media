@@ -46,8 +46,8 @@
         {% include 'ndr_core/messages.html' %}
 
         <div class="mb-2">
-            {% blocktranslate with total=result.total page=result.page num_pages=result.num_pages %}
-                Your search returned {{ total }} results, showing page {{ page }} of {{ num_pages }}.
+            {% blocktranslate with total=result.total page=result.page num_pages=result.num_pages search_desc=search_explanation %}
+                Your search for {{ search_desc }} returned {{ total }} results, showing page {{ page }} of {{ num_pages }}.
             {% endblocktranslate %}
         </div>
 

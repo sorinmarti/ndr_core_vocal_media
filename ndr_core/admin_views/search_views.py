@@ -25,8 +25,8 @@ class ConfigureSearch(AdminViewMixin, LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         """GET request for this view. """
 
-        search_fields = NdrCoreSearchField.objects.all()
-        result_fields = NdrCoreResultField.objects.all()
+        search_fields = NdrCoreSearchField.objects.all().order_by('field_label')
+        result_fields = NdrCoreResultField.objects.all().order_by('label')
         searches = NdrCoreSearchConfiguration.objects.all()
         context = {'search_fields': search_fields,
                    'result_fields': result_fields,
@@ -40,6 +40,7 @@ class SearchConfigurationCreateView(AdminViewMixin, LoginRequiredMixin, CreateVi
     """ View to create a new API configuration """
 
     model = NdrCoreSearchConfiguration
+
     form_class = SearchConfigurationCreateForm
     success_url = reverse_lazy('ndr_core:configure_search')
     template_name = 'ndr_core/admin_views/create/search_config_create.html'
