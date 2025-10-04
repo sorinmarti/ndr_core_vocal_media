@@ -3,16 +3,25 @@
 {% load i18n %}
 
 <!-- This card is the top element of one result. -->
-<div class="card mb-2 box-shadow">
-    <!--Body of the card. Contains the image and the content. -->
-    <div class="card-body d-flex flex-column align-items-start">
-        <div class="container rc-scrollable-container">
-            {% block search_result_content %}
-                {{ card_content }}
-            {% endblock %}
+<a href="?search_term={{ card_content.search_term }}&id={{ card_content.id }}" class="text-decoration-none" style="color: inherit;">
+    <div class="card data-list-card" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+        <!--Body of the card. Contains the image and the content. -->
+        <div class="card-body d-flex flex-column align-items-start">
+            <div class="container">
+                {% block search_result_content %}
+                    {{ card_content }}
+                {% endblock %}
+            </div>
         </div>
     </div>
-</div>
+</a>
+
+<style>
+.data-list-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}
+</style>
 
 
 

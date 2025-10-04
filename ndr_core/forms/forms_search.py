@@ -19,6 +19,40 @@ from ndr_core.forms.widgets import (
 )
 
 
+class DataListSearchForm(_NdrCoreForm):
+    search_config = None
+
+    def __init__(self, *args, **kwargs):
+        if "ndr_page" in kwargs:
+            self.ndr_page = kwargs.pop("ndr_page")
+
+        if self.ndr_page is not None:
+            self.search_config = self.ndr_page.search_configs.first()
+
+        if self.search_config is None:
+            raise AttributeError("No Search Config Found")
+
+        super().__init__(*args, **kwargs)
+
+        self.fields["search_term"] = forms.CharField(
+            label=self.search_config.simple_query_label,
+            required=False,
+            max_length=100,
+            help_text=self.search_config.simple_query_help_text)
+
+
+    @property
+    def helper(self):
+        """Creates and returns the form helper class with the layout-ed form fields."""
+
+        helper = FormHelper()
+        helper.form_method = "GET"
+        layout = helper.layout = Layout()
+        layout.append(Div(Field("search_term", wrapper_class="col-md-12"), css_class="form-row"))
+        return helper
+
+
+
 class AdvancedSearchForm(_NdrCoreForm):
     """Form class for the search.
     Needs a search config and then creates and configures the form from it."""

@@ -1,7 +1,12 @@
 {% extends 'ndr_core/result_renderers/data_list_base_renderer.html' %}
 {% load i18n %}
+{% load crispy_forms_tags %}
+{% load ndr_utils %}
+{% load ndr_values %}
 
 {% block search_result_content %}
-   {{ card_content }}
+    <span class="badge font-weight-normal text-dark" style="background-color: #D9D9D9;">{{ card_content.id }}</span>
+    &nbsp;&nbsp;
+    <strong>{{ card_content.label }}</strong>
 {% endblock %}
 

@@ -3,12 +3,94 @@ import json
 import re
 
 from django import template
-from django.db.models import Max
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from ndr_core.ndr_templatetags.template_string import TemplateString
 
 register = template.Library()
+
+@register.tag(name="render_single")
+def render_single_tag(parser, token):
+    """Renders a single result without header/footer wrapper.
+    Usage: {% render_single result search_config %}"""
+    token_list = token.split_contents()
+    return RenderSingleNode(token_list[1], token_list[2])
+
+class RenderSingleNode(template.Node):
+    """Renders a single result using the full detail card without the header/footer wrapper."""
+
+    def __init__(self, result, search_config):
+        self.result = template.Variable(result)
+        self.search_config = template.Variable(search_config)
+
+    def render(self, context):
+        """Renders the single result detail view."""
+        result_object = self.result.resolve(context)
+
+        # Get first result from the result object
+        if not result_object.results or len(result_object.results) == 0:
+            return ""
+
+        result_data = result_object.results[0]
+
+        # Reuse the existing grid creation logic
+        card_content = self.create_grid(context, result_data["data"], "normal")
+
+        # Use simplified template without header/footer
+        # Get search_term from parent context if available
+        search_term = context.get('search_term', '')
+
+        card_context = {
+            "card_content": card_content,
+            "search_term": search_term,
+        }
+        card_template = "ndr_core/result_renderers/single_detail_template.html"
+
+        card_template_str = get_template(card_template).render(card_context)
+        return mark_safe(card_template_str)
+
+    def create_grid(self, context, data, compact_view):
+        """Creates a CSS Grid of result fields - copied from RenderResultNode."""
+        result_card_fields = self.search_config.resolve(
+            context
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
+
+        if not result_card_fields.exists():
+            return ""
+
+        # Create CSS Grid container
+        grid_html = '<div class="result-grid">'
+
+        for field_config in result_card_fields:
+            field_html = self.create_field(field_config, data)
+            grid_html += field_html
+
+        grid_html += '</div>'
+        return mark_safe(grid_html)
+
+    @staticmethod
+    def create_field(field_config, data):
+        """Creates a result field with CSS Grid positioning - copied from RenderResultNode."""
+        field_template = "ndr_core/result_renderers/elements/result_field.html"
+        result_field = field_config.result_field
+
+        template_string = TemplateString(
+            result_field.rich_expression, data, show_errors=True
+        )
+        field_content = template_string.get_formatted_string()
+        field_content = template_string.sanitize_html(field_content)
+
+        field_context = {
+            "field_row": field_config.field_row,
+            "field_column": field_config.field_column,
+            "field_column_span": field_config.field_column_span,
+            "field_row_span": field_config.field_row_span,
+            "classes": result_field.field_classes,
+            "field_content": field_content,
+        }
+        field_template_str = get_template(field_template).render(field_context)
+        return mark_safe(field_template_str)
+
 
 @register.tag(name="render_data_list")
 def render_data_list_tag(parser, token):
@@ -27,9 +109,12 @@ class RenderDataListNode(template.Node):
     def create_entry(self, context, result):
         """Creates a result card."""
 
+        conf = self.search_config.resolve(context)
         card_context = {
             "result": result,
-            "card_content": result["data"],
+            "card_content": {"id": result['data'][conf.search_id_field],
+                             "label": result['data'][conf.simple_query_main_field],
+                             "search_term": context.get('search_term', '')},
         }
         card_template = "ndr_core/result_renderers/data_list_template.html"
 
@@ -39,8 +124,6 @@ class RenderDataListNode(template.Node):
     def render(self, context):
         """Renders a result object."""
         result_object = self.result.resolve(context)
-        conf = self.search_config.resolve(context)
-
         html_string = ""
         for result in result_object.results:
                 html_string += self.create_entry(context, result)

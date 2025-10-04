@@ -88,7 +88,7 @@ class MongoDBQuery(BaseQuery):
         return None
 
     def get_record_query(self, record_id):
-        """ Not Implemented """
+        """ Single record query by id """
         record_query = {'filter': {self.search_config.search_id_field: record_id}, 'type': 'single'}
         return record_query
 

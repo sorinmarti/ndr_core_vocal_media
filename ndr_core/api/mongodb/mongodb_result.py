@@ -72,10 +72,15 @@ class MongoDBResult(BaseResult):
         """Fills the search result metadata. In the download_result method, the raw result is created and the
         total number of documents is retrieved. The page number is also set in the download_result method."""
 
+        # Check if this is a single document query (raw_result is the document itself)
         if "total" in self.raw_result:
             self.total = self.raw_result["total"]
+        elif self.query.get('type') == 'single':
+            # Single document query - check if document exists
+            self.total = 1 if self.raw_result else 0
         else:
             self.total = 0
+
         if "page" in self.raw_result:
             self.page = self.raw_result["page"]
 
@@ -86,6 +91,9 @@ class MongoDBResult(BaseResult):
     def fill_results(self):
         if "hits" in self.raw_result:
             self.results = self.raw_result['hits']
+        elif self.query.get('type') == 'single' and self.raw_result:
+            # Single document query - wrap in list
+            self.results = [self.raw_result]
 
     def get_id_value(self, result):
         """ Overwrite the default get_id_value method to get the id from the result. """

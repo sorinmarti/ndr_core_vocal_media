@@ -19,7 +19,7 @@ from django.conf import settings
 
 from ndr_core.exceptions import NdrCorePageNotFound, PreRenderError
 from ndr_core.forms.forms_contact import ContactForm
-from ndr_core.forms.forms_search import AdvancedSearchForm
+from ndr_core.forms.forms_search import AdvancedSearchForm, DataListSearchForm
 
 from ndr_core.models import (
     NdrCorePage,
@@ -423,7 +423,7 @@ class DataListView(_NdrCoreSearchView):
     Uses compact result cards for list items, detailed cards for detail view,
     and simple search fields for filters."""
 
-    form_class = AdvancedSearchForm
+    form_class = DataListSearchForm
 
     def get(self, request, *args, **kwargs):
         """Display paginated list with optional filters."""
@@ -443,41 +443,37 @@ class DataListView(_NdrCoreSearchView):
         api_factory = ApiFactory(search_config)
         query_obj = api_factory.get_query_instance(page=request.GET.get("page", 1))
 
-        # Check if filters are applied from GET parameters
-        has_filters = False
+        # Check if search term filter is applied
+        search_term = None
+        detail_page_id = None
+
         if request.GET:
             form = self.form_class(request.GET, ndr_page=self.ndr_page, search_config=search_config)
             if form.is_valid():
-                for field in form.fields:
-                    if field.startswith(search_config.conf_name):
-                        actual_key = field[len(search_config.conf_name) + 1:]
-                        if form.cleaned_data.get(field) not in [None, '', []]:
-                            has_filters = True
-                            if search_config.search_form_fields.filter(search_field__field_name=actual_key).count() > 0:
-                                query_obj.set_value(actual_key, form.cleaned_data[field])
-                            elif actual_key.endswith('_condition'):
-                                query_obj.set_value(actual_key, form.cleaned_data[field])
+                search_term = form.cleaned_data.get('search_term', '').strip()
+            if request.GET.get('id',''):
+                detail_page_id = request.GET.get('id','').strip()
 
-        # Get query string - use advanced query if filters, otherwise get all items
-        if has_filters:
-            query_string = query_obj.get_advanced_query()
+        # Get query string - use simple query if search term provided, otherwise get all items
+        if detail_page_id:
+            query_string = query_obj.get_record_query(detail_page_id)
+        elif search_term:
+            query_string = query_obj.get_simple_query(search_term)
         else:
-            # Get all items - implementation depends on your API
             query_string = query_obj.get_all_items_query()
 
         # Create result object and load results
         result = api_factory.get_result_instance(query_string, self.request)
-        print("Query String: ", query_string)
-        print("Result: ", result)
         result.load_result()
+        print(result.total)
 
         # Add to context
         context.update({
             'form': form,
             'search_config': search_config,
             'result': result,
-            'result_card_group': 'compact',  # Always use compact view for list
-            'has_filters': has_filters,
+            'detail_page_id': detail_page_id,
+            'search_term': search_term,
         })
 
         return render(request, self.template_name, context)
