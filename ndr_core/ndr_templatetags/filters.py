@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 import uuid
 import json
+from urllib.parse import urlparse
 
 from ndr_core.models import NdrCoreSearchField, NdrCorePage
 from ndr_core.ndr_templatetags.abstract_filter import AbstractFilter
@@ -31,6 +32,8 @@ def get_get_filter_class(filter_name):
         return NumberFilter
     if filter_name == "linkify":
         return LinkifyFilter
+    if filter_name == "weblinks":
+        return WeblinksFilter
     if filter_name == "iframe":
         return IframeFilter
     if filter_name == "default":
@@ -596,6 +599,57 @@ class LinkifyFilter(AbstractFilter):
 
         return url
 
+
+class WeblinksFilter(AbstractFilter):
+    """A filter to generate a list of favicons linking to the provided URLs."""
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["class", "style", "target"]
+
+    def needed_options(self):
+        return []
+
+    def processes_list_as_whole(self):
+        """This filter processes the entire list as a whole."""
+        return True
+
+    def get_rendered_value(self):
+        """Generates a list of favicons linking to the provided URLs."""
+        value = self.get_value()
+
+        if not isinstance(value, list):
+            return value
+
+        if not value:
+            return f"<span class='text-muted'>No URLs provided</span>"
+
+        # Default attributes
+        link_target = self.get_configuration("target") or "_blank"
+        link_class = self.get_configuration("class") or "weblink"
+        link_style = self.get_configuration("style") or ""
+        default_icon = self.get_configuration("default_icon") or "/static/ndr_core/images/not-found-favicon.ico"
+
+        # Generate HTML for each URL
+        links_html = []
+        for url in value:
+            parsed = urlparse(url)
+            base_url = f"{parsed.scheme}://{parsed.netloc}"
+            favicon_url = f"{base_url}/favicon.ico"
+            link_html = f"""
+                       <a href="{url}" target="{link_target}" class="{link_class}" style="{link_style}"
+                          data-bs-toggle="tooltip" title="{url}">
+                           <img src="{favicon_url}" alt="{parsed.netloc}" 
+                                onerror="this.onerror=null;this.src='{default_icon}';" 
+                                style="width: 16px; height: 16px; vertical-align: middle;">
+                       </a>
+                       """
+            links_html.append(link_html)
+
+        # Wrap in a container
+        return f"<div>{''.join(links_html)}</div>"
 
 class IframeFilter(AbstractFilter):
     """A class to represent an iframe template filter that embeds content in an <iframe> tag."""
