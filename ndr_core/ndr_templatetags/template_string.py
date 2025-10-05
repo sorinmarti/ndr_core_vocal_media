@@ -168,6 +168,9 @@ class TemplateStringVariable:
             raw_value = self.get_raw_value(data)
             if len(self.value_filters) > 0:
                 if isinstance(raw_value, list):
+                    # Check if any filter wants to process the list as a whole
+                    if self.any_filter_processes_list_as_whole():
+                        return self.apply_filters(raw_value, data)
                     # Check for limit parameter in any filter configuration
                     limit = self.get_limit_from_filters()
                     if limit:
@@ -214,6 +217,21 @@ class TemplateStringVariable:
                     continue
         return None
 
+    def any_filter_processes_list_as_whole(self):
+        """Check if any filter in the chain wants to process lists as a whole."""
+        for i, my_filter in enumerate(self.value_filters):
+            try:
+                filter_class = get_get_filter_class(my_filter)
+                if filter_class is None:
+                    continue
+                # Create a temporary instance to check the flag
+                temp_instance = filter_class(my_filter, None, self.filter_configurations[i], None)
+                if temp_instance.processes_list_as_whole():
+                    return True
+            except (ValueError, Exception):
+                continue
+        return False
+
     def apply_filters(self, value, data_context=None):
         """Returns the value of the variable with the filter applied."""
         for i, my_filter in enumerate(self.value_filters):
@@ -237,11 +255,12 @@ class TemplateStringVariable:
         if self.is_literal_string():
             return [self.variable]
 
-        if re.match(r"^(\w+)(\[\w+?\])+$", self.variable):
+        # Allow dashes in variable names
+        if re.match(r"^([\w-]+)(\[[\w-]+?\])+$", self.variable):
             return self.get_keys_from_bracket_string()
-        if re.match(r"^(\w+)(\.\w+)+$", self.variable):
+        if re.match(r"^([\w-]+)(\.[\w-]+)+$", self.variable):
             return self.get_keys_from_dot_string()
-        if re.match(r"^(\w+)$", self.variable):
+        if re.match(r"^([\w-]+)$", self.variable):
             return [self.variable]
 
         raise ValueError(f"Could not parse variable: {self.variable}")

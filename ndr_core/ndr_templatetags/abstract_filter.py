@@ -35,6 +35,11 @@ class AbstractFilter(ABC):
     def needed_options(self):
         return []
 
+    def processes_list_as_whole(self):
+        """Override this to return True if the filter should receive the entire list
+        instead of being applied to each item individually."""
+        return False
+
     def check_configuration(self):
         for needed_option in self.needed_options():
             if not self.get_configuration(needed_option):

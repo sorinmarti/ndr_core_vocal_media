@@ -17,6 +17,10 @@ def get_get_filter_class(filter_name):
         return BoolFilter
     if filter_name == "fieldify":
         return FieldTemplateFilter
+    if filter_name == "fieldinfo":
+        return FieldInfoTemplateFilter
+    if filter_name == "list":
+        return ListTemplateFilter
     if filter_name in ["badge", "pill"]:
         return BadgeTemplateFilter
     if filter_name == "img":
@@ -133,6 +137,96 @@ class FieldTemplateFilter(AbstractFilter):
             return self.get_value()
 
         return self.field_value
+
+
+class FieldInfoTemplateFilter(AbstractFilter):
+    """A class to represent a template filter that returns the info text of a field value."""
+
+    field_info = ""
+    search_field = None
+
+    def __init__(self, filter_name, value, filter_configurations, data_context=None):
+        super().__init__(filter_name, value, filter_configurations, data_context)
+        try:
+            self.search_field = NdrCoreSearchField.objects.get(
+                field_name=self.get_configuration("o0")
+            )
+            try:
+                self.field_info = self.search_field.get_choices_list_dict()[
+                    self.value
+                ][self.get_language_info_field_name()]
+            except KeyError:
+                self.field_info = ""
+
+        except NdrCoreSearchField.DoesNotExist:
+            self.search_field = None
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return []
+
+    def needed_options(self):
+        return ["o0"]
+
+    def get_rendered_value(self):
+        """Returns the info text."""
+        if not self.search_field:
+            return ""
+
+        return self.field_info
+
+
+class ListTemplateFilter(AbstractFilter):
+    """A class to represent a template filter that renders lists as HTML ul or ol."""
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["type", "class"]
+
+    def needed_options(self):
+        return []
+
+    def processes_list_as_whole(self):
+        """This filter needs to process the entire list at once."""
+        return True
+
+    def get_rendered_value(self):
+        """Returns the formatted string."""
+        value = self.value
+
+        if not isinstance(value, list):
+            return self.get_value()
+
+        if len(value) == 0:
+            return ""
+
+        list_type = self.get_configuration("type") or "ul"
+        list_class = self.get_configuration("class") or ""
+
+        class_attr = f' class="{list_class}"' if list_class else ""
+
+        if list_type == "ol":
+            html = f"<ol{class_attr}>"
+        else:
+            html = f"<ul{class_attr}>"
+
+        for item in value:
+            if isinstance(item, dict):
+                item_str = str(item)
+            else:
+                item_str = str(item)
+            html += f"<li>{item_str}</li>"
+
+        if list_type == "ol":
+            html += "</ol>"
+        else:
+            html += "</ul>"
+
+        return html
 
 
 class BadgeTemplateFilter(AbstractFilter):
