@@ -842,6 +842,13 @@ class NdrCoreColorScheme(models.Model):
     error_color = ColorField(help_text='Error color for alerts.')
     """Error color for alerts."""
 
+    # New fields for fonts and sizes
+    font_family = models.CharField(max_length=100, default="Arial, sans-serif")
+    h1_size = models.CharField(max_length=10, default="2rem")
+    h2_size = models.CharField(max_length=10, default="1.75rem")
+    h3_size = models.CharField(max_length=10, default="1.5rem")
+    h4_size = models.CharField(max_length=10, default="1.25rem")
+
     @staticmethod
     def color_list():
         """Returns a list of all color fields. This is used to generate the colors.css file."""
@@ -853,7 +860,8 @@ class NdrCoreColorScheme(models.Model):
                 'footer_link_color', 'footer_link_hover_color', 'powered_by_color',
                 'tab_title_color', 'tab_active_title_color',
                 'link_color', 'nav_link_color', 'nav_active_color',
-                'accent_color_1', 'accent_color_2', 'info_color', 'success_color', 'error_color']
+                'accent_color_1', 'accent_color_2', 'info_color', 'success_color', 'error_color',
+                "font_family", "h1_size", "h2_size", "h3_size", "h4_size"]
 
     def __str__(self):
         return self.scheme_label

@@ -30,6 +30,21 @@ class ColorPaletteForm(forms.ModelForm):
         layout.append(form_row)
 
         form_row = Row(
+            Column('font_family', css_class='form-group col-md-12 mb-0'),
+            css_class='form-row'
+        )
+        layout.append(form_row)
+
+        form_row = Row(
+            Column('h1_size', css_class='form-group col-md-3 mb-0'),
+            Column('h2_size', css_class='form-group col-md-3 mb-0'),
+            Column('h3_size', css_class='form-group col-md-3 mb-0'),
+            Column('h4_size', css_class='form-group col-md-3 mb-0'),
+            css_class='form-row'
+        )
+        layout.append(form_row)
+
+        form_row = Row(
             Column('background_color', css_class='form-group col-md-3 mb-0'),
             Column('container_bg_color', css_class='form-group col-md-3 mb-0'),
             Column('footer_bg', css_class='form-group col-md-3 mb-0'),

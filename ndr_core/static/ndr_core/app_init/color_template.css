@@ -4,6 +4,24 @@
 body {
     background: [[background_color]] !important;
     color: [[text_color]] !important;
+    font-family: [[font_family]];
+}
+
+/* Headings */
+h1 {
+    font-size: [[h1_size]];
+}
+
+h2 {
+    font-size: [[h2_size]];
+}
+
+h3 {
+    font-size: [[h3_size]];
+}
+
+h4 {
+    font-size: [[h4_size]];
 }
 
 /* Containers */
