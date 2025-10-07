@@ -34,6 +34,8 @@ def get_get_filter_class(filter_name):
         return LinkifyFilter
     if filter_name == "weblinks":
         return WeblinksFilter
+    if filter_name == "orcid":
+        return LinkifyFilter
     if filter_name == "iframe":
         return IframeFilter
     if filter_name == "default":
@@ -455,6 +457,21 @@ class LinkifyFilter(AbstractFilter):
 
     def get_rendered_value(self):
         """Returns the content wrapped in an <a> tag."""
+
+        # Handle ORCID-specific case
+        if self.filter_name == "orcid":
+            orcid = self.get_value()
+            orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
+            if re.match(orcid_pattern, orcid):
+                orcid_url = f"https://orcid.org/{orcid}"
+                return f"""
+                        <a href="{orcid_url}" target="_blank" class="orcid-link" rel="noopener noreferrer">
+                            <img src="/static/ndr_core/images/orcid.svg" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
+                            {orcid}
+                        </a>
+                        """
+            else:
+                return f"<span class='text-danger'>Invalid ORCID: {orcid}</span>"
 
         # Determine the URL from various sources
         url = self.build_url()

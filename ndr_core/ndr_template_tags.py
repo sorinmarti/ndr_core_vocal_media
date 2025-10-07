@@ -13,7 +13,7 @@ class TextPreRenderer:
 
     MAX_ITERATIONS = 50
     ui_element_regex = r'\[\[(card|slideshow|carousel|jumbotron|figure|banner|iframe|manifest_viewer)\|(.*)\]\]'
-    link_element_regex = r'\[\[(file|page)\|([0-9a-zA-Z_ ]*)\]\]'
+    link_element_regex = r'\[\[(file|page|orcid)\|([0-9a-zA-Z_ -]*)\]\]'
     container_regex = r'\[\[(start|end)_(block)\]\]'
     link_element_classes = {'figure': NdrCoreImage, 'file': NdrCoreUpload, 'page': NdrCorePage}
     link_element_keys = {"page": "view_name"}
@@ -98,6 +98,23 @@ class TextPreRenderer:
 
     def render_element(self, template, element_id,  text):
         """Renders an element."""
+        if template == "orcid":
+            # Validate ORCID format
+            orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
+            if not re.match(orcid_pattern, element_id):
+                return text.replace(f"[[{template}|{element_id}]]",
+                                    f"<span class='text-danger'>Invalid ORCID: {element_id}</span>")
+
+            # Generate ORCID link
+            orcid_url = f"https://orcid.org/{element_id}"
+            orcid_html = f"""
+            <a href="{orcid_url}" target="_blank" class="orcid-link" rel="noopener noreferrer">
+                <img src="/static/ndr_core/images/orcid.svg" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
+                {element_id}
+            </a>
+            """
+            return text.replace(f"[[{template}|{element_id}]]", orcid_html)
+
         element = self.get_element(template, element_id)
         context = {'data': element}
 

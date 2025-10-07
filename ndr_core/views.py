@@ -473,7 +473,7 @@ class DataListView(_NdrCoreSearchView):
             'search_config': search_config,
             'result': result,
             'detail_page_id': detail_page_id,
-            'search_term': search_term,
+            'search_term': search_term or '',
         })
 
         return render(request, self.template_name, context)
