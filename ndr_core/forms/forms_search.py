@@ -169,6 +169,9 @@ class AdvancedSearchForm(_NdrCoreForm):
                         lower_value = (
                             f"{lower_value[8:10]}.{lower_value[5:7]}.{lower_value[0:4]}"
                         )
+                    else:
+                        lower_value = "01.01.2024"
+
                     # Do the same with upper_value
                     upper_value = search_field.upper_value
                     if upper_value is not None:
@@ -186,8 +189,8 @@ class AdvancedSearchForm(_NdrCoreForm):
                             picker_options={
                                 "startDate": lower_value,
                                 "endDate": "upper_value",
-                                "minYear": int(lower_value[6:10]),
-                                "maxYear": int(upper_value[6:10]),
+                                "minYear": int(lower_value[6:10] if lower_value else "1900"),
+                                "maxYear": int(upper_value[6:10] if upper_value else "2100"),
                                 "maxSpan": {"years": 500},
                                 "showDropdowns": True,
                             },
