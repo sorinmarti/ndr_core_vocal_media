@@ -1,10 +1,12 @@
 """Template tags for the ndr_core app."""
 import json
 import re
+from datetime import datetime, timedelta
 
 from django import template
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 from ndr_core.ndr_templatetags.template_string import TemplateString
 
 register = template.Library()
@@ -87,6 +89,7 @@ class RenderSingleNode(template.Node):
             "field_row_span": field_config.field_row_span,
             "classes": result_field.field_classes,
             "field_content": field_content,
+            "border_label": result_field.border_label,
         }
         field_template_str = get_template(field_template).render(field_context)
         return mark_safe(field_template_str)
@@ -209,6 +212,7 @@ class RenderResultNode(template.Node):
             "field_row_span": field_config.field_row_span,
             "classes": result_field.field_classes,
             "field_content": field_content,
+            "border_label": result_field.border_label,
         }
         field_template_str = get_template(field_template).render(field_context)
         return mark_safe(field_template_str)

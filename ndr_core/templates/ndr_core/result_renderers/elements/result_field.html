@@ -3,6 +3,13 @@
        data-row="{{ field_row }}"
        data-colspan="{{ field_column_span }}"
        data-rowspan="{{ field_row_span }}"
-       class="{{ classes }}">
+       class="{{ classes }}"
+       style="position: relative; {% if border_label %}margin-top: 12px;{% endif %}">
+      <!-- Border label positioned on the top border -->
+      {% if border_label %}
+      <span style="position: absolute; top: -10px; left: 10px; background-color: white; padding: 0 6px; font-size: 0.75rem; color: #6c757d; font-weight: 500;">
+          {{ border_label }}
+      </span>
+      {% endif %}
       {{ field_content }}
   </div>

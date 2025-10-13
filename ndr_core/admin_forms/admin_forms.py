@@ -51,14 +51,21 @@ class UploadGoogleVerificationFileForm(forms.Form):
         self.helper.add_input(Submit('submit', 'Upload'))
 
 
-def get_form_buttons(submit_text):
+def get_form_buttons(submit_text, include_save_and_continue=False):
     """Returns a button holder with a submit button with the given text.
     This is a convenience function for all forms that are used in the
-    NDRCore admin interface. """
-    bh = ButtonHolder(
-            Submit('submit', submit_text, css_class='btn-default'),
-            css_class="modal-footer"
-        )
+    NDRCore admin interface.
+
+    Args:
+        submit_text: Text for the primary submit button
+        include_save_and_continue: If True, adds a "Save and keep editing" button
+    """
+    buttons = [Submit('submit', submit_text, css_class='btn-default')]
+
+    if include_save_and_continue:
+        buttons.append(Submit('submit_and_continue', 'Save and keep editing', css_class='btn-secondary'))
+
+    bh = ButtonHolder(*buttons, css_class="modal-footer")
     return bh
 
 

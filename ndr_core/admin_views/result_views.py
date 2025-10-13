@@ -1,8 +1,10 @@
 """ Views for the result fields and result card configuration. """
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, FormView
+from django.shortcuts import redirect
 
 from ndr_core.admin_forms.result_card_forms import SearchConfigurationResultEditForm
 from ndr_core.admin_views.admin_views import AdminViewMixin
@@ -22,6 +24,15 @@ class ResultFieldCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('ndr_core:configure_search')
     template_name = 'ndr_core/admin_views/create/result_field_create.html'
 
+    def form_valid(self, form):
+        """Handle form submission and check which button was clicked."""
+        response = super().form_valid(form)
+        messages.success(self.request, "Result field saved successfully.")
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect to the edit page for the newly created object
+            return redirect('ndr_core:edit_result_field', pk=self.object.pk)
+        return response
+
 
 class ResultFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     """ View to edit an existing Search field """
@@ -30,6 +41,15 @@ class ResultFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     form_class = ResultFieldEditForm
     success_url = reverse_lazy('ndr_core:configure_search')
     template_name = 'ndr_core/admin_views/edit/result_field_edit.html'
+
+    def form_valid(self, form):
+        """Handle form submission and check which button was clicked."""
+        response = super().form_valid(form)
+        messages.success(self.request, "Result field updated successfully.")
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect back to the same edit page
+            return redirect('ndr_core:edit_result_field', pk=self.object.pk)
+        return response
 
 
 class ResultFieldDeleteView(AdminViewMixin, LoginRequiredMixin, DeleteView):

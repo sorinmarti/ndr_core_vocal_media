@@ -1,8 +1,10 @@
 """Views for the search field configuration pages. """
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django.shortcuts import redirect
 
 from ndr_core.admin_views.admin_views import AdminViewMixin
 from ndr_core.form_preview import PreviewImage
@@ -26,6 +28,15 @@ class SearchFieldCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
         context['widget_form'] = CSVTextEditorWidget.ImportCsvForm()
         return context
 
+    def form_valid(self, form):
+        """Handle form submission and check which button was clicked."""
+        response = super().form_valid(form)
+        messages.success(self.request, "Result field updated successfully.")
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect to the edit page for the newly created object
+            return redirect('ndr_core:edit_search_field', pk=self.object.pk)
+        return response
+
 
 class SearchFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     """ View to edit an existing Search field """
@@ -40,6 +51,15 @@ class SearchFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['widget_form'] = CSVTextEditorWidget.ImportCsvForm()
         return context
+
+    def form_valid(self, form):
+        """Handle form submission and check which button was clicked."""
+        response = super().form_valid(form)
+        messages.success(self.request, "Search field saved successfully.")
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect back to the same edit page
+            return redirect('ndr_core:edit_search_field', pk=self.object.pk)
+        return response
 
 
 class SearchFieldDeleteView(AdminViewMixin, LoginRequiredMixin, DeleteView):

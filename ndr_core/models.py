@@ -103,6 +103,12 @@ class NdrCoreResultField(TranslatableMixin, models.Model):
     field_classes = models.CharField(max_length=100, blank=True, default='',
                                      help_text="Bootstrap classes to apply to the display.")
 
+    border_label = models.CharField(max_length=100,
+                                    blank=True,
+                                    default='',
+                                    help_text="Label text to display on the top border of the field box")
+    """Label text to display on the top border of the field box"""
+
     def __getattribute__(self, item):
         """Returns the translated field for a given language. If no translation exists,
         the default value is returned. """

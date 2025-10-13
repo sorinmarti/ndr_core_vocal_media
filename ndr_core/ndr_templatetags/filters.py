@@ -30,6 +30,12 @@ def get_get_filter_class(filter_name):
         return DateFilter
     if filter_name == "format":
         return NumberFilter
+    if filter_name == "readable":
+        return ReadableNumberFilter
+    if filter_name == "compact":
+        return CompactNumberFilter
+    if filter_name == "relative":
+        return RelativeDateFilter
     if filter_name == "linkify":
         return LinkifyFilter
     if filter_name == "weblinks":
@@ -257,6 +263,12 @@ class BadgeTemplateFilter(AbstractFilter):
         if self.get_configuration("tt"):
             badge_element.add_attribute("data-toggle", "tooltip")
             badge_element.add_attribute("data-placement", "top")
+            if not self.get_configuration("field"):
+                # Replace placeholders in tooltip text
+                tt_text = self.get_configuration("tt")
+                if self.data_context:
+                    tt_text = self.replace_placeholders(tt_text)
+                badge_element.add_attribute("title", tt_text)
 
         field_options = None
         if self.get_configuration("field"):
@@ -279,7 +291,10 @@ class BadgeTemplateFilter(AbstractFilter):
                     if tt_content == "__field__":
                         tt_text = field_options[self.get_language_info_field_name()]
                     else:
+                        # Replace placeholders in tooltip text
                         tt_text = tt_content
+                        if self.data_context:
+                            tt_text = self.replace_placeholders(tt_text)
                     badge_element.add_attribute("title", tt_text)
             except NdrCoreSearchField.DoesNotExist:
                 badge_element.add_content("Field not found")  # TODO: internationalize
@@ -296,6 +311,29 @@ class BadgeTemplateFilter(AbstractFilter):
             )
 
         return str(badge_element)
+
+    def replace_placeholders(self, text):
+        """Replace [variable] placeholders in the text with actual values."""
+        # Find all [variable] patterns
+        placeholders = re.findall(r'\[([^\]]+)\]', text)
+
+        # Replace each placeholder with its value
+        for placeholder in placeholders:
+            try:
+                # Get the value from the data context
+                placeholder_value = get_nested_value(self.data_context, placeholder)
+                if placeholder_value is not None:
+                    # Handle arrays - take first element if it's a list
+                    if isinstance(placeholder_value, list) and len(placeholder_value) > 0:
+                        placeholder_value = placeholder_value[0]
+                    text = text.replace(f'[{placeholder}]', str(placeholder_value))
+                else:
+                    text = text.replace(f'[{placeholder}]', '')
+            except:
+                # If placeholder can't be resolved, remove it
+                text = text.replace(f'[{placeholder}]', '')
+
+        return text
 
 
 class ImageTemplateFilter(AbstractFilter):
@@ -432,10 +470,25 @@ class NumberFilter(AbstractFilter):
 
     def get_rendered_value(self):
         """Returns the formatted string."""
-        number_value = int(self.get_value())
+        value = self.get_value()
+
+        # Try to convert to number (int or float)
         try:
+            # First try as float to preserve decimal values
+            if isinstance(value, str):
+                # Check if it contains a decimal point
+                if '.' in value:
+                    number_value = float(value)
+                else:
+                    number_value = int(value)
+            elif isinstance(value, (int, float)):
+                number_value = value
+            else:
+                return self.get_value()
+
+            # Apply the format specification
             return ("{:" + self.get_configuration('o0') + "}").format(number_value)
-        except ValueError:
+        except (ValueError, TypeError):
             return self.get_value()
 
     def get_value(self):
@@ -1173,50 +1226,50 @@ class TextTruncateFilter(AbstractFilter):
         """Returns truncated text with optional expand/collapse functionality."""
         import uuid
         import html
-        
+
         value = self.get_value()
         if not value:
             return ""
-            
+
         text = str(value).strip()
         if not text:
             return ""
-        
+
         # Configuration
         max_length = int(self.get_configuration("length") or 200)
         is_expandable = self.get_configuration("expandable") != "false"  # Default to true
         expand_text = self.get_configuration("expand_text") or "Show more"
         collapse_text = self.get_configuration("collapse_text") or "Show less"
         ellipsis = self.get_configuration("ellipsis") or "..."
-        
+
         # If text is short enough, return as-is
         if len(text) <= max_length:
             return f"<span>{html.escape(text)}</span>"
-        
+
         # Truncate text at word boundary if possible
         truncated = text[:max_length]
         if " " in text[max_length:max_length+20]:  # Look ahead for word boundary
             last_space = truncated.rfind(" ")
             if last_space > max_length * 0.8:  # Only use word boundary if not too far back
                 truncated = truncated[:last_space]
-        
+
         # Escape HTML in text
         truncated_escaped = html.escape(truncated)
         full_text_escaped = html.escape(text)
-        
+
         if not is_expandable:
             # Non-expandable: just return truncated text with ellipsis
             return f"<span>{truncated_escaped}{ellipsis}</span>"
-        
+
         # Expandable: create interactive version
         unique_id = f"text_{uuid.uuid4().hex[:8]}"
-        
+
         return f"""
         <span id="{unique_id}_container">
-            <span id="{unique_id}_truncated">{truncated_escaped}{ellipsis} 
+            <span id="{unique_id}_truncated">{truncated_escaped}{ellipsis}
                 <a href="#" id="{unique_id}_expand" style="color: #007bff; text-decoration: none; font-size: 0.9em; cursor: pointer;">{expand_text}</a>
             </span>
-            <span id="{unique_id}_full" style="display: none;">{full_text_escaped} 
+            <span id="{unique_id}_full" style="display: none;">{full_text_escaped}
                 <a href="#" id="{unique_id}_collapse" style="color: #007bff; text-decoration: none; font-size: 0.9em; cursor: pointer;">{collapse_text}</a>
             </span>
         </span>
@@ -1226,7 +1279,7 @@ class TextTruncateFilter(AbstractFilter):
             var collapseBtn = document.getElementById("{unique_id}_collapse");
             var truncatedSpan = document.getElementById("{unique_id}_truncated");
             var fullSpan = document.getElementById("{unique_id}_full");
-            
+
             if (expandBtn) {{
                 expandBtn.addEventListener("click", function(e) {{
                     e.preventDefault();
@@ -1234,7 +1287,7 @@ class TextTruncateFilter(AbstractFilter):
                     fullSpan.style.display = "inline";
                 }});
             }}
-            
+
             if (collapseBtn) {{
                 collapseBtn.addEventListener("click", function(e) {{
                     e.preventDefault();
@@ -1245,3 +1298,177 @@ class TextTruncateFilter(AbstractFilter):
         }})();
         </script>
         """
+
+
+class ReadableNumberFilter(AbstractFilter):
+    """A filter to format numbers with separators for better readability.
+
+    Usage: [number|readable(separator="'")]
+    Examples:
+        123456 -> 123'456
+        1234567890 -> 1'234'567'890
+        With separator=",": 123456 -> 123,456
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["separator"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the formatted number with separators."""
+        try:
+            value = self.get_value()
+            separator = self.get_configuration("separator") or "'"
+
+            # Convert to int/float if it's a string
+            if isinstance(value, str):
+                value = float(value) if '.' in value else int(value)
+
+            # Split into integer and decimal parts
+            if isinstance(value, float):
+                int_part, dec_part = str(value).split('.')
+                formatted_int = "{:,}".format(int(int_part)).replace(',', separator)
+                return f"{formatted_int}.{dec_part}"
+            else:
+                return "{:,}".format(int(value)).replace(',', separator)
+        except (ValueError, TypeError, AttributeError):
+            return self.get_value()
+
+
+class CompactNumberFilter(AbstractFilter):
+    """A filter to format numbers in compact form (K for thousands, M for millions).
+
+    Usage: [number|compact(precision="1")]
+    Examples:
+        21438 -> 21.4K
+        1234567 -> 1.2M
+        123 -> 123
+        With precision=0: 21438 -> 21K
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["precision"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the formatted number in compact form."""
+        try:
+            value = self.get_value()
+            precision = int(self.get_configuration("precision") or 1)
+
+            # Convert to number if it's a string
+            if isinstance(value, str):
+                value = float(value) if '.' in value else int(value)
+
+            num = float(value)
+
+            if abs(num) >= 1_000_000_000:
+                formatted = f"{num / 1_000_000_000:.{precision}f}B"
+            elif abs(num) >= 1_000_000:
+                formatted = f"{num / 1_000_000:.{precision}f}M"
+            elif abs(num) >= 1_000:
+                formatted = f"{num / 1_000:.{precision}f}K"
+            else:
+                return str(int(num) if num == int(num) else num)
+
+            # Remove trailing zeros after decimal point
+            if '.' in formatted:
+                formatted = formatted.rstrip('0').rstrip('.')
+
+            return formatted
+        except (ValueError, TypeError, AttributeError):
+            return self.get_value()
+
+
+class RelativeDateFilter(AbstractFilter):
+    """A filter to format dates as relative time (e.g., 'today', 'yesterday', '2 days ago').
+
+    Usage: [date|relative()]
+    Examples:
+        Today's date -> "today"
+        Yesterday -> "yesterday"
+        2 days ago -> "2 days ago"
+        Last week -> "1 week ago"
+        Older dates -> formatted as "13.10.2025"
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["format"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the date formatted as relative time."""
+        from django.utils import timezone
+
+        try:
+            value = self.get_value()
+
+            # Parse the date if it's a string
+            if isinstance(value, str):
+                # Try common date formats
+                for fmt in ["%Y-%m-%d", "%Y/%m/%d", "%d.%m.%Y", "%d/%m/%Y", "%m/%d/%Y"]:
+                    try:
+                        date_obj = datetime.strptime(value, fmt).date()
+                        break
+                    except ValueError:
+                        continue
+                else:
+                    return self.get_value()  # If no format matches, return original
+            elif isinstance(value, datetime):
+                date_obj = value.date()
+            elif hasattr(value, 'year'):  # date object
+                date_obj = value
+            else:
+                return self.get_value()
+
+            # Get today's date (timezone-aware if needed)
+            today = timezone.now().date() if timezone.is_aware(timezone.now()) else datetime.now().date()
+
+            # Calculate difference
+            diff = (today - date_obj).days
+
+            if diff == 0:
+                return "today"
+            elif diff == 1:
+                return "yesterday"
+            elif diff == -1:
+                return "tomorrow"
+            elif diff > 1 and diff < 7:
+                return f"{diff} days ago"
+            elif diff == 7:
+                return "1 week ago"
+            elif diff > 7 and diff < 30:
+                weeks = diff // 7
+                return f"{weeks} week{'s' if weeks > 1 else ''} ago"
+            elif diff >= 30 and diff < 365:
+                months = diff // 30
+                return f"{months} month{'s' if months > 1 else ''} ago"
+            elif diff >= 365:
+                years = diff // 365
+                return f"{years} year{'s' if years > 1 else ''} ago"
+            elif diff < -1 and diff > -7:
+                return f"in {abs(diff)} days"
+            elif diff <= -7 and diff > -30:
+                weeks = abs(diff) // 7
+                return f"in {weeks} week{'s' if weeks > 1 else ''}"
+            else:
+                # For older dates or far future dates, return formatted date
+                format_str = self.get_configuration("format") or "%d.%m.%Y"
+                return date_obj.strftime(format_str)
+        except (ValueError, TypeError, AttributeError):
+            return self.get_value()

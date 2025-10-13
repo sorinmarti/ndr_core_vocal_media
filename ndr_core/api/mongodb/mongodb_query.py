@@ -15,6 +15,9 @@ class MongoDBQuery(BaseQuery):
         else:
             regex_string = f"({'|'.join(search_words)})"
 
+        # Convert sort_order to MongoDB format: 1 for ascending, -1 for descending
+        sort_direction = -1 if self.search_config.sort_order == 'desc' else 1
+
         query = {
             'filter': {
                 self.search_config.simple_query_main_field: {
@@ -22,15 +25,19 @@ class MongoDBQuery(BaseQuery):
                     '$options': 'msi'
                 }
             },
-            'sort': list({self.search_config.sort_field: 1}.items()),
+            'sort': list({self.search_config.sort_field: sort_direction}.items()),
             'page': int(self.page)
         }
         return query
 
     def get_advanced_query(self, *kwargs):
+        # Convert sort_order to MongoDB format: 1 for ascending, -1 for descending
+        print("ADVANCED QUERY", self.search_config.sort_order)
+        sort_direction = -1 if self.search_config.sort_order == 'desc' else 1
+
         query = {
             'filter': {},
-            'sort': list({self.search_config.sort_field: 1}.items()),
+            'sort': list({self.search_config.sort_field: sort_direction}.items()),
             'page': int(self.page)
         }
 
@@ -94,9 +101,12 @@ class MongoDBQuery(BaseQuery):
 
     def get_all_items_query(self, add_page_and_size=True):
         """Returns a query to retrieve all items without filters."""
+        # Convert sort_order to MongoDB format: 1 for ascending, -1 for descending
+        sort_direction = -1 if self.search_config.sort_order == 'desc' else 1
+
         query = {
             'filter': {},  # Empty filter returns all documents
-            'sort': list({self.search_config.sort_field: 1}.items()),
+            'sort': list({self.search_config.sort_field: sort_direction}.items()),
             'page': int(self.page)
         }
         return query

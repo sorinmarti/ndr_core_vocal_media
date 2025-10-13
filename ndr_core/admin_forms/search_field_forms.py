@@ -190,7 +190,7 @@ class SearchFieldCreateForm(SearchFieldForm):
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Create Search Field'))
+        helper.layout.append(get_form_buttons('Create Search Field', include_save_and_continue=True))
         return helper
 
 
@@ -201,5 +201,5 @@ class SearchFieldEditForm(SearchFieldForm):
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Save Search Field'))
+        helper.layout.append(get_form_buttons('Save Search Field', include_save_and_continue=True))
         return helper

@@ -110,6 +110,9 @@ class HTMLElement:
             self.add_attribute('style', f'{color_style_string}: niy;')
         if option_value == 'byval':
             self.add_attribute('style', f'{color_style_string}: {self.get_color_from_value(value)};')
+        if option_value == 'gradient':
+            # Red to green gradient based on numeric value (0-100 or 0-1)
+            self.add_attribute('style', f'{color_style_string}: {self.get_gradient_color(value)};')
 
     @staticmethod
     def get_color_from_value(value, lightness=80):
@@ -124,3 +127,46 @@ class HTMLElement:
             hash_value = hash_value & hash_value
 
         return f'hsl({hash_value % 360}, {100}%, {lightness}%)'
+
+    @staticmethod
+    def get_gradient_color(value):
+        """Generates a color from red (low) to green (high) based on numeric value.
+        Supports both 0-100 scale and 0-1 scale (automatically detected).
+
+        Args:
+            value: Numeric value (int, float, or string representing a number)
+
+        Returns:
+            HSL color string transitioning from red (0°) to green (120°)
+        """
+        if value is None or value == '':
+            return 'hsl(0, 70%, 50%)'  # Default to red for None/empty
+
+        try:
+            # Convert to float
+            if isinstance(value, str):
+                num_value = float(value)
+            else:
+                num_value = float(value)
+
+            # Auto-detect scale: if value is between 0-1, treat as percentage
+            if 0 <= num_value <= 1:
+                percentage = num_value * 100
+            elif 0 <= num_value <= 100:
+                percentage = num_value
+            else:
+                # Value out of range, clamp it
+                percentage = max(0, min(100, num_value))
+
+            # Calculate hue: 0° (red) to 120° (green)
+            # At 0%: hue = 0 (red)
+            # At 50%: hue = 60 (yellow/orange)
+            # At 100%: hue = 120 (green)
+            hue = int((percentage / 100) * 120)
+
+            # Return HSL color with moderate saturation and lightness
+            return f'hsl({hue}, 70%, 50%)'
+
+        except (ValueError, TypeError):
+            # If conversion fails, return gray
+            return 'hsl(0, 0%, 50%)'

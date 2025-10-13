@@ -13,7 +13,7 @@ class ResultFieldForm(forms.ModelForm):
     class Meta:
         """Configure the model form. Provide model class and form fields."""
         model = NdrCoreResultField
-        fields = ['label', 'rich_expression', 'field_classes']
+        fields = ['label', 'rich_expression', 'field_classes', 'border_label']
 
     @property
     def helper(self):
@@ -35,7 +35,8 @@ class ResultFieldForm(forms.ModelForm):
         layout.append(form_row)
 
         form_row = Row(
-            Column('field_classes', css_class='form-group col-12'),
+            Column('field_classes', css_class='form-group col-6'),
+            Column('border_label', css_class='form-group col-6'),
             css_class='form-row'
         )
         layout.append(form_row)
@@ -59,7 +60,7 @@ class ResultFieldCreateForm(ResultFieldForm):
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Create Search Field'))
+        helper.layout.append(get_form_buttons('Create Result Card', include_save_and_continue=True))
         return helper
 
 
@@ -70,5 +71,5 @@ class ResultFieldEditForm(ResultFieldForm):
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Save Search Field'))
+        helper.layout.append(get_form_buttons('Save Result Card', include_save_and_continue=True))
         return helper
