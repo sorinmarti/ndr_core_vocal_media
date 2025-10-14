@@ -1,5 +1,7 @@
 """NDR Core template tags."""
 import re
+import json
+import html
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
@@ -14,15 +16,20 @@ class TextPreRenderer:
     MAX_ITERATIONS = 50
     ui_element_regex = r'\[\[(card|slideshow|carousel|jumbotron|figure|banner|iframe|manifest_viewer)\|(.*)\]\]'
     link_element_regex = r'\[\[(file|page|orcid)\|([0-9a-zA-Z_ -]*)\]\]'
-    container_regex = r'\[\[(start|end)_(block)\]\]'
+    container_regex = r'\[\[(start|end)_(block)(?:=(.*?))?\]\]'
+    code_start_regex = r'\[\[start_code(?:=(.*?))?\]\]'
+    code_end_regex = r'\[\[end_code\]\]'
+    toc_regex = r'\[\[toc\]\]'
     link_element_classes = {'figure': NdrCoreImage, 'file': NdrCoreUpload, 'page': NdrCorePage}
     link_element_keys = {"page": "view_name"}
 
     text = None
+    block_titles = None
 
     def __init__(self, text, request):
         self.text = text
         self.request = request
+        self.block_titles = []
 
     def check_tags_integrity(self):
         """Checks if all tags are well-formed. """
@@ -48,11 +55,31 @@ class TextPreRenderer:
             rendered_text = self.text
             match = re.search(self.container_regex, rendered_text)
             security_breaker = 0
+            block_counter = 0
+
             while match:
-                rendered_text = rendered_text.replace('[[start_block]]',
-                                                      '<div class="card mb-2 box-shadow">'
-                                                      '<div class="card-body d-flex flex-column">')
-                rendered_text = rendered_text.replace('[[end_block]]', '</div></div>')
+                full_match = match.group(0)
+                action = match.group(1)  # 'start' or 'end'
+                block_type = match.group(2)  # 'block'
+                title = match.group(3) if len(match.groups()) >= 3 else None  # optional title
+
+                if action == 'start':
+                    block_counter += 1
+                    if title:
+                        # Create slug from title for anchor ID
+                        anchor_id = f"block-{block_counter}-{re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')}"
+                        self.block_titles.append({'title': title, 'anchor': anchor_id})
+
+                        replacement = (f'<div class="card mb-2 box-shadow" id="{anchor_id}">'
+                                     f'<div class="card-body d-flex flex-column">'
+                                     f'<h3 class="card-title">{title}</h3>')
+                    else:
+                        replacement = ('<div class="card mb-2 box-shadow">'
+                                     '<div class="card-body d-flex flex-column">')
+                elif action == 'end':
+                    replacement = '</div></div>'
+
+                rendered_text = rendered_text.replace(full_match, replacement, 1)
                 match = re.search(self.container_regex, rendered_text)
 
                 security_breaker += 1
@@ -94,6 +121,92 @@ class TextPreRenderer:
             security_breaker += 1
             if security_breaker > self.MAX_ITERATIONS:
                 raise PreRenderError("Too many link elements rendering iterations.")
+        return rendered_text
+
+    def create_toc(self):
+        """Creates table of contents with anchor links to titled blocks."""
+        rendered_text = self.text
+        match = re.search(self.toc_regex, rendered_text)
+
+        if match and self.block_titles:
+            toc_html = '<div class="card mb-3 toc-container">'
+            toc_html += '<div class="card-body">'
+            toc_html += '<h4 class="card-title">Table of Contents</h4>'
+            toc_html += '<ul class="list-unstyled">'
+
+            for block in self.block_titles:
+                toc_html += f'<li><a href="#{block["anchor"]}">{block["title"]}</a></li>'
+
+            toc_html += '</ul>'
+            toc_html += '</div>'
+            toc_html += '</div>'
+
+            rendered_text = rendered_text.replace('[[toc]]', toc_html)
+        elif match and not self.block_titles:
+            # If [[toc]] is present but no titled blocks exist, remove the tag
+            rendered_text = rendered_text.replace('[[toc]]', '')
+
+        return rendered_text
+
+    def create_code_blocks(self):
+        """Creates code blocks with optional syntax highlighting and pretty-printing."""
+        rendered_text = self.text
+        security_breaker = 0
+
+        # Find start tag
+        start_match = re.search(self.code_start_regex, rendered_text)
+
+        while start_match:
+            language = start_match.group(1) if start_match.group(1) else 'text'
+            start_pos = start_match.end()
+
+            # Find corresponding end tag
+            end_match = re.search(self.code_end_regex, rendered_text[start_pos:])
+            if not end_match:
+                # No matching end tag found
+                break
+
+            end_pos = start_pos + end_match.start()
+
+            # Extract content between tags
+            code_content = rendered_text[start_pos:end_pos]
+
+            # Strip HTML tags (like <p>, <br>, etc.) inserted by WYSIWYG editor
+            # Remove all HTML tags but preserve the text content
+            code_content = re.sub(r'<[^>]+>', '', code_content)
+
+            # Unescape HTML entities that might be in the content
+            code_content = html.unescape(code_content)
+
+            # Strip leading/trailing whitespace but preserve internal formatting
+            code_content = code_content.strip()
+
+            # Pretty-print JSON if language is json
+            if language.lower() == 'json':
+                try:
+                    parsed_json = json.loads(code_content)
+                    code_content = json.dumps(parsed_json, indent=2, ensure_ascii=False)
+                except json.JSONDecodeError:
+                    # If JSON is invalid, just display as-is
+                    pass
+
+            # Escape HTML to prevent XSS
+            code_content = html.escape(code_content)
+
+            # Create the code block with language class for syntax highlighting
+            code_html = f'<pre class="code-block"><code class="language-{language.lower()}">{code_content}</code></pre>'
+
+            # Replace the entire block (from start tag to end tag) with the rendered HTML
+            full_block = rendered_text[start_match.start():start_pos + end_match.end()]
+            rendered_text = rendered_text.replace(full_block, code_html, 1)
+
+            # Search for next code block
+            start_match = re.search(self.code_start_regex, rendered_text)
+
+            security_breaker += 1
+            if security_breaker > self.MAX_ITERATIONS:
+                raise PreRenderError("Too many code block rendering iterations.")
+
         return rendered_text
 
     def render_element(self, template, element_id,  text):
@@ -156,7 +269,9 @@ class TextPreRenderer:
             return self.text
 
         try:
+            self.text = self.create_code_blocks()
             self.text = self.create_containers()
+            self.text = self.create_toc()
             self.text = self.create_ui_elements()
             self.text = self.create_links()
         except PreRenderError as e:
