@@ -7,6 +7,14 @@
 
 {% block generated_content %}
 
+    {% if rendered_text %}
+        <div class="row bg-white mb-3">
+            <div class="col-12 p-3">
+                {{ rendered_text|safe }}
+            </div>
+        </div>
+    {% endif %}
+
     {% if result %}
         <h4 class="mt-4">
             {% translate 'Search Results' %}

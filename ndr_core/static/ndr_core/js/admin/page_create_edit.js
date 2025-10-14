@@ -25,9 +25,10 @@ function setComponents(select_value) {
                 break;
             case '3':   // Custom Search
                 search_configs.show();
-                template_text.hide();
+                template_text.show();
                 info_text.text('Creates a page with one or multiple custom search forms. You need to create these forms ' +
-                               'before you can use this page type. Multiple forms are displayed in tabs.')
+                               'before you can use this page type. Multiple forms are displayed in tabs. You can add ' +
+                               'static text in the editor below.')
                 break;
             case '4':   // Data List
                 search_configs.show();
