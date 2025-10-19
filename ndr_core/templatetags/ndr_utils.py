@@ -110,19 +110,71 @@ class RenderDataListNode(template.Node):
         self.search_config = template.Variable(search_config)
 
     def create_entry(self, context, result):
-        """Creates a result card."""
+        """Creates a result card using the compact result card configuration."""
 
         conf = self.search_config.resolve(context)
+
+        # Use the compact result card configuration to render the list item
+        card_content = self.create_grid(context, result["data"], "compact")
+
+        # If no compact configuration exists, fall back to simple id/label display
+        if not card_content:
+            card_content = {"id": result['data'][conf.search_id_field],
+                           "label": result['data'][conf.simple_query_main_field],
+                           "search_term": context.get('search_term', '')}
+
         card_context = {
             "result": result,
-            "card_content": {"id": result['data'][conf.search_id_field],
-                             "label": result['data'][conf.simple_query_main_field],
-                             "search_term": context.get('search_term', '')},
+            "card_content": card_content,
+            "search_term": context.get('search_term', ''),
         }
         card_template = "ndr_core/result_renderers/data_list_template.html"
 
         card_template_str = get_template(card_template).render(card_context)
         return mark_safe(card_template_str)
+
+    def create_grid(self, context, data, compact_view):
+        """Creates a CSS Grid of result fields using the compact configuration."""
+        result_card_fields = self.search_config.resolve(
+            context
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
+
+        if not result_card_fields.exists():
+            return ""
+
+        # Create CSS Grid container
+        grid_html = '<div class="result-grid">'
+
+        for field_config in result_card_fields:
+            field_html = self.create_field(field_config, data)
+            grid_html += field_html
+
+        grid_html += '</div>'
+        return mark_safe(grid_html)
+
+    @staticmethod
+    def create_field(field_config, data):
+        """Creates a result field with CSS Grid positioning."""
+        field_template = "ndr_core/result_renderers/elements/result_field.html"
+        result_field = field_config.result_field
+
+        template_string = TemplateString(
+            result_field.rich_expression, data, show_errors=True
+        )
+        field_content = template_string.get_formatted_string()
+        field_content = template_string.sanitize_html(field_content)
+
+        field_context = {
+            "field_row": field_config.field_row,
+            "field_column": field_config.field_column,
+            "field_column_span": field_config.field_column_span,
+            "field_row_span": field_config.field_row_span,
+            "classes": result_field.field_classes,
+            "field_content": field_content,
+            "border_label": result_field.border_label,
+        }
+        field_template_str = get_template(field_template).render(field_context)
+        return mark_safe(field_template_str)
 
     def render(self, context):
         """Renders a result object."""

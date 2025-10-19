@@ -5,8 +5,14 @@
 {% load ndr_values %}
 
 {% block search_result_content %}
-    <span class="badge font-weight-normal text-dark" style="background-color: #D9D9D9;">{{ card_content.id }}</span>
-    &nbsp;&nbsp;
-    <strong>{{ card_content.label }}</strong>
+    {% if card_content.id %}
+        {# Fallback to simple id/label display if no compact configuration exists #}
+        <span class="badge font-weight-normal text-dark" style="background-color: #D9D9D9;">{{ card_content.id }}</span>
+        &nbsp;&nbsp;
+        <strong>{{ card_content.label }}</strong>
+    {% else %}
+        {# Render the configured compact result card fields #}
+        {{ card_content|safe }}
+    {% endif %}
 {% endblock %}
 
