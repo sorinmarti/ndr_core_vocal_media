@@ -15,6 +15,8 @@ from ndr_core.forms.forms_base import _NdrCoreForm
 from ndr_core.forms.widgets import (
     BootstrapSwitchWidget,
     NdrCoreFormSubmit,
+    NdrCoreFilterButton,
+    NdrCoreClearButton,
     FilteredListWidget
 )
 
@@ -35,7 +37,7 @@ class DataListSearchForm(_NdrCoreForm):
         super().__init__(*args, **kwargs)
 
         self.fields["search_term"] = forms.CharField(
-            label=self.search_config.simple_query_label,
+            label=mark_safe(self.search_config.simple_query_label + "&nbsp;"),
             required=False,
             max_length=100,
             help_text=self.search_config.simple_query_help_text)
@@ -47,8 +49,15 @@ class DataListSearchForm(_NdrCoreForm):
 
         helper = FormHelper()
         helper.form_method = "GET"
+        helper.form_class = "form-inline justify-content-end"
         layout = helper.layout = Layout()
-        layout.append(Div(Field("search_term", wrapper_class="col-md-12"), css_class="form-row"))
+
+        # Add the search field with filter and clear buttons inline
+        layout.append(Field("search_term", wrapper_class="mr-2 align-self-start"))
+        layout.append(NdrCoreFilterButton(_("Filter")))
+        layout.append(HTML("&nbsp;"))
+        layout.append(NdrCoreClearButton(_("Clear")))
+
         return helper
 
 

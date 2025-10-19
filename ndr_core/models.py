@@ -848,6 +848,104 @@ class NdrCoreColorScheme(models.Model):
     error_color = ColorField(help_text='Error color for alerts.')
     """Error color for alerts."""
 
+    # Brand panel colors (for unibas_brand style)
+    brand_panel_bg = ColorField(help_text='Background color of the brand panel.', default='#00b0b9')
+    """Background color of the brand panel."""
+
+    brand_panel_text = ColorField(help_text='Text color of the brand panel.', default='#ffffff')
+    """Text color of the brand panel."""
+
+    # Dark mode color fields
+    dark_background_color = ColorField(help_text='Background color for dark mode.', default='#121212')
+    """Background color for dark mode."""
+
+    dark_container_bg_color = ColorField(help_text='Container background color for dark mode.', default='#1e1e1e')
+    """Container background color for dark mode."""
+
+    dark_text_color = ColorField(help_text='Text color for dark mode.', default='#e9ecef')
+    """Text color for dark mode."""
+
+    dark_title_color = ColorField(help_text='Title color for dark mode.', default='#ffffff')
+    """Title color for dark mode."""
+
+    dark_button_color = ColorField(help_text='Primary button background color for dark mode.', default='#0d6efd')
+    """Primary button background color for dark mode."""
+
+    dark_button_hover_color = ColorField(help_text='Primary button hover color for dark mode.', default='#0b5ed7')
+    """Primary button hover color for dark mode."""
+
+    dark_button_text_color = ColorField(help_text='Primary button text color for dark mode.', default='#ffffff')
+    """Primary button text color for dark mode."""
+
+    dark_button_border_color = ColorField(help_text='Primary button border color for dark mode.', default='#0d6efd')
+    """Primary button border color for dark mode."""
+
+    dark_second_button_color = ColorField(help_text='Secondary button background color for dark mode.', default='#6c757d')
+    """Secondary button background color for dark mode."""
+
+    dark_second_button_hover_color = ColorField(help_text='Secondary button hover color for dark mode.', default='#5c636a')
+    """Secondary button hover color for dark mode."""
+
+    dark_second_button_text_color = ColorField(help_text='Secondary button text color for dark mode.', default='#ffffff')
+    """Secondary button text color for dark mode."""
+
+    dark_second_button_border_color = ColorField(help_text='Secondary button border color for dark mode.', default='#6c757d')
+    """Secondary button border color for dark mode."""
+
+    dark_link_color = ColorField(help_text='Link color for dark mode.', default='#6ea8fe')
+    """Link color for dark mode."""
+
+    dark_nav_link_color = ColorField(help_text='Navigation link color for dark mode.', default='#e9ecef')
+    """Navigation link color for dark mode."""
+
+    dark_nav_active_color = ColorField(help_text='Active navigation link color for dark mode.', default='#ffffff')
+    """Active navigation link color for dark mode."""
+
+    dark_tab_title_color = ColorField(help_text='Tab title color for dark mode.', default='#adb5bd')
+    """Tab title color for dark mode."""
+
+    dark_tab_active_title_color = ColorField(help_text='Active tab title color for dark mode.', default='#ffffff')
+    """Active tab title color for dark mode."""
+
+    dark_form_field_bg = ColorField(help_text='Form field background color for dark mode.', default='#2a2a2a')
+    """Form field background color for dark mode."""
+
+    dark_form_field_fg = ColorField(help_text='Form field text color for dark mode.', default='#e9ecef')
+    """Form field text color for dark mode."""
+
+    dark_footer_bg = ColorField(help_text='Footer background color for dark mode.', default='#212529')
+    """Footer background color for dark mode."""
+
+    dark_footer_link_color = ColorField(help_text='Footer link color for dark mode.', default='#adb5bd')
+    """Footer link color for dark mode."""
+
+    dark_footer_link_hover_color = ColorField(help_text='Footer link hover color for dark mode.', default='#ffffff')
+    """Footer link hover color for dark mode."""
+
+    dark_powered_by_color = ColorField(help_text='Powered by text color for dark mode.', default='#6c757d')
+    """Powered by text color for dark mode."""
+
+    dark_accent_color_1 = ColorField(help_text='Accent color 1 for dark mode.', default='#0d6efd')
+    """Accent color 1 for dark mode."""
+
+    dark_accent_color_2 = ColorField(help_text='Accent color 2 for dark mode.', default='#6ea8fe')
+    """Accent color 2 for dark mode."""
+
+    dark_info_color = ColorField(help_text='Info alert color for dark mode.', default='#0dcaf0')
+    """Info alert color for dark mode."""
+
+    dark_success_color = ColorField(help_text='Success alert color for dark mode.', default='#198754')
+    """Success alert color for dark mode."""
+
+    dark_error_color = ColorField(help_text='Error alert color for dark mode.', default='#dc3545')
+    """Error alert color for dark mode."""
+
+    dark_brand_panel_bg = ColorField(help_text='Brand panel background color for dark mode.', default='#008a92')
+    """Brand panel background color for dark mode."""
+
+    dark_brand_panel_text = ColorField(help_text='Brand panel text color for dark mode.', default='#ffffff')
+    """Brand panel text color for dark mode."""
+
     # New fields for fonts and sizes
     font_family = models.CharField(max_length=100, default="Arial, sans-serif")
     h1_size = models.CharField(max_length=10, default="2rem")
@@ -867,6 +965,18 @@ class NdrCoreColorScheme(models.Model):
                 'tab_title_color', 'tab_active_title_color',
                 'link_color', 'nav_link_color', 'nav_active_color',
                 'accent_color_1', 'accent_color_2', 'info_color', 'success_color', 'error_color',
+                'brand_panel_bg', 'brand_panel_text',
+                'dark_background_color', 'dark_container_bg_color', 'dark_text_color', 'dark_title_color',
+                'dark_button_color', 'dark_button_hover_color', 'dark_button_text_color', 'dark_button_border_color',
+                'dark_second_button_color', 'dark_second_button_hover_color', 'dark_second_button_text_color',
+                'dark_second_button_border_color',
+                'dark_link_color', 'dark_nav_link_color', 'dark_nav_active_color',
+                'dark_tab_title_color', 'dark_tab_active_title_color',
+                'dark_form_field_bg', 'dark_form_field_fg',
+                'dark_footer_bg', 'dark_footer_link_color', 'dark_footer_link_hover_color', 'dark_powered_by_color',
+                'dark_accent_color_1', 'dark_accent_color_2',
+                'dark_info_color', 'dark_success_color', 'dark_error_color',
+                'dark_brand_panel_bg', 'dark_brand_panel_text',
                 "font_family", "h1_size", "h2_size", "h3_size", "h4_size"]
 
     def __str__(self):

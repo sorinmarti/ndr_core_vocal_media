@@ -7,7 +7,7 @@
        style="position: relative; {% if border_label %}margin-top: 12px;{% endif %}">
       <!-- Border label positioned on the top border -->
       {% if border_label %}
-      <span style="position: absolute; top: -10px; left: 10px; background-color: white; padding: 0 6px; font-size: 0.75rem; color: #6c757d; font-weight: 500;">
+      <span class="result-card-field-label" style="position: absolute; top: -10px; left: 10px; background-color: var(--container-bg-color); padding: 0 6px; font-size: 0.75rem; font-weight: 500; color: var(--text-color); opacity: 0.7;">
           {{ border_label }}
       </span>
       {% endif %}

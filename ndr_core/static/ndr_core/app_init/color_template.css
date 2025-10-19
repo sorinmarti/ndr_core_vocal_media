@@ -1,10 +1,79 @@
 /* DO NOT MODIFY THIS FILE. IT IS GENERATED. MODIFY style.css INSTEAD. */
 
+/* Root CSS Variables for Light Mode */
+:root {
+    --background-color: [[background_color]];
+    --container-bg-color: [[container_bg_color]];
+    --text-color: [[text_color]];
+    --title-color: [[title_color]];
+    --button-color: [[button_color]];
+    --button-hover-color: [[button_hover_color]];
+    --button-text-color: [[button_text_color]];
+    --button-border-color: [[button_border_color]];
+    --second-button-color: [[second_button_color]];
+    --second-button-hover-color: [[second_button_hover_color]];
+    --second-button-text-color: [[second_button_text_color]];
+    --second-button-border-color: [[second_button_border_color]];
+    --link-color: [[link_color]];
+    --nav-link-color: [[nav_link_color]];
+    --nav-active-color: [[nav_active_color]];
+    --tab-title-color: [[tab_title_color]];
+    --tab-active-title-color: [[tab_active_title_color]];
+    --form-field-bg: [[form_field_bg]];
+    --form-field-fg: [[form_field_fg]];
+    --footer-bg: [[footer_bg]];
+    --footer-link-color: [[footer_link_color]];
+    --footer-link-hover-color: [[footer_link_hover_color]];
+    --powered-by-color: [[powered_by_color]];
+    --accent-color-1: [[accent_color_1]];
+    --accent-color-2: [[accent_color_2]];
+    --info-color: [[info_color]];
+    --success-color: [[success_color]];
+    --error-color: [[error_color]];
+    --brand-panel-bg: [[brand_panel_bg]];
+    --brand-panel-text: [[brand_panel_text]];
+}
+
+/* Dark Mode CSS Variables */
+[data-theme="dark"] {
+    --background-color: [[dark_background_color]];
+    --container-bg-color: [[dark_container_bg_color]];
+    --text-color: [[dark_text_color]];
+    --title-color: [[dark_title_color]];
+    --button-color: [[dark_button_color]];
+    --button-hover-color: [[dark_button_hover_color]];
+    --button-text-color: [[dark_button_text_color]];
+    --button-border-color: [[dark_button_border_color]];
+    --second-button-color: [[dark_second_button_color]];
+    --second-button-hover-color: [[dark_second_button_hover_color]];
+    --second-button-text-color: [[dark_second_button_text_color]];
+    --second-button-border-color: [[dark_second_button_border_color]];
+    --link-color: [[dark_link_color]];
+    --nav-link-color: [[dark_nav_link_color]];
+    --nav-active-color: [[dark_nav_active_color]];
+    --tab-title-color: [[dark_tab_title_color]];
+    --tab-active-title-color: [[dark_tab_active_title_color]];
+    --form-field-bg: [[dark_form_field_bg]];
+    --form-field-fg: [[dark_form_field_fg]];
+    --footer-bg: [[dark_footer_bg]];
+    --footer-link-color: [[dark_footer_link_color]];
+    --footer-link-hover-color: [[dark_footer_link_hover_color]];
+    --powered-by-color: [[dark_powered_by_color]];
+    --accent-color-1: [[dark_accent_color_1]];
+    --accent-color-2: [[dark_accent_color_2]];
+    --info-color: [[dark_info_color]];
+    --success-color: [[dark_success_color]];
+    --error-color: [[dark_error_color]];
+    --brand-panel-bg: [[dark_brand_panel_bg]];
+    --brand-panel-text: [[dark_brand_panel_text]];
+}
+
 /* BODY */
 body {
-    background: [[background_color]] !important;
-    color: [[text_color]] !important;
+    background: var(--background-color) !important;
+    color: var(--text-color) !important;
     font-family: [[font_family]];
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Headings */
@@ -26,155 +95,181 @@ h4 {
 
 /* Containers */
 .card {
-    background: [[container_bg_color]] !important;
+    background: var(--container-bg-color) !important;
+    transition: background-color 0.3s ease;
 }
 
 .card-title {
-    color: [[title_color]] !important;
+    color: var(--title-color) !important;
 }
 
 .card-text {
-    color: [[text_color]] !important;
+    color: var(--text-color) !important;
 }
 
 /* PRIMARY */
 .btn-primary {
-    background: [[button_color]] !important;
-    color: [[button_text_color]] !important;
-    border-color: [[button_border_color]] !important;
+    background: var(--button-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-border-color) !important;
 }
 
 .btn-primary:hover {
-    background: [[button_hover_color]] !important;
-    color: [[button_text_color]] !important;
-    border-color: [[button_border_color]] !important;
+    background: var(--button-hover-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-border-color) !important;
 }
 
 .btn-outline-primary {
-    background: [[background_color]] !important;
-    color: [[text_color]] !important;
-    border-color: [[button_border_color]] !important;
+    background: var(--background-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--button-border-color) !important;
 }
 
 .btn-outline-primary:hover {
-    background: [[button_color]] !important;
-    color: [[button_text_color]] !important;
-    border-color: [[button_border_color]] !important;
+    background: var(--button-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-border-color) !important;
 }
 
 /* SECONDARY */
 .btn-secondary {
-    background: [[second_button_color]] !important;
-    color: [[second_button_text_color]] !important;
-    border-color: [[second_button_border_color]] !important;
+    background: var(--second-button-color) !important;
+    color: var(--second-button-text-color) !important;
+    border-color: var(--second-button-border-color) !important;
 }
 
 .btn-secondary:hover {
-    background: [[second_button_hover_color]] !important;
-    color: [[second_button_text_color]] !important;
-    border-color: [[second_button_border_color]] !important;
+    background: var(--second-button-hover-color) !important;
+    color: var(--second-button-text-color) !important;
+    border-color: var(--second-button-border-color) !important;
 }
 
 .btn-outline-secondary {
-    background: [[second_button_hover_color]] !important;
-    color: [[second_button_text_color]] !important;
-    border-color: [[second_button_border_color]] !important;
+    background: var(--second-button-hover-color) !important;
+    color: var(--second-button-text-color) !important;
+    border-color: var(--second-button-border-color) !important;
 }
 
 .btn-outline-secondary:hover {
-    background: [[second_button_color]] !important;
-    color: [[second_button_text_color]] !important;
-    border-color: [[second_button_border_color]] !important;
+    background: var(--second-button-color) !important;
+    color: var(--second-button-text-color) !important;
+    border-color: var(--second-button-border-color) !important;
 }
 
 /* LINKS */
 a {
-    color: [[link_color]] !important;
+    color: var(--link-color) !important;
 }
 
 /* ALERTS */
 .alert-info {
-    background: [[info_color]] !important;
-    color: [[text_color]] !important;
+    background: var(--info-color) !important;
+    color: var(--text-color) !important;
 }
 
 .alert-danger {
-    background: [[error_color]] !important;
-    color: [[text_color]] !important;
+    background: var(--error-color) !important;
+    color: var(--text-color) !important;
 }
 
 .alert-success {
-    background: [[success_color]] !important;
-    color: [[text_color]] !important;
+    background: var(--success-color) !important;
+    color: var(--text-color) !important;
 }
 
 /* ACCENTS */
 .accent-1-bg {
-    background: [[accent_color_1]] !important;
+    background: var(--accent-color-1) !important;
 }
 
 .accent-1-fg {
-    color: [[accent_color_1]] !important;
+    color: var(--accent-color-1) !important;
 }
 
 .accent-2-bg {
-    background: [[accent_color_2]] !important;
+    background: var(--accent-color-2) !important;
 }
 
 .accent-2-fg {
-    color: [[accent_color_2]] !important;
+    color: var(--accent-color-2) !important;
 }
 
 /* FORM */
 form {
-    background: [[form_field_bg]];
+    background: var(--form-field-bg);
+    transition: background-color 0.3s ease;
 }
 
 .form-control {
-    color: [[form_field_fg]];
+    color: var(--form-field-fg);
+    background: var(--form-field-bg);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* FOOTER */
 .footer-bg {
-    background: [[footer_bg]] !important;
+    background: var(--footer-bg) !important;
 }
 
 .footer-link {
-    color: [[footer_link_color]] !important;
+    color: var(--footer-link-color) !important;
 }
 
 .footer-link:hover {
-    color: [[footer_link_hover_color]] !important;
+    color: var(--footer-link-hover-color) !important;
 }
 
 .powered-by {
-    color: [[powered_by_color]] !important;
+    color: var(--powered-by-color) !important;
+}
+
+.site-footer {
+    background: var(--footer-bg) !important;
+    color: var(--footer-link-color) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Brand Panel (for unibas_brand style) */
+.brand-panel {
+    background: var(--brand-panel-bg) !important;
+    color: var(--brand-panel-text) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.brand-title {
+    color: var(--brand-panel-text) !important;
+}
+
+.theme-toggle {
+    color: var(--brand-panel-text) !important;
+    border-color: var(--brand-panel-text) !important;
 }
 
 /* TEXT */
 .ndr-text-fg {
-    color: [[text_color]] !important;
+    color: var(--text-color) !important;
 }
 
 .ndr-text-fg:hover {
-    color: [[accent_color_2]] !important;
+    color: var(--accent-color-2) !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: [[title_color]];
+    color: var(--title-color);
 }
 
 p {
-    color: [[text_color]];
+    color: var(--text-color);
 }
 
 /* NAVIGATION */
 .nav-link {
-    color: [[nav_link_color]] !important;
+    color: var(--nav-link-color) !important;
 }
 
 .nav-link.active {
-    color: [[nav_active_color]] !important;
+    color: var(--nav-active-color) !important;
     text-decoration: none;
     font-weight: bold;
 }
@@ -187,11 +282,29 @@ p {
     text-decoration: underline;
 }
 
+.navbar-under {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* TABS */
 .nav-link.tab-link {
-    color: [[tab_title_color]] !important;
+    color: var(--tab-title-color) !important;
 }
 
 .nav-link.active.tab-link {
-    color: [[tab_active_title_color]] !important;
+    color: var(--tab-active-title-color) !important;
+}
+
+/* Dark mode enhancements */
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--container-bg-color);
+    border-color: #333;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--accent-color-1);
 }

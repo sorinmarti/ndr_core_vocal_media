@@ -55,6 +55,11 @@
                                         <a class="nav-link" href="{{ nav_item.url }}">{{ nav_item.label }}</a>
                                     </li>
                                 {% endfor %}
+                                <li class="nav-item">
+                                    <button id="themeToggle" class="btn btn-sm btn-outline-secondary ml-2" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+                                        <i class="fa-solid fa-adjust"></i> <span id="themeToggleText">Dark</span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -89,6 +94,42 @@
                     $(this).toggleClass('active');
                 });
             });
+        </script>
+
+        <script>
+            (function(){
+                const key = "ndr-theme";
+                const root = document.documentElement;
+                const btn = document.getElementById("themeToggle");
+
+                if (!btn) return;
+
+                // init: respect saved pref; else system
+                const saved = localStorage.getItem(key);
+                if (saved === "dark" || saved === "light") {
+                    root.setAttribute("data-theme", saved);
+                }
+                updateBtn();
+
+                btn.addEventListener("click", () => {
+                    const cur = root.getAttribute("data-theme");
+                    const next = cur === "dark" ? "light" : "dark";
+                    root.setAttribute("data-theme", next);
+                    localStorage.setItem(key, next);
+                    updateBtn();
+                });
+
+                function updateBtn(){
+                    const t = root.getAttribute("data-theme");
+                    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                    const isDark = t ? (t === "dark") : prefersDark;
+                    btn.setAttribute("aria-pressed", isDark ? "true":"false");
+                    const textEl = document.getElementById("themeToggleText");
+                    if (textEl) {
+                        textEl.textContent = isDark ? "Light" : "Dark";
+                    }
+                }
+            })();
         </script>
 
         {% block page_js %}

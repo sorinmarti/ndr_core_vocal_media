@@ -25,5 +25,14 @@
       "filename": "style_top_fixed",
       "description": "Fixed navigation at top, content below."
     }
+  },
+  {
+    "model": "ndr_core.NdrCoreUiStyle",
+    "fields": {
+      "name": "unibas_brand",
+      "label": "Brand Panel Style",
+      "filename": "style_unibas_brand",
+      "description": "Modern style with colored brand panel at top, white navigation bar, and dark mode support."
+    }
   }
 ]

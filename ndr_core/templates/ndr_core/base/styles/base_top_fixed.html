@@ -32,10 +32,9 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <form class="form-inline mt-2 mt-md-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                <button id="themeToggle" class="btn btn-sm btn-outline-light" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-adjust"></i> <span id="themeToggleText">Dark</span>
+                </button>
             </div>
         </nav>
 
@@ -58,6 +57,42 @@
         <script src="{% static 'ndr_core/js/popper.min.js' %}"></script>
         <script src="{% static 'ndr_core/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+        <script>
+            (function(){
+                const key = "ndr-theme";
+                const root = document.documentElement;
+                const btn = document.getElementById("themeToggle");
+
+                if (!btn) return;
+
+                // init: respect saved pref; else system
+                const saved = localStorage.getItem(key);
+                if (saved === "dark" || saved === "light") {
+                    root.setAttribute("data-theme", saved);
+                }
+                updateBtn();
+
+                btn.addEventListener("click", () => {
+                    const cur = root.getAttribute("data-theme");
+                    const next = cur === "dark" ? "light" : "dark";
+                    root.setAttribute("data-theme", next);
+                    localStorage.setItem(key, next);
+                    updateBtn();
+                });
+
+                function updateBtn(){
+                    const t = root.getAttribute("data-theme");
+                    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                    const isDark = t ? (t === "dark") : prefersDark;
+                    btn.setAttribute("aria-pressed", isDark ? "true":"false");
+                    const textEl = document.getElementById("themeToggleText");
+                    if (textEl) {
+                        textEl.textContent = isDark ? "Light" : "Dark";
+                    }
+                }
+            })();
+        </script>
 
         {% block page_js %}
         {% endblock %}

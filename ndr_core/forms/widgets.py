@@ -171,6 +171,32 @@ class NdrCoreFormSubmit(BaseInput):
         super().__init__(*args, **kwargs)
 
 
+class NdrCoreFilterButton(HTML):
+    """Creates a filter button with icon for crispy forms. """
+
+    def __init__(self, value, **kwargs):
+        """Init the filter button. """
+        button_html = f'''
+            <button type="submit" name="filter_button" class="btn btn-primary align-self-start">
+                <i class="fa-solid fa-filter"></i> {value}
+            </button>
+        '''
+        super().__init__(mark_safe(button_html))
+
+
+class NdrCoreClearButton(HTML):
+    """Creates a clear button with icon for crispy forms. """
+
+    def __init__(self, value, **kwargs):
+        """Init the clear button. """
+        button_html = f'''
+            <button type="button" class="btn btn-secondary align-self-start" onclick="window.location.href = window.location.pathname;">
+                <i class="fa-solid fa-eraser"></i> {value}
+            </button>
+        '''
+        super().__init__(mark_safe(button_html))
+
+
 class FilteredListWidget(s2forms.Select2MultipleWidget):
     """Widget to display a multi select2 dropdown for list configurations. """
 

@@ -8,14 +8,21 @@
   }
 
   .result-card-field {
-      background: white;
-      border: 1px solid #dee2e6;
+      background: var(--container-bg-color);
+      color: var(--text-color);
+      border: 1px solid rgba(0, 0, 0, 0.125);
       border-radius: 0.25rem;
       padding: 1rem;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 
       /* Dynamic grid positioning via CSS custom properties */
       grid-column: var(--grid-column-start) / span var(--grid-column-span);
       grid-row: var(--grid-row-start) / span var(--grid-row-span);
+  }
+
+  /* Dark mode border adjustments */
+  [data-theme="dark"] .result-card-field {
+      border-color: rgba(255, 255, 255, 0.125);
   }
 
   /* Responsive breakpoints */

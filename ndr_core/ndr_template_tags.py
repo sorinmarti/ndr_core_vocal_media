@@ -16,6 +16,7 @@ class TextPreRenderer:
     MAX_ITERATIONS = 50
     ui_element_regex = r'\[\[(card|slideshow|carousel|jumbotron|figure|banner|iframe|manifest_viewer)\|(.*)\]\]'
     link_element_regex = r'\[\[(file|page|orcid)\|([0-9a-zA-Z_ -]*)\]\]'
+    url_element_regex = r'\[\[url\|([0-9a-zA-Z_ -]*)\]\]'
     container_regex = r'\[\[(start|end)_(block)(?:=(.*?))?\]\]'
     code_start_regex = r'\[\[start_code(?:=(.*?))?\]\]'
     code_end_regex = r'\[\[end_code\]\]'
@@ -121,6 +122,27 @@ class TextPreRenderer:
             security_breaker += 1
             if security_breaker > self.MAX_ITERATIONS:
                 raise PreRenderError("Too many link elements rendering iterations.")
+        return rendered_text
+
+    def create_urls(self):
+        """Creates URL strings for pages."""
+        rendered_text = self.text
+        match = re.search(self.url_element_regex, rendered_text)
+        security_breaker = 0
+        while match:
+            page_name = match.groups()[0]
+            try:
+                page = NdrCorePage.objects.get(view_name=page_name)
+                url = page.url()
+            except NdrCorePage.DoesNotExist:
+                url = f"#page-not-found-{page_name}"
+
+            rendered_text = rendered_text.replace(f'[[url|{page_name}]]', url)
+            match = re.search(self.url_element_regex, rendered_text)
+
+            security_breaker += 1
+            if security_breaker > self.MAX_ITERATIONS:
+                raise PreRenderError("Too many URL rendering iterations.")
         return rendered_text
 
     def create_toc(self):
@@ -273,6 +295,7 @@ class TextPreRenderer:
             self.text = self.create_containers()
             self.text = self.create_toc()
             self.text = self.create_ui_elements()
+            self.text = self.create_urls()
             self.text = self.create_links()
         except PreRenderError as e:
             raise e

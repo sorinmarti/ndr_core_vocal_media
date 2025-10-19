@@ -86,127 +86,106 @@
     {% if object %}
         <div class="card bg-light mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ object.scheme_label }}</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">{{ object.scheme_label }}</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="togglePreviewMode()">
+                        <i class="fa-solid fa-adjust"></i> <span id="modeToggleText">Switch to Dark Mode</span>
+                    </button>
+                </div>
+
                 <div class="container">
-                    <div class="row">
-                        <div class="col-3">Palette Label</div>
-                        <div class="col">{{ object.scheme_label }}</div>
-                    </div>
                     <div class="row">
                         <div class="col-3">Palette Name</div>
                         <div class="col">{{ object.scheme_name }} <small>(Used as primary key)</small></div>
                     </div>
-                    <div class="row">
-                        <div class="col-3">Colors</div>
-                        <div class="col">
-                            <div class="container">
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">BG Color</div>
-                                    <div class="col-3 pl-0 small">Container BG Color</div>
-                                    <div class="col-3 pl-0 small">Footer BG</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.background_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.container_bg_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.footer_bg }};"></div>
-                                </div>
+                </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Text Color</div>
-                                    <div class="col-3 pl-0 small">Title Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.text_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.title_color }};"></div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Link Color</div>
-                                    <div class="col-3 pl-0 small">Nav Link Color</div>
-                                    <div class="col-3 pl-0 small">Nav Active Link Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.link_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.nav_link_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.nav_active_color }};"></div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Footer Link Color</div>
-                                    <div class="col-3 pl-0 small">Footer Link Active Color</div>
-                                    <div class="col-3 pl-0 small">Powered By Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.footer_link_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.footer_link_hover_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.powered_by_color }};"></div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Tab Title Color (Search Forms)</div>
-                                    <div class="col-3 pl-0 small">Active Tab Title Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.tab_title_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.tab_active_title_color }};"></div>
-                                </div>
-                                
-                                 <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Accent 1</div>
-                                    <div class="col-3 pl-0 small">Accent2</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.accent_color_1 }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.accent_color_2 }};"></div>
-                                </div>
+                <!-- Live Preview Section -->
+                <div id="palettePreview" class="mt-4 p-4 rounded" style="background: {{ object.background_color }}; color: {{ object.text_color }}; transition: all 0.3s ease;">
+                    <h3 style="color: {{ object.title_color }};">Live Preview</h3>
+                    <p style="color: {{ object.text_color }};">This is how your text will look with this color palette. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Button Color</div>
-                                    <div class="col-3 pl-0 small">Button Text Color</div>
-                                    <div class="col-3 pl-0 small">Button Hover Color</div>
-                                    <div class="col-3 pl-0 small">Button Border Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.button_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.button_text_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.button_hover_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.button_border_color }};"></div>
-                                </div>
+                    <!-- Brand Panel Preview -->
+                    <div class="mt-3 p-3 rounded" style="background: {{ object.brand_panel_bg }}; color: {{ object.brand_panel_text }};">
+                        <strong>Brand Panel</strong> - Used in UniBas brand style
+                    </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">2nd Button Color</div>
-                                    <div class="col-3 pl-0 small">2nd Button Text Color</div>
-                                    <div class="col-3 pl-0 small">2nd Button Hover Color</div>
-                                    <div class="col-3 pl-0 small">2nd Button Border Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.second_button_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.second_button_text_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.second_button_hover_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.second_button_border_color }};"></div>
-                                </div>
+                    <!-- Buttons -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Buttons</h5>
+                        <button class="btn mr-2" style="background: {{ object.button_color }}; color: {{ object.button_text_color }}; border-color: {{ object.button_border_color }};">Primary Button</button>
+                        <button class="btn" style="background: {{ object.second_button_color }}; color: {{ object.second_button_text_color }}; border-color: {{ object.second_button_border_color }};">Secondary Button</button>
+                    </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Form BG Color</div>
-                                    <div class="col-3 pl-0 small">Form FG Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.form_field_bg }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.form_field_fg }};"></div>
-                                </div>
+                    <!-- Links -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Links & Navigation</h5>
+                        <p>
+                            <a href="#" style="color: {{ object.link_color }};">Standard Link</a> |
+                            <a href="#" style="color: {{ object.nav_link_color }};">Nav Link</a> |
+                            <a href="#" style="color: {{ object.nav_active_color }}; font-weight: bold;">Active Nav Link</a>
+                        </p>
+                    </div>
 
-                                <div class="row mt-3">
-                                    <div class="col-3 pl-0 small">Info Color</div>
-                                    <div class="col-3 pl-0 small">Success Color</div>
-                                    <div class="col-3 pl-0 small">Error Color</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-2 border palette-display" style="background: {{ object.info_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.success_color }};"></div>
-                                    <div class="offset-1 col-2 border palette-display" style="background: {{ object.error_color }};"></div>
-                                </div>
+                    <!-- Card Preview -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Card Example</h5>
+                        <div class="card" style="background: {{ object.container_bg_color }}; border: 1px solid rgba(0,0,0,0.125);">
+                            <div class="card-body">
+                                <h6 class="card-title" style="color: {{ object.title_color }};">Card Title</h6>
+                                <p class="card-text" style="color: {{ object.text_color }};">This is a sample card with your palette colors.</p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Alerts</h5>
+                        <div class="alert mb-2" style="background: {{ object.info_color }}; color: {{ object.text_color }}; border: 1px solid {{ object.info_color }};">
+                            Info Alert
+                        </div>
+                        <div class="alert mb-2" style="background: {{ object.success_color }}; color: {{ object.text_color }}; border: 1px solid {{ object.success_color }};">
+                            Success Alert
+                        </div>
+                        <div class="alert mb-2" style="background: {{ object.error_color }}; color: {{ object.text_color }}; border: 1px solid {{ object.error_color }};">
+                            Error Alert
+                        </div>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Form Elements</h5>
+                        <input type="text" class="form-control" placeholder="Sample input field" style="background: {{ object.form_field_bg }}; color: {{ object.form_field_fg }}; border-color: rgba(0,0,0,0.125);">
+                    </div>
+
+                    <!-- Tabs Preview -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Tabs</h5>
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" style="color: {{ object.tab_title_color }};">Tab 1</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" style="color: {{ object.tab_active_title_color }}; font-weight: bold; border-bottom: 2px solid {{ object.tab_active_title_color }};">Active Tab</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Footer Preview -->
+                    <div class="mt-4 p-3 rounded" style="background: {{ object.footer_bg }};">
+                        <p class="mb-0">
+                            <small>
+                                <a href="#" style="color: {{ object.footer_link_color }};">Footer Link</a> |
+                                <span style="color: {{ object.powered_by_color }};">Powered by NDR Core</span>
+                            </small>
+                        </p>
+                    </div>
+
+                    <!-- Accent Colors -->
+                    <div class="mt-3">
+                        <h5 style="color: {{ object.title_color }};">Accent Colors</h5>
+                        <span class="badge mr-2" style="background: {{ object.accent_color_1 }}; color: white;">Accent 1</span>
+                        <span class="badge" style="background: {{ object.accent_color_2 }}; color: white;">Accent 2</span>
                     </div>
                 </div>
             </div>
@@ -219,6 +198,164 @@
                 {% endif %}
             </div>
         </div>
+
+        <script>
+        let isDarkMode = false;
+        const lightModeColors = {
+            background: '{{ object.background_color }}',
+            containerBg: '{{ object.container_bg_color }}',
+            text: '{{ object.text_color }}',
+            title: '{{ object.title_color }}',
+            button: '{{ object.button_color }}',
+            buttonText: '{{ object.button_text_color }}',
+            buttonBorder: '{{ object.button_border_color }}',
+            secondButton: '{{ object.second_button_color }}',
+            secondButtonText: '{{ object.second_button_text_color }}',
+            secondButtonBorder: '{{ object.second_button_border_color }}',
+            link: '{{ object.link_color }}',
+            navLink: '{{ object.nav_link_color }}',
+            navActive: '{{ object.nav_active_color }}',
+            tabTitle: '{{ object.tab_title_color }}',
+            tabActiveTitle: '{{ object.tab_active_title_color }}',
+            formFieldBg: '{{ object.form_field_bg }}',
+            formFieldFg: '{{ object.form_field_fg }}',
+            footerBg: '{{ object.footer_bg }}',
+            footerLink: '{{ object.footer_link_color }}',
+            poweredBy: '{{ object.powered_by_color }}',
+            accent1: '{{ object.accent_color_1 }}',
+            accent2: '{{ object.accent_color_2 }}',
+            info: '{{ object.info_color }}',
+            success: '{{ object.success_color }}',
+            error: '{{ object.error_color }}',
+            brandPanelBg: '{{ object.brand_panel_bg }}',
+            brandPanelText: '{{ object.brand_panel_text }}'
+        };
+
+        const darkModeColors = {
+            background: '{{ object.dark_background_color }}',
+            containerBg: '{{ object.dark_container_bg_color }}',
+            text: '{{ object.dark_text_color }}',
+            title: '{{ object.dark_title_color }}',
+            button: '{{ object.dark_button_color }}',
+            buttonText: '{{ object.dark_button_text_color }}',
+            buttonBorder: '{{ object.dark_button_border_color }}',
+            secondButton: '{{ object.dark_second_button_color }}',
+            secondButtonText: '{{ object.dark_second_button_text_color }}',
+            secondButtonBorder: '{{ object.dark_second_button_border_color }}',
+            link: '{{ object.dark_link_color }}',
+            navLink: '{{ object.dark_nav_link_color }}',
+            navActive: '{{ object.dark_nav_active_color }}',
+            tabTitle: '{{ object.dark_tab_title_color }}',
+            tabActiveTitle: '{{ object.dark_tab_active_title_color }}',
+            formFieldBg: '{{ object.dark_form_field_bg }}',
+            formFieldFg: '{{ object.dark_form_field_fg }}',
+            footerBg: '{{ object.dark_footer_bg }}',
+            footerLink: '{{ object.dark_footer_link_color }}',
+            poweredBy: '{{ object.dark_powered_by_color }}',
+            accent1: '{{ object.dark_accent_color_1 }}',
+            accent2: '{{ object.dark_accent_color_2 }}',
+            info: '{{ object.dark_info_color }}',
+            success: '{{ object.dark_success_color }}',
+            error: '{{ object.dark_error_color }}',
+            brandPanelBg: '{{ object.dark_brand_panel_bg }}',
+            brandPanelText: '{{ object.dark_brand_panel_text }}'
+        };
+
+        function togglePreviewMode() {
+            isDarkMode = !isDarkMode;
+            const colors = isDarkMode ? darkModeColors : lightModeColors;
+            const preview = document.getElementById('palettePreview');
+            const modeText = document.getElementById('modeToggleText');
+
+            // Update main background and text
+            preview.style.background = colors.background;
+            preview.style.color = colors.text;
+
+            // Update all elements
+            preview.querySelectorAll('h3, h5').forEach(el => el.style.color = colors.title);
+            preview.querySelectorAll('p:not(.card-text)').forEach(el => el.style.color = colors.text);
+
+            // Update brand panel
+            const brandPanel = preview.querySelector('[style*="brand_panel"]');
+            if (brandPanel) {
+                brandPanel.style.background = colors.brandPanelBg;
+                brandPanel.style.color = colors.brandPanelText;
+            }
+
+            // Update buttons
+            const buttons = preview.querySelectorAll('button.btn');
+            if (buttons[0]) {
+                buttons[0].style.background = colors.button;
+                buttons[0].style.color = colors.buttonText;
+                buttons[0].style.borderColor = colors.buttonBorder;
+            }
+            if (buttons[1]) {
+                buttons[1].style.background = colors.secondButton;
+                buttons[1].style.color = colors.secondButtonText;
+                buttons[1].style.borderColor = colors.secondButtonBorder;
+            }
+
+            // Update links
+            const links = preview.querySelectorAll('a');
+            if (links[0]) links[0].style.color = colors.link;
+            if (links[1]) links[1].style.color = colors.navLink;
+            if (links[2]) links[2].style.color = colors.navActive;
+
+            // Update card
+            const card = preview.querySelector('.card');
+            if (card) {
+                card.style.background = colors.containerBg;
+                card.querySelector('.card-title').style.color = colors.title;
+                card.querySelector('.card-text').style.color = colors.text;
+            }
+
+            // Update alerts
+            const alerts = preview.querySelectorAll('.alert');
+            if (alerts[0]) {
+                alerts[0].style.background = colors.info;
+                alerts[0].style.color = colors.text;
+            }
+            if (alerts[1]) {
+                alerts[1].style.background = colors.success;
+                alerts[1].style.color = colors.text;
+            }
+            if (alerts[2]) {
+                alerts[2].style.background = colors.error;
+                alerts[2].style.color = colors.text;
+            }
+
+            // Update form fields
+            const input = preview.querySelector('input');
+            if (input) {
+                input.style.background = colors.formFieldBg;
+                input.style.color = colors.formFieldFg;
+            }
+
+            // Update tabs
+            const tabs = preview.querySelectorAll('.nav-link');
+            if (tabs[0]) tabs[0].style.color = colors.tabTitle;
+            if (tabs[1]) {
+                tabs[1].style.color = colors.tabActiveTitle;
+                tabs[1].style.borderBottomColor = colors.tabActiveTitle;
+            }
+
+            // Update footer
+            const footer = preview.querySelector('[style*="footer_bg"]');
+            if (footer) {
+                footer.style.background = colors.footerBg;
+                footer.querySelector('a').style.color = colors.footerLink;
+                footer.querySelector('span').style.color = colors.poweredBy;
+            }
+
+            // Update accent badges
+            const badges = preview.querySelectorAll('.badge');
+            if (badges[0]) badges[0].style.background = colors.accent1;
+            if (badges[1]) badges[1].style.background = colors.accent2;
+
+            // Update button text
+            modeText.textContent = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+        </script>
     {% endif %}
 
     <div class="alert alert-info small" role="alert">
