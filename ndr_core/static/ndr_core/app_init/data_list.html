@@ -11,6 +11,10 @@
     {% if detail_page_id %}
         {% render_single result search_config %}
     {% else %}
+        {% if rendered_text %}
+            {{ rendered_text|safe }}
+        {% endif %}
+
         {% crispy form %}
         {% render_data_list result search_config %}
         <br/>
