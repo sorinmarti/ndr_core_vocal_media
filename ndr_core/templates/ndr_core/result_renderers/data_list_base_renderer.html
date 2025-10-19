@@ -3,18 +3,19 @@
 {% load i18n %}
 
 <!-- This card is the top element of one result. -->
-<a href="?search_term={{ card_content.search_term }}&id={{ card_content.id }}" class="text-decoration-none" style="color: inherit;">
-    <div class="card data-list-card" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-        <!--Body of the card. Contains the image and the content. -->
-        <div class="card-body d-flex flex-column align-items-start">
-            <div class="container">
-                {% block search_result_content %}
-                    {{ card_content }}
-                {% endblock %}
-            </div>
+<div class="card data-list-card"
+     style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+     data-detail-url="?search_term={{ search_term }}&id={{ result_id }}"
+     onclick="handleCardClick(event, this)">
+    <!--Body of the card. Contains the image and the content. -->
+    <div class="card-body d-flex flex-column align-items-start">
+        <div class="container">
+            {% block search_result_content %}
+                {{ card_content }}
+            {% endblock %}
         </div>
     </div>
-</a>
+</div>
 
 <style>
 .data-list-card:hover {
@@ -22,6 +23,26 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
 }
 </style>
+
+<script>
+function handleCardClick(event, card) {
+    // Check if the click was on a link or inside a link
+    let target = event.target;
+    while (target && target !== card) {
+        if (target.tagName === 'A' || target.tagName === 'BUTTON') {
+            // Allow the link/button to handle the click
+            return;
+        }
+        target = target.parentElement;
+    }
+
+    // If we didn't click on a link, navigate to the detail page
+    const detailUrl = card.getAttribute('data-detail-url');
+    if (detailUrl) {
+        window.location.href = detailUrl;
+    }
+}
+</script>
 
 
 

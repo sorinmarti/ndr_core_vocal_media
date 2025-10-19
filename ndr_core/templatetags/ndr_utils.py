@@ -117,16 +117,21 @@ class RenderDataListNode(template.Node):
         # Use the compact result card configuration to render the list item
         card_content = self.create_grid(context, result["data"], "compact")
 
+        # Get the result ID for the detail page link
+        result_id = result['data'].get(conf.search_id_field, '')
+        search_term = context.get('search_term', '')
+
         # If no compact configuration exists, fall back to simple id/label display
         if not card_content:
-            card_content = {"id": result['data'][conf.search_id_field],
+            card_content = {"id": result_id,
                            "label": result['data'][conf.simple_query_main_field],
-                           "search_term": context.get('search_term', '')}
+                           "search_term": search_term}
 
         card_context = {
             "result": result,
             "card_content": card_content,
-            "search_term": context.get('search_term', ''),
+            "result_id": result_id,
+            "search_term": search_term,
         }
         card_template = "ndr_core/result_renderers/data_list_template.html"
 

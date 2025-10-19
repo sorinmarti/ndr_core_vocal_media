@@ -503,7 +503,7 @@ class LinkifyFilter(AbstractFilter):
         return []  # No required attributes now - we have multiple ways to specify URL
 
     def allowed_attributes(self):
-        return ["url", "page", "page_url", "params", "target", "class", "title", "rel"]
+        return ["url", "page", "page_url", "params", "target", "class", "title", "rel", "display"]
 
     def needed_options(self):
         return []
@@ -545,8 +545,18 @@ class LinkifyFilter(AbstractFilter):
                 target = "_blank"
             link_element.add_attribute("target", target)
 
+        # Handle display attribute for button styling
+        css_classes = []
         if self.get_configuration("class"):
-            link_element.add_attribute("class", self.get_configuration("class"))
+            css_classes.append(self.get_configuration("class"))
+
+        display_type = self.get_configuration("display")
+        if display_type == "button":
+            # Add Bootstrap button classes
+            css_classes.append("btn btn-primary")
+
+        if css_classes:
+            link_element.add_attribute("class", " ".join(css_classes))
 
         if self.get_configuration("title"):
             link_element.add_attribute("title", self.get_configuration("title"))
