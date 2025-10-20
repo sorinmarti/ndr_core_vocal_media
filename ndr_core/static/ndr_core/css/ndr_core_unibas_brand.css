@@ -1,0 +1,92 @@
+/* UniBas Brand Style CSS - Structural styles only, colors from palette */
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,300,400,700);
+
+body p {
+    font-weight: 400;
+}
+
+/* Brand panel styling - layout only */
+.brand-panel {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.brand-title {
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+/* Theme toggle button - structure only */
+.theme-toggle {
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Navigation bar - structure only */
+.navbar-under {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+}
+
+.nav-link {
+    transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+    opacity: 0.7;
+}
+
+.nav-link.active {
+    font-weight: 600;
+}
+
+/* Footer styling - structure only */
+.site-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.site-footer a {
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Box shadow utility */
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .brand-title {
+        font-size: 0.75rem;
+    }
+
+    .theme-toggle {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .container {
+        min-width: 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 15px !important;
+    }
+}
