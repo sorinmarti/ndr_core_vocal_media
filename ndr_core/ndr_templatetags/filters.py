@@ -50,6 +50,8 @@ def get_get_filter_class(filter_name):
         return MapFilter
     if filter_name in ["truncate", "text"]:
         return TextTruncateFilter
+    if filter_name == "table":
+        return TableTemplateFilter
 
     raise ValueError(f"Filter {filter_name} not found.")
 
@@ -1482,3 +1484,346 @@ class RelativeDateFilter(AbstractFilter):
                 return date_obj.strftime(format_str)
         except (ValueError, TypeError, AttributeError):
             return self.get_value()
+
+
+class TableTemplateFilter(AbstractFilter):
+    """A filter to render list data as an HTML table with column configuration and filter expressions.
+
+    Usage:
+        {data|table}  # Simple table with auto-detected columns
+        {contributors|table:cols=[role,contributors],headers=[Role,Contributors],expr=["capitalize","badge:field=person"],tstyle=striped}
+
+    Configuration:
+        - cols: Array of column keys to display (supports dot-notation for nested values)
+        - headers: Array of header labels (default: capitalize column keys)
+        - expr: Array of filter expressions to apply to each column
+        - tstyle: Table style (plain, small, striped, small-striped, bordered, hover, sm-striped)
+        - tclass: Additional CSS classes for the table
+        - rowclass: CSS class for table rows
+        - limit: Maximum number of rows to display
+        - empty: Text to display when list is empty (default: "No data available")
+        - empty_cell: Text to display for empty cells (default: "")
+        - join: Separator when cell contains a list (default: ", ")
+        - responsive: Whether to wrap in responsive div (default: true)
+    """
+
+    STYLE_CLASSES = {
+        'plain': 'table',
+        'small': 'table table-sm',
+        'sm': 'table table-sm',
+        'striped': 'table table-striped',
+        'small-striped': 'table table-sm table-striped',
+        'sm-striped': 'table table-sm table-striped',
+        'bordered': 'table table-bordered',
+        'hover': 'table table-hover',
+    }
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["cols", "headers", "expr", "tstyle", "tclass", "rowclass",
+                "limit", "empty", "empty_cell", "join", "responsive"]
+
+    def needed_options(self):
+        return []
+
+    def processes_list_as_whole(self):
+        """This filter needs to process the entire list at once."""
+        return True
+
+    def get_rendered_value(self):
+        """Returns the formatted table HTML."""
+        value = self.value
+
+        # Validate input is a list
+        if not isinstance(value, list):
+            return f"<span class='text-danger'>Table filter requires a list, got {type(value).__name__}</span>"
+
+        if len(value) == 0:
+            empty_message = self.get_configuration("empty") or "No data available"
+            return f"<div class='text-muted'>{empty_message}</div>"
+
+        # Parse configurations
+        cols = self.parse_array_config(self.get_configuration("cols"))
+        headers = self.parse_array_config(self.get_configuration("headers"))
+        expressions = self.parse_array_config(self.get_configuration("expr"), preserve_quotes=True)
+
+        # Auto-detect columns if not specified
+        if not cols:
+            cols = self.auto_detect_columns(value)
+
+        # Auto-generate headers if not specified
+        if not headers:
+            headers = [self.format_header(col) for col in cols]
+
+        # Validate headers match columns
+        if len(headers) != len(cols):
+            return f"<span class='text-danger'>Headers count ({len(headers)}) must match columns count ({len(cols)})</span>"
+
+        # Validate expressions match columns (if provided)
+        if expressions and len(expressions) != len(cols):
+            return f"<span class='text-danger'>Expressions count ({len(expressions)}) must match columns count ({len(cols)})</span>"
+
+        # Apply row limit if specified
+        limit = self.get_configuration("limit")
+        if limit:
+            try:
+                value = value[:int(limit)]
+            except (ValueError, TypeError):
+                pass
+
+        # Build table HTML
+        table_html = self.build_table_html(value, cols, headers, expressions)
+
+        # Wrap in responsive div if configured
+        responsive = self.get_configuration("responsive")
+        if responsive is None or responsive.lower() not in ["false", "0", "no"]:
+            table_html = f'<div class="table-responsive">{table_html}</div>'
+
+        return table_html
+
+    def build_table_html(self, data, cols, headers, expressions):
+        """Build the complete table HTML."""
+        # Determine table classes
+        tstyle = self.get_configuration("tstyle") or "plain"
+        table_classes = self.STYLE_CLASSES.get(tstyle, "table")
+
+        # Add additional classes if specified
+        tclass = self.get_configuration("tclass")
+        if tclass:
+            table_classes += f" {tclass}"
+
+        # Build table
+        table = HTMLElement("table")
+        table.add_attribute("class", table_classes)
+
+        # Build thead
+        thead = HTMLElement("thead")
+        thead_row = HTMLElement("tr")
+        for header in headers:
+            th = HTMLElement("th")
+            th.add_content(header)
+            thead_row.add_content(str(th))
+        thead.add_content(str(thead_row))
+        table.add_content(str(thead))
+
+        # Build tbody
+        tbody = HTMLElement("tbody")
+        rowclass = self.get_configuration("rowclass")
+
+        for row_data in data:
+            tr = HTMLElement("tr")
+            if rowclass:
+                tr.add_attribute("class", rowclass)
+
+            for i, col in enumerate(cols):
+                td = HTMLElement("td")
+
+                # Extract cell value (with nested support)
+                cell_value = self.extract_cell_value(row_data, col)
+
+                # Apply filter expression if specified
+                if expressions and i < len(expressions) and expressions[i]:
+                    cell_value = self.apply_filter_expression(cell_value, expressions[i], row_data)
+
+                # Handle lists within cells
+                if isinstance(cell_value, list):
+                    join_separator = self.get_configuration("join") or ", "
+                    cell_value = join_separator.join(str(item) for item in cell_value if item is not None)
+
+                # Handle None/empty values
+                if cell_value is None or cell_value == "":
+                    cell_value = self.get_configuration("empty_cell") or ""
+
+                td.add_content(str(cell_value))
+                tr.add_content(str(td))
+
+            tbody.add_content(str(tr))
+
+        table.add_content(str(tbody))
+
+        return str(table)
+
+    def extract_cell_value(self, row_data, col_key):
+        """Extract a cell value from row data, supporting dot-notation for nested values."""
+        if not isinstance(row_data, dict):
+            return row_data
+
+        # Handle dot-notation for nested values
+        if '.' in col_key:
+            return get_nested_value(row_data, col_key)
+
+        # Simple key access
+        return row_data.get(col_key, None)
+
+    def apply_filter_expression(self, value, expr_str, row_data):
+        """Apply a filter expression string to a value.
+
+        Args:
+            value: The value to filter
+            expr_str: Filter expression like "upper" or "badge:field=person,tt=__field__"
+            row_data: The full row data for context
+
+        Returns:
+            Filtered value
+        """
+        if not expr_str:
+            return value
+
+        # Remove surrounding quotes if present
+        expr_str = self.remove_quotes(expr_str)
+
+        # Handle lists - apply filter to each item
+        if isinstance(value, list):
+            filtered_items = []
+            for item in value:
+                try:
+                    filtered = self.apply_single_filter_expression(item, expr_str, row_data)
+                    if filtered is not None:
+                        filtered_items.append(filtered)
+                except Exception:
+                    # If filter fails, keep original item
+                    if item is not None:
+                        filtered_items.append(item)
+            return filtered_items
+
+        # Apply filter to single value
+        try:
+            return self.apply_single_filter_expression(value, expr_str, row_data)
+        except Exception:
+            # If filter fails, return original value
+            return value
+
+    def apply_single_filter_expression(self, value, expr_str, row_data):
+        """Apply filter expression to a single value."""
+        # Parse the filter expression
+        # Format: "filter_name" or "filter_name:param=value,param2=value2"
+        if ':' in expr_str:
+            filter_name, config_str = expr_str.split(':', 1)
+        else:
+            filter_name = expr_str
+            config_str = ""
+
+        # Parse configuration
+        filter_config = {}
+        if config_str:
+            # Split by comma, respecting quotes
+            configs = self.split_respecting_quotes(config_str, ',')
+            for config in configs:
+                if '=' in config:
+                    k, v = config.split('=', 1)
+                    filter_config[k.strip()] = self.remove_quotes(v.strip())
+                else:
+                    # Positional parameter
+                    filter_config[f"o{len(filter_config)}"] = self.remove_quotes(config.strip())
+
+        # Get filter class and apply
+        try:
+            filter_class = get_get_filter_class(filter_name.strip())
+            return filter_class(filter_name.strip(), value, filter_config, row_data).get_rendered_value()
+        except ValueError:
+            # Filter not found, return value as-is
+            return value
+
+    def parse_array_config(self, config_str, preserve_quotes=False):
+        """Parse array configuration like [item1,item2,item3] into a list.
+
+        Args:
+            config_str: Configuration string
+            preserve_quotes: If True, keep quotes around items (useful for filter expressions)
+
+        Returns:
+            List of items
+        """
+        if not config_str:
+            return []
+
+        config_str = config_str.strip()
+
+        # Remove outer brackets
+        if config_str.startswith('[') and config_str.endswith(']'):
+            config_str = config_str[1:-1]
+
+        if not config_str:
+            return []
+
+        # Split by comma, respecting quotes
+        items = self.split_respecting_quotes(config_str, ',')
+
+        # Clean up items
+        result = []
+        for item in items:
+            item = item.strip()
+            if not preserve_quotes:
+                item = self.remove_quotes(item)
+            result.append(item)
+
+        return result
+
+    def split_respecting_quotes(self, text, delimiter):
+        """Split text by delimiter, but respect quoted strings."""
+        parts = []
+        current_part = ""
+        in_quotes = False
+        quote_char = None
+
+        for i, char in enumerate(text):
+            if char in ['"', "'"] and not in_quotes:
+                in_quotes = True
+                quote_char = char
+                current_part += char
+            elif char == quote_char and in_quotes:
+                # Check if it's escaped
+                if i > 0 and text[i - 1] == '\\':
+                    current_part += char
+                else:
+                    in_quotes = False
+                    quote_char = None
+                    current_part += char
+            elif char == delimiter and not in_quotes:
+                if current_part.strip():
+                    parts.append(current_part.strip())
+                current_part = ""
+            else:
+                current_part += char
+
+        if current_part.strip():
+            parts.append(current_part.strip())
+
+        return parts
+
+    def remove_quotes(self, text):
+        """Remove surrounding quotes from text."""
+        text = text.strip()
+        if len(text) >= 2:
+            if (text.startswith('"') and text.endswith('"')) or \
+                    (text.startswith("'") and text.endswith("'")):
+                return text[1:-1]
+        return text
+
+    def auto_detect_columns(self, data):
+        """Auto-detect columns from the first item in the list."""
+        if not data or len(data) == 0:
+            return []
+
+        first_item = data[0]
+        if isinstance(first_item, dict):
+            return list(first_item.keys())
+
+        return []
+
+    def format_header(self, col_key):
+        """Format a column key into a readable header.
+
+        Examples:
+            'role' -> 'Role'
+            'first_name' -> 'First Name'
+            'user.name' -> 'User Name'
+        """
+        # Handle dot-notation
+        if '.' in col_key:
+            col_key = col_key.split('.')[-1]
+
+        # Replace underscores with spaces and capitalize
+        return col_key.replace('_', ' ').title()
