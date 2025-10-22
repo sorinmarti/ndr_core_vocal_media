@@ -52,6 +52,8 @@ def get_get_filter_class(filter_name):
         return TextTruncateFilter
     if filter_name == "table":
         return TableTemplateFilter
+    if filter_name == "code":
+        return CodeFilter
 
     raise ValueError(f"Filter {filter_name} not found.")
 
@@ -1827,3 +1829,157 @@ class TableTemplateFilter(AbstractFilter):
 
         # Replace underscores with spaces and capitalize
         return col_key.replace('_', ' ').title()
+
+
+class CodeFilter(AbstractFilter):
+    """A filter to render code blocks with optional syntax highlighting.
+
+    Usage:
+        {code_string|code}  # Basic code block
+        {json_data|code:lang=json}  # JSON with language hint
+        {python_code|code:lang=python,linenumbers=true}  # Python with line numbers
+        {data|code:lang=json,pretty=true}  # Pretty-print JSON
+        {long_code|code:maxheight=300px}  # Limit height with scrolling
+        {text_with_escapes|code:nl2br=true}  # Convert \n to actual line breaks
+
+    Configuration:
+        - lang: Language for syntax highlighting (python, json, javascript, html, css, etc.)
+        - linenumbers: Show line numbers (true/false, default: false)
+        - class: Additional CSS classes for the code block
+        - style: Inline CSS styles
+        - pretty: Pretty-print JSON data (true/false, default: true for JSON)
+        - indent: Indentation spaces for pretty-printing (default: 2)
+        - wrap: Enable word wrapping (true/false, default: false)
+        - maxheight: Maximum height with scrolling (e.g., 300px, 20rem)
+        - nl2br: Convert literal \n escape sequences to actual newlines (true/false, default: false)
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["lang", "linenumbers", "class", "style", "pretty", "indent", "wrap", "maxheight", "nl2br"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the code block HTML."""
+        import html
+
+        value = self.get_value()
+
+        if value is None or value == "":
+            return ""
+
+        # Get configuration
+        lang = self.get_configuration("lang") or ""
+        show_linenumbers = self.get_configuration("linenumbers") == "true"
+        custom_class = self.get_configuration("class") or ""
+        custom_style = self.get_configuration("style") or ""
+        pretty = self.get_configuration("pretty")
+        indent = int(self.get_configuration("indent") or 2)
+        wrap = self.get_configuration("wrap") == "true"
+        maxheight = self.get_configuration("maxheight")
+        nl2br = self.get_configuration("nl2br") == "true"
+
+        # Convert value to string and handle JSON pretty-printing
+        code_content = self.format_code_content(value, lang, pretty, indent)
+
+        # Convert literal \n to actual newlines if nl2br is enabled
+        if nl2br and isinstance(code_content, str):
+            code_content = code_content.replace('\\n', '\n').replace('\\r\\n', '\n').replace('\\r', '\n')
+
+        # Escape HTML
+        code_content = html.escape(code_content)
+
+        # Build CSS classes
+        css_classes = ["code-block"]
+        if lang:
+            css_classes.append(f"language-{lang}")
+        if custom_class:
+            css_classes.extend(custom_class.split())
+
+        # Build inline styles
+        styles = []
+        styles.append("font-size: 0.7rem")  # Smaller text (14px on most browsers)
+        if not wrap:
+            styles.append("white-space: pre")
+            styles.append("overflow-x: auto")
+        else:
+            styles.append("white-space: pre-wrap")
+
+        # Add max-height and scrolling if configured
+        if maxheight:
+            styles.append(f"max-height: {maxheight}")
+            styles.append("overflow-y: auto")
+
+        if custom_style:
+            styles.append(custom_style)
+
+        style_attr = "; ".join(styles)
+
+        # Build the HTML
+        pre_element = HTMLElement("pre")
+        pre_element.add_attribute("class", " ".join(css_classes))
+        if style_attr:
+            pre_element.add_attribute("style", style_attr)
+
+        code_element = HTMLElement("code")
+        if lang:
+            code_element.add_attribute("class", f"language-{lang}")
+
+        # Add line numbers if requested
+        if show_linenumbers:
+            code_content = self.add_line_numbers(code_content)
+            code_element.add_attribute("style", "counter-reset: line")
+
+        code_element.add_content(code_content)
+        pre_element.add_content(str(code_element))
+
+        return str(pre_element)
+
+    def format_code_content(self, value, lang, pretty, indent):
+        """Format the code content, with special handling for JSON."""
+        # If it's a dict or list and language is JSON, serialize it
+        if isinstance(value, (dict, list)):
+            # Auto-detect JSON if not specified
+            if not lang:
+                lang = "json"
+
+            # Determine if we should pretty-print
+            should_pretty = pretty != "false" if pretty is not None else True
+
+            if should_pretty:
+                return json.dumps(value, indent=indent, ensure_ascii=False)
+            else:
+                return json.dumps(value, ensure_ascii=False)
+
+        # For strings, check if they contain JSON and lang is json
+        if isinstance(value, str) and lang == "json":
+            should_pretty = pretty != "false" if pretty is not None else True
+
+            if should_pretty:
+                try:
+                    # Try to parse and re-format as JSON
+                    parsed = json.loads(value)
+                    return json.dumps(parsed, indent=indent, ensure_ascii=False)
+                except (json.JSONDecodeError, ValueError):
+                    # If it's not valid JSON, return as-is
+                    return value
+            else:
+                return value
+
+        # For all other cases, return as string
+        return str(value)
+
+    def add_line_numbers(self, code_content):
+        """Add line numbers to code content."""
+        lines = code_content.split('\n')
+        numbered_lines = []
+
+        for i, line in enumerate(lines, 1):
+            # Use CSS counters for line numbers
+            numbered_lines.append(f'<span class="line-number" data-line="{i}"></span>{line}')
+
+        return '\n'.join(numbered_lines)

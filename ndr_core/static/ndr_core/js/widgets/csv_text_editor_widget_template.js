@@ -12,8 +12,23 @@ $.ajax({url: header_url, success: function(result){
     };
 
     let data_count = 0;
+
+    // Get the initial data from the textarea
+    let text_area = $('#'+name);
+    let initial_data = [];
+    try {
+        let textarea_value = text_area.val();
+        if (textarea_value && textarea_value.trim() !== '') {
+            initial_data = JSON.parse(textarea_value);
+        }
+    } catch (e) {
+        console.log("Error parsing initial data, will load from AJAX:", e);
+    }
+
+    // Initialize table with data from textarea, or use AJAX as fallback
     let table = new Tabulator(table_name, {
-        ajaxURL: ajax_url,
+        data: initial_data.length > 0 ? initial_data : undefined,
+        ajaxURL: initial_data.length > 0 ? undefined : ajax_url,
         index: "key",
         movableRows: true,
         addRowPos: "bottom",
@@ -24,9 +39,15 @@ $.ajax({url: header_url, success: function(result){
 
     function cellEdited(){
         let data = table.getData();
-        let text_area = $('#'+name);
         text_area.val(JSON.stringify(data));
     }
+
+    // Handle both data loaded from initial data and AJAX
+    table.on("tableBuilt", function(){
+        if (initial_data.length > 0) {
+            data_count = initial_data.length;
+        }
+    });
 
     table.on("dataLoaded", function(data){
         data_count = data.length;

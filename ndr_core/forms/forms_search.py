@@ -106,6 +106,7 @@ class AdvancedSearchForm(_NdrCoreForm):
                 search_field = field.search_field
                 form_field = None
                 condition_form_field = None
+                operator_form_field = None
                 help_text = mark_safe(
                     f'<small id="{search_field.field_name}Help" class="form-text text-muted">'
                     f"{search_field.help_text}</small>"
@@ -119,6 +120,19 @@ class AdvancedSearchForm(_NdrCoreForm):
                         help_text=help_text,
                         initial=search_field.get_initial_value(),
                     )
+                    # Add operator dropdown if CHOOSE
+                    if search_field.comparison_operator == 'CHOOSE':
+                        operator_form_field = forms.ChoiceField(
+                            label=mark_safe('&nbsp;'),
+                            choices=[('=', _('Exact')), ('contains', _('Contains'))],
+                            initial='contains',
+                            required=False,
+                            widget=forms.Select(attrs={'style': 'height: 32px; font-size: 14px;'}),
+                            help_text='<small class="form-text text-muted">'
+                                      '  {exact_text}<br/>'
+                                      '  {contains_text}'
+                                      '</small>'.format(exact_text=_('Exact: exact match'),
+                                                       contains_text=_('Contains: uses regex')))
                 # Number field
                 if search_field.field_type == search_field.FieldType.NUMBER:
                     form_field = forms.IntegerField(
@@ -127,6 +141,32 @@ class AdvancedSearchForm(_NdrCoreForm):
                         help_text=help_text,
                         initial=search_field.get_initial_value(),
                     )
+                    # Add operator dropdown if CHOOSE
+                    if search_field.comparison_operator == 'CHOOSE':
+                        operator_form_field = forms.ChoiceField(
+                            label=mark_safe('&nbsp;'),
+                            choices=[('=', '='), ('>', '>'), ('<', '<'), ('>=', '≥'), ('<=', '≤'), ('!=', '≠')],
+                            initial='=',
+                            required=False,
+                            widget=forms.Select(attrs={'style': 'height: 32px; font-size: 14px;'}),
+                            help_text='<small class="form-text text-muted">Comparison operator</small>')
+                # Float field
+                if search_field.field_type == search_field.FieldType.FLOAT:
+                    form_field = forms.FloatField(
+                        label=search_field.field_label,
+                        required=search_field.field_required,
+                        help_text=help_text,
+                        initial=search_field.get_initial_value(),
+                    )
+                    # Add operator dropdown if CHOOSE
+                    if search_field.comparison_operator == 'CHOOSE':
+                        operator_form_field = forms.ChoiceField(
+                            label=mark_safe('&nbsp;'),
+                            choices=[('=', '='), ('>', '>'), ('<', '<'), ('>=', '≥'), ('<=', '≤'), ('!=', '≠')],
+                            initial='=',
+                            required=False,
+                            widget=forms.Select(attrs={'style': 'height: 32px; font-size: 14px;'}),
+                            help_text='<small class="form-text text-muted">Comparison operator</small>')
                 # Number Range field
                 if search_field.field_type == search_field.FieldType.NUMBER_RANGE:
                     form_field = NumberRangeField(
@@ -170,6 +210,16 @@ class AdvancedSearchForm(_NdrCoreForm):
                         help_text=help_text,
                         initial=search_field.get_initial_value(),
                     )
+                    # Add operator dropdown if CHOOSE
+                    if search_field.comparison_operator == 'CHOOSE':
+                        operator_form_field = forms.ChoiceField(
+                            label=mark_safe('&nbsp;'),
+                            choices=[('=', _('At')), ('>', _('After')), ('<', _('Before')),
+                                   ('>=', _('At or after')), ('<=', _('At or before'))],
+                            initial='=',
+                            required=False,
+                            widget=forms.Select(attrs={'style': 'height: 32px; font-size: 14px;'}),
+                            help_text='<small class="form-text text-muted">Date comparison</small>')
                 # Date range field
                 if search_field.field_type == search_field.FieldType.DATE_RANGE:
                     # search_field.lower_value is in the form YYYY-MM-DD. Convert it to DD.MM.YYYY
@@ -249,6 +299,11 @@ class AdvancedSearchForm(_NdrCoreForm):
                         self.fields[
                             f"{search_config.conf_name}_{search_field.field_name}_condition"
                         ] = condition_form_field
+                    # Add the operator field to the form if it was created.
+                    if operator_form_field is not None:
+                        self.fields[
+                            f"{search_config.conf_name}_{search_field.field_name}_operator"
+                        ] = operator_form_field
 
     @staticmethod
     def get_compact_view_field(search_config):
@@ -401,6 +456,24 @@ class AdvancedSearchForm(_NdrCoreForm):
                                     ),
                                     Field(
                                         f"{search_config.conf_name}_{column.search_field.field_name}_condition",
+                                        css_class="",
+                                        wrapper_class="col-3 m-0 pl-0",
+                                    ),
+                                    css_class="row"
+                                ),
+                                css_class=f"col-md-{column.field_size}",
+                            )
+                        # If the field has an operator dropdown (comparison_operator set to CHOOSE)
+                        elif f"{search_config.conf_name}_{column.search_field.field_name}_operator" in self.fields:
+                            print("Adding operator field for ", column.search_field.field_name)
+                            form_field = Div(
+                                Div(
+                                    Field(
+                                        f"{search_config.conf_name}_{column.search_field.field_name}",
+                                        wrapper_class="col-9 m-0 pr-0",
+                                    ),
+                                    Field(
+                                        f"{search_config.conf_name}_{column.search_field.field_name}_operator",
                                         css_class="",
                                         wrapper_class="col-3 m-0 pl-0",
                                     ),

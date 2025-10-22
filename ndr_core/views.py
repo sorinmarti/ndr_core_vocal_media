@@ -177,6 +177,8 @@ class _NdrCoreSearchView(_NdrCoreView):
                     query_obj.set_value(actual_key, form.cleaned_data[field])
                 elif actual_key.endswith('condition'):
                     query_obj.set_value(actual_key, form.cleaned_data[field])
+                elif actual_key.endswith('operator'):
+                    query_obj.set_value(actual_key, form.cleaned_data[field])
                 else:
                     print("Invalid search field: " + actual_key)
 

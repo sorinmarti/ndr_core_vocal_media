@@ -62,7 +62,7 @@ class BaseQuery(ABC):
         set_values = []
         for key, value in self.values.items():
             if value is not None and value != '' and value != []:
-                if not key.endswith('_condition'):
+                if not key.endswith('_condition') and not key.endswith('_operator'):
                     set_values.append(key)
 
         return set_values
@@ -74,6 +74,8 @@ class BaseQuery(ABC):
             field_conf = FieldConfiguration(name, self.values[name])
             if f"{name}_condition" in self.values:
                 field_conf.user_condition = self.values[f"{name}_condition"]
+            if f"{name}_operator" in self.values:
+                field_conf.user_operator = self.values[f"{name}_operator"]
             field_configs.append(field_conf)
         return field_configs
 

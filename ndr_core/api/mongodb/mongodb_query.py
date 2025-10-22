@@ -32,7 +32,6 @@ class MongoDBQuery(BaseQuery):
 
     def get_advanced_query(self, *kwargs):
         # Convert sort_order to MongoDB format: 1 for ascending, -1 for descending
-        print("ADVANCED QUERY", self.search_config.sort_order)
         sort_direction = -1 if self.search_config.sort_order == 'desc' else 1
 
         query = {
@@ -48,14 +47,67 @@ class MongoDBQuery(BaseQuery):
 
             value = None
             if field.field_type == 'string':
-                value = {"$regex": field.value, "$options": "i"}
+                # Handle string comparison operators
+                if field.operator == 'contains':
+                    value = {"$regex": field.value, "$options": "i"}
+                elif field.operator == '=':
+                    value = field.value
+                elif field.operator == '!=':
+                    value = {"$ne": field.value}
+                else:
+                    # Default to regex for backwards compatibility
+                    value = {"$regex": field.value, "$options": "i"}
             elif field.field_type == 'number':
-                value = field.value
+                # Handle number comparison operators
+                if field.operator == '=':
+                    value = field.value
+                elif field.operator == '>':
+                    value = {"$gt": field.value}
+                elif field.operator == '<':
+                    value = {"$lt": field.value}
+                elif field.operator == '>=':
+                    value = {"$gte": field.value}
+                elif field.operator == '<=':
+                    value = {"$lte": field.value}
+                elif field.operator == '!=':
+                    value = {"$ne": field.value}
+                else:
+                    value = field.value
+            elif field.field_type == 'float':
+                # Handle float comparison operators
+                if field.operator == '=':
+                    value = field.value
+                elif field.operator == '>':
+                    value = {"$gt": field.value}
+                elif field.operator == '<':
+                    value = {"$lt": field.value}
+                elif field.operator == '>=':
+                    value = {"$gte": field.value}
+                elif field.operator == '<=':
+                    value = {"$lte": field.value}
+                elif field.operator == '!=':
+                    value = {"$ne": field.value}
+                else:
+                    value = field.value
             elif field.field_type == 'number_range':
                 if isinstance(field.value, str):
                     value = {"$regex": field.value}
                 else:
                     value = {"$in": field.value}
+            elif field.field_type == 'date':
+                # Handle date comparison operators
+                if field.operator == '=':
+                    value = field.value
+                elif field.operator == '>':
+                    value = {"$gt": field.value}
+                elif field.operator == '<':
+                    value = {"$lt": field.value}
+                elif field.operator == '>=':
+                    value = {"$gte": field.value}
+                elif field.operator == '<=':
+                    value = {"$lte": field.value}
+                else:
+                    value = field.value
             elif field.field_type == 'list':
                 value = field.value
             elif field.field_type == 'multi_list':

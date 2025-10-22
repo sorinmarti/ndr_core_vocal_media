@@ -14,6 +14,9 @@ class FieldConfiguration:
     user_condition = None
     """The user defined condition of a list field. (and/or)"""
 
+    user_operator = None
+    """The user defined comparison operator. (=, >, <, etc.)"""
+
     def __init__(self, field_name, value):
         """Loads the corresponding field configuration from the search configuration and sets the value
         with al its manipulations.
@@ -63,6 +66,9 @@ class FieldConfiguration:
         # A number field returns a single value
         elif self.field.field_type == NdrCoreSearchField.FieldType.NUMBER:
             self.value = self.apply_modifications(value)
+        # A float field returns a single value
+        elif self.field.field_type == NdrCoreSearchField.FieldType.FLOAT:
+            self.value = self.apply_modifications(value)
         # A number range field returns a list of values
         elif self.field.field_type == NdrCoreSearchField.FieldType.NUMBER_RANGE:
             self.value = self.apply_modifications(value)
@@ -75,6 +81,8 @@ class FieldConfiguration:
 
         if self.field.data_field_type == "int":
             return int(value)
+        elif self.field.data_field_type == "float":
+            return float(value)
         elif self.field.data_field_type == "string":
             # If the value should be transformed by regex
             if self.field.input_transformation_regex is not None and self.field.input_transformation_regex != '' and '{_value_}' in self.field.input_transformation_regex:
@@ -99,11 +107,21 @@ class FieldConfiguration:
         return self.field.list_condition.lower()
 
     @property
+    def operator(self):
+        """Returns the comparison operator for the field.
+        If user_operator is set, returns that. Otherwise returns the field's default operator."""
+        if self.user_operator is not None:
+            return self.user_operator
+        return self.field.comparison_operator if self.field.comparison_operator else '='
+
+    @property
     def field_type(self):
         if self.field.field_type == NdrCoreSearchField.FieldType.STRING:
             return 'string'
         elif self.field.field_type == NdrCoreSearchField.FieldType.NUMBER:
             return 'number'
+        elif self.field.field_type == NdrCoreSearchField.FieldType.FLOAT:
+            return 'float'
         elif self.field.field_type == NdrCoreSearchField.FieldType.LIST:
             return 'list'
         elif self.field.field_type == NdrCoreSearchField.FieldType.MULTI_LIST:

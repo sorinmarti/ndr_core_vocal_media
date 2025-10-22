@@ -17,6 +17,7 @@ let help_text = $('#id_help_text');
 // 4.) Additional options for specific field types.
 let div_list_choices = $('#div_id_list_choices');
 let list_condition = $('#id_list_condition');
+let comparison_operator = $('#id_comparison_operator');
 let lower_value = $('#id_lower_value');
 let upper_value = $('#id_upper_value');
 
@@ -128,6 +129,15 @@ function setTextBox(select_value) {
                                   "  <li>Add options below</li>" +
                                   "</ul>");
             break;
+        case '12':      // Float
+            info_text_title.text('Float');
+            info_text.text("Generates a float number input field.")
+            info_text_detail.html("<ul>" +
+                                  "  <li>Search for decimal numbers</li>" +
+                                  "  <li>Define a lower and upper bound</li>" +
+                                  "  <li>Valid initial values: any decimal number (e.g., 3.14, -2.5, 0.99)</li>" +
+                                  "</ul>");
+            break;
         default:
             info_text_title.text('Select a Field Type');
             info_text.text("Select a field type to see more information.")
@@ -152,6 +162,7 @@ function selectType(select_value) {
     upper_value.attr('disabled', 'disabled');
     div_list_choices.hide();
     list_condition.attr('disabled', 'disabled');
+    comparison_operator.attr('disabled', 'disabled');
 
     text_choices.attr('disabled', 'disabled');
     div_text_choices.hide();
@@ -162,10 +173,12 @@ function selectType(select_value) {
 
     switch (select_value) {
         case '1':       // String
+            comparison_operator.removeAttr('disabled');
             data_field_type.attr('disabled', 'disabled');
             input_transformation_regex.attr('disabled', 'disabled');
             break;
         case '2':       // Number
+            comparison_operator.removeAttr('disabled');
             lower_value.removeAttr('disabled');
             upper_value.removeAttr('disabled');
             break;
@@ -185,6 +198,7 @@ function selectType(select_value) {
             input_transformation_regex.attr('disabled', 'disabled');
             break;
         case '6':       // Date
+            comparison_operator.removeAttr('disabled');
             data_field_type.attr('disabled', 'disabled');
             input_transformation_regex.attr('disabled', 'disabled');
             break;
@@ -219,6 +233,11 @@ function selectType(select_value) {
             data_field_type.attr('disabled', 'disabled');
             input_transformation_regex.attr('disabled', 'disabled');
             break;
+        case '12':      // Float
+            comparison_operator.removeAttr('disabled');
+            lower_value.removeAttr('disabled');
+            upper_value.removeAttr('disabled');
+            break;
         default:
             field_name.attr('disabled', 'disabled');
             api_parameter.attr('disabled', 'disabled');
@@ -228,6 +247,7 @@ function selectType(select_value) {
             help_text.attr('disabled', 'disabled');
             div_list_choices.hide();
             list_condition.attr('disabled', 'disabled');
+            comparison_operator.attr('disabled', 'disabled');
             lower_value.attr('disabled', 'disabled');
             upper_value.attr('disabled', 'disabled');
             data_field_type.attr('disabled', 'disabled');

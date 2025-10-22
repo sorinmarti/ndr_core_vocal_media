@@ -96,6 +96,29 @@ class PreviewImage:
                                (coords[1][0] - triangle_size,
                                 coords[0][1] + 2 * (self.row_height / 3) - self.margin),
                                "down", self.indicator_color)
+        # For a float, two triangles are rendered. One pointing up and one pointing down (same as NUMBER).
+        elif field_type == NdrCoreSearchField.FieldType.FLOAT:
+            triangle_size = self.row_height / 5
+
+            self.draw_triangle(draw, triangle_size,
+                               (coords[1][0] - triangle_size + (indicator_offset / 2),
+                                coords[0][1] + self.row_height / 2.5 - self.margin + (indicator_offset / 2)),
+                               "up", self.shadow_color)
+
+            self.draw_triangle(draw, triangle_size,
+                               (coords[1][0] - triangle_size,
+                                coords[0][1] + self.row_height / 2.5 - self.margin),
+                               "up", self.indicator_color)
+
+            self.draw_triangle(draw, triangle_size,
+                               (coords[1][0] - triangle_size + (indicator_offset / 2),
+                                coords[0][1] + 2 * (self.row_height / 3) - self.margin + (indicator_offset / 2)),
+                               "down", self.shadow_color)
+
+            self.draw_triangle(draw, triangle_size,
+                               (coords[1][0] - triangle_size,
+                                coords[0][1] + 2 * (self.row_height / 3) - self.margin),
+                               "down", self.indicator_color)
         # For a multi list, a number of selected items is shown. The maximum number of items is 5, it depends
         # on the width of the field how many are shown.
         elif field_type == NdrCoreSearchField.FieldType.MULTI_LIST:

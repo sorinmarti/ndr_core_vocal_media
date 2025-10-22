@@ -38,7 +38,28 @@ class NodegoatQuery(BaseQuery):
         for field in self.get_field_configurations():
             object_definition = {}
             if field.field_type == 'string':
-                object_definition["equality"] = "*"
+                # Handle string comparison operators
+                if field.operator == 'contains':
+                    object_definition["equality"] = "*"
+                elif field.operator == '=':
+                    object_definition["equality"] = "="
+                elif field.operator == '!=':
+                    object_definition["equality"] = "!="
+                else:
+                    # Default to contains for backwards compatibility
+                    object_definition["equality"] = "*"
+                object_definition["value"] = field.value
+            elif field.field_type == 'number':
+                # Handle number comparison operators
+                object_definition["equality"] = field.operator if field.operator else "="
+                object_definition["value"] = field.value
+            elif field.field_type == 'float':
+                # Handle float comparison operators
+                object_definition["equality"] = field.operator if field.operator else "="
+                object_definition["value"] = field.value
+            elif field.field_type == 'date':
+                # Handle date comparison operators
+                object_definition["equality"] = field.operator if field.operator else "="
                 object_definition["value"] = field.value
             elif field.field_type == 'list':
                 object_definition["equality"] = "*"

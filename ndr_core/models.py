@@ -163,6 +163,9 @@ class NdrCoreSearchField(TranslatableMixin, models.Model):
         BOOLEAN_LIST = 11, "Boolean List"
         """This type produces a list of checkboxes"""
 
+        FLOAT = 12, "Float"
+        """This type produces a float number field"""
+
         __empty__ = 'Select a Type'
 
     field_name = models.CharField(max_length=100,
@@ -221,6 +224,18 @@ class NdrCoreSearchField(TranslatableMixin, models.Model):
                                       help_text="Condition for multiple list values")
     """Condition for multiple list values"""
 
+    comparison_operator = models.CharField(max_length=20, blank=True, default='=',
+                                          choices=(('=', 'Equal to / At / Exact match'),
+                                                   ('>', 'Greater than / After'),
+                                                   ('<', 'Less than / Before'),
+                                                   ('>=', 'Greater than or equal / At or after'),
+                                                   ('<=', 'Less than or equal / At or before'),
+                                                   ('!=', 'Not equal to'),
+                                                   ('contains', 'Contains (uses regex)'),
+                                                   ('CHOOSE', 'Let the user decide')),
+                                          help_text="Comparison operator for number, float, date, and string fields")
+    """Comparison operator for number, float, date, and string fields"""
+
     lower_value = models.CharField(null=True,
                                    blank=True,
                                    max_length=100,
@@ -246,7 +261,7 @@ class NdrCoreSearchField(TranslatableMixin, models.Model):
     data_field_type = models.CharField(max_length=100,
                                        blank=True,
                                        default='',
-                                       choices=(('int', 'Integer'), ('string', 'String')),
+                                       choices=(('int', 'Integer'), ('float', 'Float'), ('string', 'String')),
                                        help_text="Type of the field in the data source. This may change "
                                                  "the way data is queried.")
 
