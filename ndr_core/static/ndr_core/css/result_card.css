@@ -50,6 +50,12 @@
     scrollbar-width: none; /* hide by default in Firefox */
 }
 
+/* Detail pages: no max-height restriction */
+.rc-scrollable-container.rc-detail-page {
+    max-height: none;
+    overflow-y: visible;
+}
+
 /* Show scrollbar only on hover */
 .rc-scrollable-container:hover {
     scrollbar-width: thin;

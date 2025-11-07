@@ -19,7 +19,7 @@ function setTabs(select_value) {
     $( ".tab-pane" ).removeAttr( "style" );
     first_tab.children('a').tab('show');
 
-    // These UI-Elements feature 1 tab
+    // These UI-Elements feature 1 tab (data_object actually can have multiple, but we handle it differently)
     if(['card', 'jumbotron', 'iframe', 'banner', 'manifest_viewer'].includes(select_value)) {
         first_tab.children('a').text('Configure your ' + select_value);
         $(other_tabs).each(function(k,v){
@@ -34,6 +34,9 @@ function setTabs(select_value) {
         let first_text = $('#div_id_item_0_text');
         let first_url = $('#div_id_item_0_url');
         let first_manifest_group = $('#div_id_item_0_manifest_group');
+        let first_search_configuration = $('#div_id_item_0_search_configuration');
+        let first_object_id = $('#div_id_item_0_object_id');
+        let first_result_field = $('#div_id_item_0_result_field');
 
         switch (select_value) {
             case 'card':
@@ -44,6 +47,9 @@ function setTabs(select_value) {
                 first_text.show();
                 first_url.show();
                 first_manifest_group.hide();
+                first_search_configuration.hide();
+                first_object_id.hide();
+                first_result_field.hide();
                 break;
             case 'jumbotron':
                 first_ndr_banner_image.show();
@@ -53,6 +59,9 @@ function setTabs(select_value) {
                 first_text.show();
                 first_url.hide();
                 first_manifest_group.hide();
+                first_search_configuration.hide();
+                first_object_id.hide();
+                first_result_field.hide();
                 break;
             case 'iframe':
                 first_ndr_banner_image.hide();
@@ -62,6 +71,9 @@ function setTabs(select_value) {
                 first_text.show();
                 first_url.hide();
                 first_manifest_group.hide();
+                first_search_configuration.hide();
+                first_object_id.hide();
+                first_result_field.hide();
                 break;
             case 'banner':
                 first_ndr_banner_image.show();
@@ -71,6 +83,9 @@ function setTabs(select_value) {
                 first_text.hide();
                 first_url.hide();
                 first_manifest_group.hide();
+                first_search_configuration.hide();
+                first_object_id.hide();
+                first_result_field.hide();
                 break;
             case 'manifest_viewer':
                 first_ndr_banner_image.hide();
@@ -80,10 +95,46 @@ function setTabs(select_value) {
                 first_text.hide();
                 first_url.hide();
                 first_manifest_group.show();
+                first_search_configuration.hide();
+                first_object_id.hide();
+                first_result_field.hide();
                 break;
         }
     }
-    // The other UI-Elements feature 10 tabs
+    // Data Object UI-Element features 10 tabs for multiple data objects
+    else if(select_value === 'data_object') {
+        first_tab.children('a').text('Data Object 1');
+        $(other_tabs).each(function(k,v){
+            $(this).children('a').attr('class', 'nav-link');
+            $(this).children('a').text('Data Object ' + (k+2));
+        });
+
+        for (let i = 0; i < 10; i++) {
+            let ndr_banner_image = $('#div_id_item_' + i + '_ndr_banner_image');
+            let ndr_slide_image = $('#div_id_item_' + i + '_ndr_slide_image');
+            let ndr_card_image = $('#div_id_item_' + i + '_ndr_card_image');
+            let title = $('#div_id_item_' + i + '_title');
+            let text = $('#div_id_item_' + i + '_text');
+            let url = $('#div_id_item_' + i + '_url');
+            let manifest_group = $('#div_id_item_' + i + '_manifest_group');
+            let search_configuration = $('#div_id_item_' + i + '_search_configuration');
+            let object_id = $('#div_id_item_' + i + '_object_id');
+            let result_field = $('#div_id_item_' + i + '_result_field');
+
+            // Hide all image/text fields, show data object fields
+            ndr_banner_image.hide();
+            ndr_slide_image.hide();
+            ndr_card_image.hide();
+            title.hide();
+            text.hide();
+            url.hide();
+            manifest_group.hide();
+            search_configuration.show();
+            object_id.show();
+            result_field.show();
+        }
+    }
+    // The other UI-Elements (slides, carousel) feature 10 tabs
     else {
         first_tab.children('a').text('Slide 1');
         $(other_tabs).each(function(k,v){
@@ -99,6 +150,9 @@ function setTabs(select_value) {
             let text = $('#div_id_item_' + i + '_text');
             let url = $('#div_id_item_' + i + '_url');
             let manifest_group = $('#div_id_item_' + i + '_manifest_group');
+            let search_configuration = $('#div_id_item_' + i + '_search_configuration');
+            let object_id = $('#div_id_item_' + i + '_object_id');
+            let result_field = $('#div_id_item_' + i + '_result_field');
 
             switch (select_value) {
             case 'slides':
@@ -109,6 +163,9 @@ function setTabs(select_value) {
                 text.hide();
                 url.hide();
                 manifest_group.hide();
+                search_configuration.hide();
+                object_id.hide();
+                result_field.hide();
                 break;
             case 'carousel':
                 ndr_banner_image.hide();
@@ -118,6 +175,9 @@ function setTabs(select_value) {
                 text.show();
                 url.hide();
                 manifest_group.hide();
+                search_configuration.hide();
+                object_id.hide();
+                result_field.hide();
                 break;
             }
         }
@@ -197,6 +257,15 @@ function setComponents(select_value) {
         case 'manifest_viewer':   // manifest_viewer
             select_help_text.text('A manifest viewer is a viewer for a IIIF manifest');
             new_preview_image_url = preview_image_url.replace('_ITEM_', 'manifest_viewer');
+            ui_element_preview.attr('src', new_preview_image_url);
+
+            show_indicators.prop( "disabled", true );
+            link_element.prop( "disabled", true );
+            autoplay.prop( "disabled", true );
+            break;
+        case 'data_object':   // data_object
+            select_help_text.text('A data object displays API data using result fields');
+            new_preview_image_url = preview_image_url.replace('_ITEM_', 'data_object');
             ui_element_preview.attr('src', new_preview_image_url);
 
             show_indicators.prop( "disabled", true );

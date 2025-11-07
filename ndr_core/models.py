@@ -2,7 +2,7 @@
 import json
 import os.path
 
-from ckeditor_uploader.fields import RichTextUploadingField
+from django_ckeditor_5.fields import CKEditor5Field
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -95,7 +95,7 @@ class NdrCoreResultField(TranslatableMixin, models.Model):
                              blank=True, default='',
                              help_text="The label of the result field")
 
-    rich_expression = RichTextUploadingField(null=True, blank=True,
+    rich_expression = CKEditor5Field(config_name='result_editor', null=True, blank=True,
                                              help_text='Rich text for your expression')
     """The expression to display. This can be a static text or a template string which is filled with data from the
     result. Rich text can be styled (bold, italic, etc.)"""
@@ -695,7 +695,7 @@ class NdrCorePage(TranslatableMixin, models.Model):
     """If the page is of one of the search types (SEARCH, COMBINED_SEARCH), a number of search configurations can 
     be saved. """
 
-    template_text = RichTextUploadingField(null=True, blank=True,
+    template_text = CKEditor5Field(config_name='page_editor', null=True, blank=True,
                                            help_text='Text for your template page')
     """Template Pages can be filled with RichText content (instead of 'manual' HTML). """
 
@@ -1375,6 +1375,7 @@ class NdrCoreUIElement(models.Model):
         IFRAME = "iframe", "IFrame"
         BANNER = "banner", "Banner"
         MANIFEST_VIEWER = "manifest_viewer", "Manifest Viewer"
+        DATA_OBJECT = "data_object", "Data Object"
 
     type = models.CharField(max_length=100,
                             choices=UIElementType.choices,
@@ -1427,6 +1428,24 @@ class NdrCoreUiElementItem(models.Model, TranslatableMixin):
     manifest_group = models.ForeignKey(NdrCoreManifestGroup, on_delete=models.CASCADE, null=True)
     """The manifest group of the item. """
 
+    search_configuration = models.ForeignKey('NdrCoreSearchConfiguration',
+                                            on_delete=models.SET_NULL,
+                                            null=True,
+                                            blank=True,
+                                            help_text='Search configuration for DATA_OBJECT elements')
+    """Search configuration to use for fetching data object. """
+
+    object_id = models.CharField(max_length=255, blank=True,
+                                 help_text='ID of the object to fetch from the API')
+    """ID of the object to fetch from the API. """
+
+    result_field = models.ForeignKey('NdrCoreResultField',
+                                    on_delete=models.SET_NULL,
+                                    null=True,
+                                    blank=True,
+                                    help_text='Result field to use for rendering the data object')
+    """Result field containing the rich_expression to render the data object. """
+
     def __getattribute__(self, item):
         """Returns the translated field for a given language. If no translation exists,
         the default value is returned. """
@@ -1469,6 +1488,6 @@ class NdrCoreRichTextTranslation(models.Model):
     field_name = models.CharField(max_length=100)
     """Name of the field to translate. """
 
-    translation = RichTextUploadingField(null=True, blank=True,
+    translation = CKEditor5Field(config_name='page_editor', null=True, blank=True,
                                          help_text='Text for your template page')
     """Template Pages can be filled with RichText content (instead of 'manual' HTML). """

@@ -195,9 +195,164 @@ CORS_ALLOW_HEADERS = [
 GEOIP_PATH = os.path.join('geoip/')
 """Needed for the geoip functionality."""
 
-# CKEDITOR SETTINGS
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-"""Needed for the ck-editor"""
+customColorPalette = [
+        {
+            'color': 'hsl(4, 90%, 58%)',
+            'label': 'Red'
+        },
+        {
+            'color': 'hsl(340, 82%, 52%)',
+            'label': 'Pink'
+        },
+        {
+            'color': 'hsl(291, 64%, 42%)',
+            'label': 'Purple'
+        },
+        {
+            'color': 'hsl(262, 52%, 47%)',
+            'label': 'Deep Purple'
+        },
+        {
+            'color': 'hsl(231, 48%, 48%)',
+            'label': 'Indigo'
+        },
+        {
+            'color': 'hsl(207, 90%, 54%)',
+            'label': 'Blue'
+        },
+    ]
+
+# CKEDITOR 5 SETTINGS
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote'],
+    },
+    'page_editor': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'outdent', 'indent', '|',
+            'blockQuote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+            'code', 'subscript', 'superscript', 'highlight', '|',
+            'removeFormat', 'sourceEditing'
+        ],
+        'table': {
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+                'defaultProperties': {
+                    'borderStyle': 'solid',
+                    'borderWidth': '1px',
+                    'borderColor': 'hsl(0, 0%, 90%)',
+                },
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+            }
+        },
+        'htmlSupport': {
+            'allow': [
+                {
+                    'name': 'table',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'td',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'th',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                }
+            ]
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        }
+    },
+    'result_editor': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'outdent', 'indent', '|',
+            'blockQuote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+            'code', 'subscript', 'superscript', 'highlight', '|',
+            'removeFormat', 'sourceEditing'
+        ],
+        'table': {
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+                'defaultProperties': {
+                    'borderStyle': 'solid',
+                    'borderWidth': '1px',
+                    'borderColor': 'hsl(0, 0%, 90%)',
+                },
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+            }
+        },
+        'htmlSupport': {
+            'allow': [
+                {
+                    'name': 'table',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'td',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'th',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                }
+            ]
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        }
+    }
+}
 
 # RECAPTCHA SETTINGS
 SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']

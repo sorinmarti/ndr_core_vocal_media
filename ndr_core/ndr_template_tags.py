@@ -8,20 +8,22 @@ from django.utils.translation import gettext_lazy as _
 from ndr_core.exceptions import PreRenderError
 from ndr_core.forms.forms_manifest import ManifestSelectionForm
 from ndr_core.models import NdrCoreUIElement, NdrCoreImage, NdrCoreUpload, NdrCorePage
-
+from ndr_core.ndr_templatetags.template_string import TemplateString
+from ndr_core.api_factory import ApiFactory
 
 class TextPreRenderer:
     """Class to pre-render text before it is displayed on the website."""
 
     MAX_ITERATIONS = 50
-    ui_element_regex = r'\[\[(card|slideshow|carousel|jumbotron|figure|banner|iframe|manifest_viewer)\|(.*)\]\]'
-    link_element_regex = r'\[\[(file|page|orcid)\|([0-9a-zA-Z_ -]*)\]\]'
+    ui_element_regex = r'\[\[element\|([a-zA-Z0-9_-]+)\]\]'
+    link_element_regex = r'\[\[(file|page|orcid|plotly)\|([0-9a-zA-Z_ -]*)\]\]'
     url_element_regex = r'\[\[url\|([0-9a-zA-Z_ -]*)\]\]'
-    container_regex = r'\[\[(start|end)_(block)(?:=(.*?))?\]\]'
+    # Updated regex to capture both old syntax ([[start_block=Title]]) and new syntax ([[start_block:options]])
+    container_regex = r'\[\[(start|end)_(block|cell)(?:[:=](.*?))?\]\]'
     code_start_regex = r'\[\[start_code(?:=(.*?))?\]\]'
     code_end_regex = r'\[\[end_code\]\]'
     toc_regex = r'\[\[toc\]\]'
-    link_element_classes = {'figure': NdrCoreImage, 'file': NdrCoreUpload, 'page': NdrCorePage}
+    link_element_classes = {'figure': NdrCoreImage, 'file': NdrCoreUpload, 'page': NdrCorePage, 'plotly': NdrCoreUpload}
     link_element_keys = {"page": "view_name"}
 
     text = None
@@ -31,6 +33,50 @@ class TextPreRenderer:
         self.text = text
         self.request = request
         self.block_titles = []
+
+    def _parse_block_options(self, param_string):
+        """Parse block options from the parameter string.
+
+        Supports:
+        - Old syntax: [[start_block=Title]] → title only
+        - New syntax with options only: [[start_block:collapsible=true,back_to_top=true]]
+        - New syntax with title + options: [[start_block=Title:collapsible=true]]
+        - New syntax explicit: [[start_block:title=My Title,collapsible=true]]
+
+        Returns dict with: {'title': str or None, 'collapsible': bool, 'back_to_top': bool}
+        """
+        options = {
+            'title': None,
+            'collapsible': False,
+            'back_to_top': False
+        }
+
+        if not param_string:
+            return options
+
+        # Check if new syntax (contains comma or key=value pairs)
+        if ',' in param_string or ('=' in param_string and ':' not in param_string and param_string.count('=') > 0):
+            # New syntax with key=value pairs
+            # Split by comma
+            pairs = param_string.split(',')
+            for pair in pairs:
+                pair = pair.strip()
+                if '=' in pair:
+                    key, value = pair.split('=', 1)
+                    key = key.strip().lower()
+                    value = value.strip()
+
+                    if key == 'title':
+                        options['title'] = value
+                    elif key in ['collapsible', 'collapsable']:  # Support both spellings
+                        options['collapsible'] = value.lower() in ['true', '1', 'yes']
+                    elif key == 'back_to_top':
+                        options['back_to_top'] = value.lower() in ['true', '1', 'yes']
+        else:
+            # Old syntax: just the title
+            options['title'] = param_string
+
+        return options
 
     def check_tags_integrity(self):
         """Checks if all tags are well-formed. """
@@ -51,9 +97,13 @@ class TextPreRenderer:
         return True
 
     def create_containers(self):
-        """Creates container elements."""
+        """Creates container elements (blocks and cells)."""
         if self.check_tags_integrity():
             rendered_text = self.text
+
+            # First pass: Clean up CKEditor's paragraph wrappers around template tags
+            rendered_text = self._clean_template_tag_wrappers(rendered_text)
+
             match = re.search(self.container_regex, rendered_text)
             security_breaker = 0
             block_counter = 0
@@ -61,24 +111,109 @@ class TextPreRenderer:
             while match:
                 full_match = match.group(0)
                 action = match.group(1)  # 'start' or 'end'
-                block_type = match.group(2)  # 'block'
-                title = match.group(3) if len(match.groups()) >= 3 else None  # optional title
+                container_type = match.group(2)  # 'block' or 'cell'
+                param = match.group(3) if len(match.groups()) >= 3 else None  # optional parameter
 
-                if action == 'start':
-                    block_counter += 1
-                    if title:
-                        # Create slug from title for anchor ID
-                        anchor_id = f"block-{block_counter}-{re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')}"
-                        self.block_titles.append({'title': title, 'anchor': anchor_id})
+                if container_type == 'block':
+                    # Block: parse options from param
+                    if action == 'start':
+                        block_counter += 1
+                        options = self._parse_block_options(param)
 
-                        replacement = (f'<div class="card mb-2 box-shadow" id="{anchor_id}">'
-                                     f'<div class="card-body d-flex flex-column">'
-                                     f'<h3 class="card-title">{title}</h3>')
-                    else:
-                        replacement = ('<div class="card mb-2 box-shadow">'
-                                     '<div class="card-body d-flex flex-column">')
-                elif action == 'end':
-                    replacement = '</div></div>'
+                        # Generate unique ID for this block
+                        if options['title']:
+                            anchor_id = f"block-{block_counter}-{re.sub(r'[^a-z0-9]+', '-', options['title'].lower()).strip('-')}"
+                            self.block_titles.append({'title': options['title'], 'anchor': anchor_id})
+                        else:
+                            anchor_id = f"block-{block_counter}"
+
+                        # Start building the HTML
+                        replacement_parts = []
+                        replacement_parts.append(f'<div class="card mb-2 box-shadow" id="{anchor_id}">')
+
+                        # Add card header if collapsible or has title
+                        if options['collapsible'] or options['title']:
+                            replacement_parts.append('<div class="card-header d-flex justify-content-between align-items-center">')
+
+                            if options['collapsible']:
+                                # Collapsible header with button
+                                collapse_id = f"collapse-{anchor_id}"
+                                title_text = options['title'] if options['title'] else ''
+                                replacement_parts.append(f'''
+                                    <h3 class="card-title mb-0">{title_text}</h3>
+                                    <button class="btn btn-sm btn-outline-secondary" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#{collapse_id}"
+                                            aria-expanded="true" aria-controls="{collapse_id}">
+                                        <i class="fas fa-chevron-up collapse-icon"></i>
+                                    </button>
+                                ''')
+                            else:
+                                # Just title, no collapse button
+                                replacement_parts.append(f'<h3 class="card-title mb-0">{options["title"]}</h3>')
+
+                            replacement_parts.append('</div>')  # End card-header
+
+                        # Start card body (collapsible or not)
+                        if options['collapsible']:
+                            collapse_id = f"collapse-{anchor_id}"
+                            replacement_parts.append(f'<div class="collapse show" id="{collapse_id}">')
+
+                        replacement_parts.append('<div class="card-body d-flex flex-column">')
+
+                        # Store collapse_id and back_to_top flag for the end tag
+                        # We'll use a simple marker system
+                        if options['collapsible'] or options['back_to_top']:
+                            replacement_parts.append(f'[[BLOCK_OPTIONS:{anchor_id}:{options["collapsible"]}:{options["back_to_top"]}]]')
+
+                        replacement = ''.join(replacement_parts)
+
+                    elif action == 'end':
+                        # Check if this block has options markers
+                        # Search backwards from current position for options marker
+                        before_text = rendered_text[:match.start()]
+                        options_match = re.search(r'\[\[BLOCK_OPTIONS:([^:]+):([^:]+):([^\]]+)\]\](?!.*\[\[BLOCK_OPTIONS)', before_text)
+
+                        replacement_parts = []
+
+                        if options_match:
+                            anchor_id = options_match.group(1)
+                            is_collapsible = options_match.group(2) == 'True'
+                            has_back_to_top = options_match.group(3) == 'True'
+
+                            # Add back to top button if requested
+                            if has_back_to_top:
+                                replacement_parts.append('''
+                                    <div class="text-end mt-3">
+                                        <a href="#top" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-arrow-up"></i> Back to Top
+                                        </a>
+                                    </div>
+                                ''')
+
+                            # Remove the options marker
+                            rendered_text = rendered_text.replace(options_match.group(0), '', 1)
+
+                        replacement_parts.append('</div>')  # End card-body
+
+                        # Close collapse div if it exists
+                        if options_match and options_match.group(2) == 'True':
+                            replacement_parts.append('</div>')  # End collapse
+
+                        replacement_parts.append('</div>')  # End card
+                        replacement = ''.join(replacement_parts)
+
+                elif container_type == 'cell':
+                    # Cell: param is the width
+                    if action == 'start':
+                        if param:
+                            # Parse width - support percentages, px, or Bootstrap col classes
+                            width_style = self._parse_cell_width(param)
+                            replacement = f'[[CELL_START:{width_style}]]'
+                        else:
+                            # No width specified - flex auto
+                            replacement = '[[CELL_START:class="cell-block" style="flex: 1; min-width: 0;"]]'
+                    elif action == 'end':
+                        replacement = '[[CELL_END]]'
 
                 rendered_text = rendered_text.replace(full_match, replacement, 1)
                 match = re.search(self.container_regex, rendered_text)
@@ -86,9 +221,96 @@ class TextPreRenderer:
                 security_breaker += 1
                 if security_breaker > 50:
                     raise PreRenderError("Too many container elements.")
+
+            # Second pass: Wrap consecutive cells in row containers
+            rendered_text = self._wrap_cells_in_rows(rendered_text)
+
         else:
             raise PreRenderError("Container tags are not well-formed.")
         return rendered_text
+
+    def _clean_template_tag_wrappers(self, text):
+        """Remove <p> tags that only wrap template tags like [[start_cell]], [[end_cell]], etc."""
+        # Remove <p>[[tag]]</p> patterns
+        text = re.sub(r'<p>\s*(\[\[(?:start|end)_(?:cell|block)[^\]]*\]\])\s*</p>', r'\1', text)
+        # Remove empty <p></p> tags
+        text = re.sub(r'<p>\s*</p>', '', text)
+        # Remove <br> tags right after/before cell markers
+        text = re.sub(r'(\[\[(?:CELL_(?:START|END)|start|end)_[^\]]*\]\])\s*<br\s*/?>', r'\1', text)
+        text = re.sub(r'<br\s*/?>\s*(\[\[(?:CELL_(?:START|END)|start|end)_[^\]]*\]\])', r'\1', text)
+        return text
+
+    def _wrap_cells_in_rows(self, text):
+        """Wrap consecutive cells in a flex row container."""
+        # Find sequences of [[CELL_START:...]]...[[CELL_END]]
+        # and wrap them in a row div
+
+        # Pattern: one or more cell blocks
+        cell_pattern = r'(\[\[CELL_START:[^\]]+\]\].*?\[\[CELL_END\]\])'
+
+        # Find all positions where cells appear consecutively
+        result = []
+        pos = 0
+
+        while pos < len(text):
+            # Look for a cell start
+            cell_start_match = re.search(r'\[\[CELL_START:', text[pos:])
+
+            if not cell_start_match:
+                # No more cells, append rest of text
+                result.append(text[pos:])
+                break
+
+            # Append text before cell
+            result.append(text[pos:pos + cell_start_match.start()])
+            pos += cell_start_match.start()
+
+            # Collect consecutive cells
+            cells = []
+            while True:
+                cell_match = re.match(r'\[\[CELL_START:([^\]]+)\]\](.*?)\[\[CELL_END\]\]', text[pos:], re.DOTALL)
+                if cell_match:
+                    attr = cell_match.group(1)
+                    content = cell_match.group(2)
+                    # Create cell div - attr already contains the full attribute (class="..." or style="...")
+                    cells.append(f'<div {attr}>{content}</div>')
+                    pos += cell_match.end()
+
+                    # Check if next thing is another cell
+                    next_text = text[pos:].lstrip()
+                    if not next_text.startswith('[[CELL_START:'):
+                        break
+                    pos = pos + (len(text[pos:]) - len(next_text))
+                else:
+                    break
+
+            # Wrap collected cells in a row
+            if cells:
+                result.append('<div class="cell-row" style="display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;">')
+                result.append(''.join(cells))
+                result.append('</div>')
+
+        return ''.join(result)
+
+    def _parse_cell_width(self, width_param):
+        """Parse cell width parameter and return appropriate style attribute.
+
+        Supports:
+        - Percentages: 40%, 33.33%
+        - Pixels: 300px
+        - Bootstrap col classes: col-4, col-md-6
+        - Multiple Bootstrap classes: col-md-4,col-sm-12
+        """
+        width_param = width_param.strip()
+
+        # Check if it's Bootstrap col classes (starts with 'col-')
+        if width_param.startswith('col-'):
+            classes = width_param.replace(',', ' ')
+            return f'class="cell-block {classes}"'
+
+        # Otherwise treat as width value (40%, 300px, etc.)
+        # Use flex-basis for proper flex layout
+        return f'class="cell-block" style="flex: 0 0 {width_param}; min-width: 0;"'
 
     def create_ui_elements(self):
         """Creates UI elements."""
@@ -96,9 +318,8 @@ class TextPreRenderer:
         match = re.search(self.ui_element_regex, rendered_text)
         security_breaker = 0
         while match:
-            rendered_text = self.render_element(template=match.groups()[0],
-                                                element_id=match.groups()[1],
-                                                text=rendered_text)
+            element_name = match.groups()[0]
+            rendered_text = self.render_ui_element(element_name=element_name, text=rendered_text)
             match = re.search(self.ui_element_regex, rendered_text)
 
             security_breaker += 1
@@ -206,10 +427,13 @@ class TextPreRenderer:
             # Pretty-print JSON if language is json
             if language.lower() == 'json':
                 try:
-                    parsed_json = json.loads(code_content)
+                    # Replace non-breaking spaces with regular spaces (CKEditor inserts these)
+                    code_content_cleaned = code_content.replace('\xa0', ' ').replace('\u00a0', ' ')
+
+                    parsed_json = json.loads(code_content_cleaned)
                     code_content = json.dumps(parsed_json, indent=2, ensure_ascii=False)
-                except json.JSONDecodeError:
-                    # If JSON is invalid, just display as-is
+                except json.JSONDecodeError as e:
+                    print(f"Invalid JSON content; skipping pretty-printing. Error: {e}")
                     pass
 
             # Escape HTML to prevent XSS
@@ -231,6 +455,80 @@ class TextPreRenderer:
 
         return rendered_text
 
+    def render_ui_element(self, element_name, text):
+        """Renders a UI element by name."""
+        try:
+            element = NdrCoreUIElement.objects.get(name=element_name)
+        except NdrCoreUIElement.DoesNotExist:
+            error_html = f"<span class='text-danger'>UI Element not found: {element_name}</span>"
+            return text.replace(f"[[element|{element_name}]]", error_html)
+
+        # Get the template name from the element type
+        template_name = element.type
+
+        # Build context for rendering
+        context = {'data': element, 'request': self.request}
+
+        # Special handling for DATA_OBJECT type
+        if element.type == NdrCoreUIElement.UIElementType.DATA_OBJECT:
+            try:
+                # Render data objects for each item
+                rendered_items = []
+                for item in element.items():
+                    if item.search_configuration and item.object_id and item.result_field:
+                        # Fetch data from API
+                        api_result = self._fetch_data_object(item.search_configuration, item.object_id)
+
+                        if api_result:
+                            # Render using result field's rich_expression
+                            template_string = TemplateString(
+                                item.result_field.rich_expression, api_result, show_errors=True
+                            )
+                            field_content = template_string.get_formatted_string()
+                            field_content = template_string.sanitize_html(field_content)
+
+                            rendered_items.append(field_content)
+
+                context['rendered_items'] = rendered_items
+            except Exception as e:
+                error_html = f"<span class='text-danger'>Error fetching data: {e}</span>"
+                return text.replace(f'[[element|{element_name}]]', error_html)
+
+        # Special handling for manifest viewer
+        if element.type == NdrCoreUIElement.UIElementType.MANIFEST_VIEWER:
+            group_id = element.items().first().manifest_group if element and element.items().exists() else None
+            context['manifest_selection_form'] = ManifestSelectionForm(self.request.GET or None, manifest_group=group_id)
+
+        # Render the template
+        try:
+            element_html_string = render_to_string(f'ndr_core/ui_elements/{template_name}.html',
+                                                   request=self.request, context=context)
+            text = text.replace(f'[[element|{element_name}]]', element_html_string)
+        except Exception as e:
+            error_html = f"<span class='text-danger'>Error rendering element {element_name}: {e}</span>"
+            text = text.replace(f'[[element|{element_name}]]', error_html)
+
+        return text
+
+    def _fetch_data_object(self, search_configuration, object_id):
+        """Fetches a single data object from the API."""
+
+        # Create API query
+        factory = ApiFactory(search_configuration)
+        query_obj = factory.get_query_instance()
+
+        # Execute query
+        query = query_obj.get_record_query(object_id)
+        result_obj = factory.get_result_instance(query, self.request)
+        result_obj.load_result()
+
+        # Return the first result if available
+        if result_obj and result_obj.results and len(result_obj.results) > 0:
+            # print(f"Fetched data object with ID: {result_obj.results}")
+            return result_obj.results[0]['data']
+
+        return None
+
     def render_element(self, template, element_id,  text):
         """Renders an element."""
         if template == "orcid":
@@ -249,6 +547,41 @@ class TextPreRenderer:
             </a>
             """
             return text.replace(f"[[{template}|{element_id}]]", orcid_html)
+
+        if template == "plotly":
+            # Load the JSON file and render as Plotly chart
+            element = self.get_element(template, element_id)
+            if element is None:
+                error_html = f"<span class='text-danger'>Plotly file not found: {element_id}</span>"
+                return text.replace(f"[[{template}|{element_id}]]", error_html)
+
+            try:
+                # Read file content
+                file_path = element.file.path
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    file_content = f.read()
+
+                # Parse JSON
+                plotly_data = json.loads(file_content)
+
+                # Import PlotlyFilter
+                from ndr_core.ndr_templatetags.filters import PlotlyFilter
+
+                # Render using PlotlyFilter
+                plotly_filter = PlotlyFilter('plotly', plotly_data, {}, None)
+                plotly_html = plotly_filter.get_rendered_value()
+
+                return text.replace(f"[[{template}|{element_id}]]", plotly_html)
+
+            except FileNotFoundError:
+                error_html = f"<span class='text-danger'>Plotly file not found on disk: {element_id}</span>"
+                return text.replace(f"[[{template}|{element_id}]]", error_html)
+            except json.JSONDecodeError as e:
+                error_html = f"<span class='text-danger'>Invalid JSON in Plotly file: {e}</span>"
+                return text.replace(f"[[{template}|{element_id}]]", error_html)
+            except Exception as e:
+                error_html = f"<span class='text-danger'>Error rendering Plotly chart: {e}</span>"
+                return text.replace(f"[[{template}|{element_id}]]", error_html)
 
         element = self.get_element(template, element_id)
         context = {'data': element}

@@ -1,5 +1,5 @@
 """Contains forms used in the NDRCore admin interface for the creation or edit of NDR pages."""
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django_ckeditor_5.widgets import CKEditor5Widget
 from crispy_forms.bootstrap import TabHolder, Tab
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, HTML
@@ -58,7 +58,7 @@ class PageForm(forms.ModelForm):
         for lang in self.additional_languages:
             self.fields[f'template_text_{lang}'] = forms.CharField(label=f"Template Text ({lang})",
                                                                    required=False,
-                                                                   widget=CKEditorUploadingWidget)
+                                                                   widget=CKEditor5Widget(config_name='page_editor'))
             try:
                 translation = NdrCoreRichTextTranslation.objects.get(language=lang,
                                                                      table_name='NdrCorePage',
@@ -147,19 +147,7 @@ class PageForm(forms.ModelForm):
         layout.append(form_row)
 
         form_row = Row(
-            Column('simple_api', css_class='form-group col-md-12 mb-0'),
-            css_class='form-row'
-        )
-        layout.append(form_row)
-
-        form_row = Row(
             Column('search_configs', css_class='form-group col-md-12 mb-0'),
-            css_class='form-row'
-        )
-        layout.append(form_row)
-
-        form_row = Row(
-            Column('list_configs', css_class='form-group col-md-12 mb-0'),
             css_class='form-row'
         )
         layout.append(form_row)
@@ -210,7 +198,7 @@ class PageEditForm(PageForm):
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Save Page'))
+        helper.layout.append(get_form_buttons('Save Page', include_save_and_continue=True))
         return helper
 
 

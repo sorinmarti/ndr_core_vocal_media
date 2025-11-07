@@ -202,9 +202,66 @@ form {
 }
 
 .form-control {
-    color: var(--form-field-fg);
-    background: var(--form-field-bg);
+    color: var(--form-field-fg) !important;
+    background: var(--form-field-bg) !important;
+    border-color: rgba(128, 128, 128, 0.3) !important;
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.form-control:focus {
+    background: var(--form-field-bg) !important;
+    color: var(--form-field-fg) !important;
+    border-color: var(--button-color) !important;
+}
+
+input, select, textarea {
+    color: var(--form-field-fg) !important;
+    background: var(--form-field-bg) !important;
+    border-color: rgba(128, 128, 128, 0.3) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    background: var(--form-field-bg) !important;
+    color: var(--form-field-fg) !important;
+    border-color: var(--button-color) !important;
+}
+
+label {
+    color: var(--text-color) !important;
+}
+
+/* Dark mode form enhancements */
+[data-theme="dark"] .form-control {
+    background-color: var(--form-field-bg) !important;
+    color: var(--form-field-fg) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: var(--form-field-bg) !important;
+    border-color: var(--button-color) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background-color: var(--form-field-bg) !important;
+    color: var(--form-field-fg) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: rgba(233, 236, 239, 0.5) !important;
+}
+
+[data-theme="dark"] label {
+    color: var(--text-color) !important;
+}
+
+/* Override Bootstrap bg-white class in dark mode */
+[data-theme="dark"] .bg-white {
+    background-color: var(--container-bg-color) !important;
 }
 
 /* FOOTER */
@@ -307,4 +364,318 @@ p {
 
 [data-theme="dark"] .dropdown-item:hover {
     background-color: var(--accent-color-1);
+}
+
+/* TABLES - Light and Dark Mode Support */
+.table {
+    color: var(--text-color) !important;
+    background-color: var(--container-bg-color) !important;
+    border-color: rgba(128, 128, 128, 0.3) !important;
+}
+
+.table thead th,
+.table table thead th,
+figure.table table thead th {
+    color: var(--title-color) !important;
+    background-color: var(--container-bg-color) !important;
+    border-color: rgba(128, 128, 128, 0.3) !important;
+}
+
+.table tbody tr {
+    background-color: var(--container-bg-color) !important;
+}
+
+.table tbody td {
+    color: var(--text-color) !important;
+    background-color: var(--container-bg-color) !important;
+    border-color: rgba(128, 128, 128, 0.3) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(128, 128, 128, 0.05) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) td {
+    background-color: rgba(128, 128, 128, 0.05) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(128, 128, 128, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: rgba(128, 128, 128, 0.1) !important;
+}
+
+/* Dark mode specific table enhancements */
+[data-theme="dark"] .table {
+    background-color: var(--container-bg-color) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .table thead th,
+[data-theme="dark"] .table table thead th,
+[data-theme="dark"] figure.table table thead th,
+[data-theme="dark"] table thead th,
+[data-theme="dark"] .table-responsive thead th,
+[data-theme="dark"] .table-responsive table thead th,
+[data-theme="dark"] th {
+    color: #FFFFFF !important;
+    background-color: #2A2A2A !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .table tbody tr,
+[data-theme="dark"] table tbody tr {
+    background-color: var(--container-bg-color) !important;
+}
+
+[data-theme="dark"] .table tbody th,
+[data-theme="dark"] table tbody th {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table tbody td,
+[data-theme="dark"] table tbody td {
+    background-color: var(--container-bg-color) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) td {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .table-bordered {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .table-bordered th,
+[data-theme="dark"] .table-bordered td {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Table responsive wrapper */
+.table-responsive {
+    background-color: transparent !important;
+}
+
+/* BADGES - Adaptive text color */
+.badge-auto-text {
+    color: #212529 !important;
+}
+
+[data-theme="dark"] .badge-auto-text {
+    color: #000000 !important;
+}
+
+/* TABULATOR - Interactive Tables Dark Mode Support */
+.tabulator-dark {
+    background-color: var(--container-bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.tabulator-dark .tabulator-header {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.tabulator-dark .tabulator-header .tabulator-col {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--title-color) !important;
+}
+
+.tabulator-dark .tabulator-header .tabulator-col .tabulator-col-content {
+    color: var(--title-color) !important;
+}
+
+.tabulator-dark .tabulator-header .tabulator-col .tabulator-arrow {
+    border-bottom-color: var(--title-color) !important;
+}
+
+.tabulator-dark .tabulator-header .tabulator-col.tabulator-sortable:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.tabulator-dark .tabulator-tableholder .tabulator-table {
+    background-color: var(--container-bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.tabulator-dark .tabulator-row {
+    background-color: var(--container-bg-color) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.tabulator-dark .tabulator-row.tabulator-row-even {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.tabulator-dark .tabulator-row:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.tabulator-dark .tabulator-row .tabulator-cell {
+    color: var(--text-color) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.tabulator-dark .tabulator-footer {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.tabulator-dark .tabulator-footer .tabulator-page {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-color) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.tabulator-dark .tabulator-footer .tabulator-page:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.tabulator-dark .tabulator-footer .tabulator-page.active {
+    background-color: var(--button-color) !important;
+    color: var(--button-text-color) !important;
+}
+
+.tabulator-dark .tabulator-header-filter input {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.tabulator-dark .tabulator-header-filter input::placeholder {
+    color: rgba(233, 236, 239, 0.5) !important;
+}
+
+.tabulator-dark .tabulator-header-filter input:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: var(--button-color) !important;
+}
+
+/* Light mode Tabulator overrides */
+.tabulator-light .tabulator-header {
+    background-color: var(--container-bg-color) !important;
+}
+
+.tabulator-light .tabulator-row {
+    background-color: var(--container-bg-color) !important;
+}
+
+.tabulator-light .tabulator-row:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* LISTS - Ensure proper text color in both modes */
+ul, ol {
+    color: var(--text-color) !important;
+}
+
+ul li, ol li {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] ul,
+[data-theme="dark"] ol {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] ul li,
+[data-theme="dark"] ol li {
+    color: var(--text-color) !important;
+}
+
+/* CODE BLOCKS - Dark mode */
+[data-theme="dark"] pre,
+[data-theme="dark"] code {
+    background-color: #1E1E1E !important;
+    color: #D4D4D4 !important;
+}
+
+[data-theme="dark"] pre.code-block {
+    background-color: #1E1E1E !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Prism.js syntax highlighting - Dark mode */
+[data-theme="dark"] .token.comment,
+[data-theme="dark"] .token.prolog,
+[data-theme="dark"] .token.doctype,
+[data-theme="dark"] .token.cdata {
+    color: #6A9955 !important;
+}
+
+[data-theme="dark"] .token.punctuation {
+    color: #D4D4D4 !important;
+}
+
+[data-theme="dark"] .token.property,
+[data-theme="dark"] .token.tag,
+[data-theme="dark"] .token.boolean,
+[data-theme="dark"] .token.number,
+[data-theme="dark"] .token.constant,
+[data-theme="dark"] .token.symbol,
+[data-theme="dark"] .token.deleted {
+    color: #B5CEA8 !important;
+}
+
+[data-theme="dark"] .token.selector,
+[data-theme="dark"] .token.attr-name,
+[data-theme="dark"] .token.string,
+[data-theme="dark"] .token.char,
+[data-theme="dark"] .token.builtin,
+[data-theme="dark"] .token.inserted {
+    color: #CE9178 !important;
+}
+
+[data-theme="dark"] .token.operator,
+[data-theme="dark"] .token.entity,
+[data-theme="dark"] .token.url,
+[data-theme="dark"] .language-css .token.string,
+[data-theme="dark"] .style .token.string {
+    color: #D4D4D4 !important;
+}
+
+[data-theme="dark"] .token.atrule,
+[data-theme="dark"] .token.attr-value,
+[data-theme="dark"] .token.keyword {
+    color: #569CD6 !important;
+}
+
+[data-theme="dark"] .token.function,
+[data-theme="dark"] .token.class-name {
+    color: #DCDCAA !important;
+}
+
+[data-theme="dark"] .token.regex,
+[data-theme="dark"] .token.important,
+[data-theme="dark"] .token.variable {
+    color: #D16969 !important;
+}
+
+/* CARD HEADERS - Dark mode */
+[data-theme="dark"] .card-header {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-header .card-title {
+    color: var(--title-color) !important;
 }

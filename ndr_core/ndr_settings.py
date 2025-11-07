@@ -21,8 +21,7 @@ class NdrSettings:
         'django_select2',
         'bootstrap4',
         'crispy_bootstrap4',
-        'ckeditor',
-        'ckeditor_uploader',
+        'django_ckeditor_5',
         'django_recaptcha',
         'colorfield',
         'fontawesomefree',
@@ -61,7 +60,7 @@ class NdrSettings:
         urls = [
             path('ndr_core/', include('ndr_core.urls')),
             path("select2/", include("django_select2.urls")),
-            re_path(r'^ckeditor/', include('ckeditor_uploader.urls'))
+            path("ckeditor5/", include('django_ckeditor_5.urls'))
         ]
 
         if NdrSettings.app_exists():

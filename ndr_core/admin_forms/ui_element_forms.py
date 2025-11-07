@@ -5,7 +5,8 @@ from crispy_forms.layout import Layout, Row, Column, HTML, Div
 from django import forms
 
 from ndr_core.admin_forms.admin_forms import get_form_buttons
-from ndr_core.models import NdrCoreUIElement, NdrCoreImage, NdrCoreManifestGroup
+from ndr_core.models import (NdrCoreUIElement, NdrCoreImage, NdrCoreManifestGroup,
+                              NdrCoreSearchConfiguration, NdrCoreResultField)
 
 
 class ImageChoiceField(forms.ModelChoiceField):
@@ -52,6 +53,22 @@ class UIElementForm(forms.ModelForm):
                 forms.ModelChoiceField(label='Manifest Group',
                                        queryset=NdrCoreManifestGroup.objects.all(),
                                        required=False))
+
+            # Fields for DATA_OBJECT type
+            self.fields[f'item_{x}_search_configuration'] = (
+                forms.ModelChoiceField(label='Search Configuration',
+                                       queryset=NdrCoreSearchConfiguration.objects.all(),
+                                       required=False,
+                                       help_text='Search configuration to fetch data from'))
+            self.fields[f'item_{x}_object_id'] = forms.CharField(
+                required=False,
+                label='Object ID',
+                help_text='ID of the object to fetch from the API')
+            self.fields[f'item_{x}_result_field'] = (
+                forms.ModelChoiceField(label='Result Field',
+                                       queryset=NdrCoreResultField.objects.all(),
+                                       required=False,
+                                       help_text='Result field to use for rendering this data object'))
 
     @property
     def helper(self):
@@ -110,6 +127,10 @@ class UIElementForm(forms.ModelForm):
                     f'item_{x}_text',
                     f'item_{x}_url',
                     f'item_{x}_manifest_group',
+                    HTML('<hr/><h5>Data Object Settings</h5>'),
+                    f'item_{x}_search_configuration',
+                    f'item_{x}_object_id',
+                    f'item_{x}_result_field',
                     css_class='col-8'
                 ),
                 Column(
@@ -158,6 +179,25 @@ class UIElementCreateForm(UIElementForm):
 
 class UIElementEditForm(UIElementForm):
     """Form to create a Card. Extends the base form class and adds a 'create' button."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate form fields with existing item data
+        if self.instance and self.instance.pk:
+            items = self.instance.items()
+            for idx, item in enumerate(items):
+                if idx < 10:  # Only handle first 10 items
+                    self.fields[f'item_{idx}_ndr_banner_image'].initial = item.ndr_image
+                    self.fields[f'item_{idx}_ndr_slide_image'].initial = item.ndr_image
+                    self.fields[f'item_{idx}_ndr_card_image'].initial = item.ndr_image
+                    self.fields[f'item_{idx}_title'].initial = item.title
+                    self.fields[f'item_{idx}_text'].initial = item.text
+                    self.fields[f'item_{idx}_url'].initial = item.url
+                    self.fields[f'item_{idx}_manifest_group'].initial = item.manifest_group
+                    self.fields[f'item_{idx}_search_configuration'].initial = item.search_configuration
+                    self.fields[f'item_{idx}_object_id'].initial = item.object_id
+                    self.fields[f'item_{idx}_result_field'].initial = item.result_field
 
     @property
     def helper(self):

@@ -162,6 +162,12 @@ class PageEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
         form.save_translations()
 
         response = super().form_valid(form)
+        messages.success(self.request, "Page saved successfully.")
+
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect back to the same edit page
+            return redirect('ndr_core:edit_page', pk=self.object.pk)
+
         return response
 
 

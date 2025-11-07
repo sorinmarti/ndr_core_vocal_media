@@ -62,7 +62,8 @@ class TemplateStringVariable:
             raise ValueError("Variable is None.")
 
         if '|' in variable:
-            parts = variable.split('|')
+            # Use quote-respecting split for pipes to handle quoted parameter values with pipes
+            parts = self._split_filter_with_quotes(variable, '|')
             self.variable = parts[0]
             self.value_filters = parts[1:]
 
@@ -403,15 +404,28 @@ class TemplateString:
         return ''
 
     def sanitize_html(self, field_content):
-        """Removes empty elements from the html."""
+        """Removes empty elements from the html, but preserves structurally important table elements."""
         # return field_content
+        # Elements that should NOT be removed even when empty (table structure elements)
+        preserve_elements = {'td', 'th', 'tr', 'table', 'thead', 'tbody', 'tfoot'}
+
         pattern = r"<(\w+)>(&nbsp;)?</\1>"
         empty_element_match = re.findall(pattern, field_content)
         i = 0
         while empty_element_match:
             i = i + 1
-            for match in empty_element_match:
+            # Filter out preserved elements from matches to avoid infinite loop
+            matches_to_process = [match for match in empty_element_match
+                                  if match[0].lower() not in preserve_elements]
+
+            if not matches_to_process:
+                # Only preserved elements remain, stop processing
+                break
+
+            for match in matches_to_process:
                 field_content = field_content.replace(f"<{match[0]}>{match[1]}</{match[0]}>", '')
+
+            # Re-scan for more empty elements
             empty_element_match = re.findall(pattern, field_content)
 
         return mark_safe(field_content)

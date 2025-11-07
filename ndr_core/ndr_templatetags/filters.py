@@ -52,8 +52,12 @@ def get_get_filter_class(filter_name):
         return TextTruncateFilter
     if filter_name == "table":
         return TableTemplateFilter
+    if filter_name == "datatable":
+        return DatatableFilter
     if filter_name == "code":
         return CodeFilter
+    if filter_name == "plotly":
+        return PlotlyFilter
 
     raise ValueError(f"Filter {filter_name} not found.")
 
@@ -261,7 +265,7 @@ class BadgeTemplateFilter(AbstractFilter):
 
         badge_element = HTMLElement("span")
         badge_element.add_attribute("class", "badge")
-        badge_element.add_attribute("class", "text-dark")
+        badge_element.add_attribute("class", "badge-auto-text")
         badge_element.add_attribute("class", "font-weight-normal")
 
         if self.get_configuration("tt"):
@@ -1504,7 +1508,7 @@ class TableTemplateFilter(AbstractFilter):
         - rowclass: CSS class for table rows
         - limit: Maximum number of rows to display
         - empty: Text to display when list is empty (default: "No data available")
-        - empty_cell: Text to display for empty cells (default: "")
+        - empty_cell: Text to display for empty/missing cells (default: "&nbsp;" - non-breaking space)
         - join: Separator when cell contains a list (default: ", ")
         - responsive: Whether to wrap in responsive div (default: true)
     """
@@ -1549,7 +1553,7 @@ class TableTemplateFilter(AbstractFilter):
         # Parse configurations
         cols = self.parse_array_config(self.get_configuration("cols"))
         headers = self.parse_array_config(self.get_configuration("headers"))
-        expressions = self.parse_array_config(self.get_configuration("expr"), preserve_quotes=True)
+        expressions = self.parse_array_config(self.get_configuration("expr"), preserve_quotes=True, delimiter=';')
 
         # Auto-detect columns if not specified
         if not cols:
@@ -1614,34 +1618,65 @@ class TableTemplateFilter(AbstractFilter):
         tbody = HTMLElement("tbody")
         rowclass = self.get_configuration("rowclass")
 
-        for row_data in data:
+        # Get empty cell default once
+        empty_default = self.get_configuration("empty_cell")
+        if empty_default is None:
+            empty_default = "&nbsp;"
+
+        for row_idx, row_data in enumerate(data):
+            # Build all cells first into a list
+            cells = []
+
+            for i in range(len(cols)):
+                col = cols[i]
+                cell_html = "<td>&nbsp;</td>"  # Default empty cell
+
+                try:
+                    # Extract cell value (with nested support)
+                    cell_value = self.extract_cell_value(row_data, col)
+
+                    # Apply filter expression if specified
+                    if expressions and i < len(expressions) and expressions[i]:
+                        try:
+                            cell_value = self.apply_filter_expression(cell_value, expressions[i], row_data)
+                        except Exception:
+                            cell_value = None
+
+                    # Handle lists within cells
+                    if isinstance(cell_value, list):
+                        join_separator = self.get_configuration("join") or ", "
+                        cell_value = join_separator.join(str(item) for item in cell_value if item is not None)
+
+                    # Handle None/empty values
+                    if cell_value is None or cell_value == "":
+                        cell_value = empty_default
+
+                    # Build cell HTML
+                    td = HTMLElement("td")
+                    td.add_content(str(cell_value))
+                    cell_html = str(td)
+
+                except Exception:
+                    # Any error: use default empty cell
+                    cell_html = f"<td>{empty_default}</td>"
+
+                # Add to cells list - GUARANTEED
+                cells.append(cell_html)
+
+            # Verify we have exactly the right number of cells
+            while len(cells) < len(cols):
+                cells.append(f"<td>{empty_default}</td>")
+
+            # Build row with all cells
             tr = HTMLElement("tr")
             if rowclass:
                 tr.add_attribute("class", rowclass)
 
-            for i, col in enumerate(cols):
-                td = HTMLElement("td")
+            for cell_html in cells:
+                tr.add_content(cell_html)
 
-                # Extract cell value (with nested support)
-                cell_value = self.extract_cell_value(row_data, col)
-
-                # Apply filter expression if specified
-                if expressions and i < len(expressions) and expressions[i]:
-                    cell_value = self.apply_filter_expression(cell_value, expressions[i], row_data)
-
-                # Handle lists within cells
-                if isinstance(cell_value, list):
-                    join_separator = self.get_configuration("join") or ", "
-                    cell_value = join_separator.join(str(item) for item in cell_value if item is not None)
-
-                # Handle None/empty values
-                if cell_value is None or cell_value == "":
-                    cell_value = self.get_configuration("empty_cell") or ""
-
-                td.add_content(str(cell_value))
-                tr.add_content(str(td))
-
-            tbody.add_content(str(tr))
+            row_html = str(tr)
+            tbody.add_content(row_html)
 
         table.add_content(str(tbody))
 
@@ -1660,11 +1695,11 @@ class TableTemplateFilter(AbstractFilter):
         return row_data.get(col_key, None)
 
     def apply_filter_expression(self, value, expr_str, row_data):
-        """Apply a filter expression string to a value.
+        """Apply a filter expression string to a value. Supports chained filters with |.
 
         Args:
             value: The value to filter
-            expr_str: Filter expression like "upper" or "badge:field=person,tt=__field__"
+            expr_str: Filter expression like "upper" or "format:.2f|badge:bg=gradient"
             row_data: The full row data for context
 
         Returns:
@@ -1676,12 +1711,18 @@ class TableTemplateFilter(AbstractFilter):
         # Remove surrounding quotes if present
         expr_str = self.remove_quotes(expr_str)
 
-        # Handle lists - apply filter to each item
+        # Split by pipe to support chained filters
+        filter_chain = self.split_filter_chain(expr_str)
+
+        # Handle lists - apply filter chain to each item
         if isinstance(value, list):
             filtered_items = []
             for item in value:
                 try:
-                    filtered = self.apply_single_filter_expression(item, expr_str, row_data)
+                    filtered = item
+                    # Apply each filter in the chain
+                    for filter_expr in filter_chain:
+                        filtered = self.apply_single_filter_expression(filtered, filter_expr, row_data)
                     if filtered is not None:
                         filtered_items.append(filtered)
                 except Exception:
@@ -1690,12 +1731,49 @@ class TableTemplateFilter(AbstractFilter):
                         filtered_items.append(item)
             return filtered_items
 
-        # Apply filter to single value
+        # Apply filter chain to single value
         try:
-            return self.apply_single_filter_expression(value, expr_str, row_data)
+            filtered_value = value
+            for filter_expr in filter_chain:
+                filtered_value = self.apply_single_filter_expression(filtered_value, filter_expr, row_data)
+            return filtered_value
         except Exception:
             # If filter fails, return original value
             return value
+
+    def split_filter_chain(self, expr_str):
+        """Split a filter expression into a chain by '|', respecting quotes.
+
+        Example: "format:.2f|badge:bg=gradient" -> ["format:.2f", "badge:bg=gradient"]
+        """
+        chain = []
+        current = ""
+        in_quotes = False
+        quote_char = None
+
+        for i, char in enumerate(expr_str):
+            if char in ['"', "'"] and not in_quotes:
+                in_quotes = True
+                quote_char = char
+                current += char
+            elif char == quote_char and in_quotes:
+                if i > 0 and expr_str[i - 1] == '\\':
+                    current += char
+                else:
+                    in_quotes = False
+                    quote_char = None
+                    current += char
+            elif char == '|' and not in_quotes:
+                if current.strip():
+                    chain.append(current.strip())
+                current = ""
+            else:
+                current += char
+
+        if current.strip():
+            chain.append(current.strip())
+
+        return chain if chain else [expr_str]
 
     def apply_single_filter_expression(self, value, expr_str, row_data):
         """Apply filter expression to a single value."""
@@ -1728,12 +1806,13 @@ class TableTemplateFilter(AbstractFilter):
             # Filter not found, return value as-is
             return value
 
-    def parse_array_config(self, config_str, preserve_quotes=False):
+    def parse_array_config(self, config_str, preserve_quotes=False, delimiter=','):
         """Parse array configuration like [item1,item2,item3] into a list.
 
         Args:
             config_str: Configuration string
             preserve_quotes: If True, keep quotes around items (useful for filter expressions)
+            delimiter: Character to use for splitting array elements (default ',', use ';' for expr arrays)
 
         Returns:
             List of items
@@ -1750,8 +1829,8 @@ class TableTemplateFilter(AbstractFilter):
         if not config_str:
             return []
 
-        # Split by comma, respecting quotes
-        items = self.split_respecting_quotes(config_str, ',')
+        # Split by delimiter, respecting quotes
+        items = self.split_respecting_quotes(config_str, delimiter)
 
         # Clean up items
         result = []
@@ -1829,6 +1908,295 @@ class TableTemplateFilter(AbstractFilter):
 
         # Replace underscores with spaces and capitalize
         return col_key.replace('_', ' ').title()
+
+
+class DatatableFilter(TableTemplateFilter):
+    """A filter to render interactive data tables using Tabulator.
+
+    This extends TableTemplateFilter to provide pagination, filtering, and sorting capabilities.
+
+    Usage:
+        {data|datatable}  # Basic interactive table
+        {data|datatable:cols=[name,age],headers=[Name,Age],pagesize=10}
+        {data|datatable:filterable=true,sortable=true,paginate=true}
+        {data|datatable:cols=[role,name],expr=["capitalize","badge:field=person"]}
+
+    Configuration (inherits all from table filter):
+        - cols: Array of column keys to display
+        - headers: Array of header labels
+        - expr: Array of filter expressions for each column
+        - limit: Maximum rows (if not paginating)
+        - empty: Empty state message
+        - empty_cell: Default for empty cells
+        - join: List separator
+
+    Datatable-specific options:
+        - paginate: Enable pagination (true/false, default: true)
+        - pagesize: Rows per page (default: 10, options: 5,10,25,50,100)
+        - filterable: Enable column filtering (true/false, default: true)
+        - sortable: Enable column sorting (true/false, default: true)
+        - height: Table height (e.g., "400px", default: auto)
+        - layout: Layout mode ("fitData", "fitColumns", "fitDataFill", default: "fitData")
+        - responsive: Enable responsive layout (true/false, default: true)
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        # Extend parent's allowed attributes
+        parent_attrs = super().allowed_attributes()
+        datatable_attrs = ["paginate", "pagesize", "filterable", "sortable",
+                          "height", "layout", "responsive"]
+        return parent_attrs + datatable_attrs
+
+    def needed_options(self):
+        return []
+
+    def processes_list_as_whole(self):
+        """This filter needs to process the entire list at once."""
+        return True
+
+    def get_rendered_value(self):
+        """Returns the Tabulator table HTML and JavaScript."""
+        value = self.value
+
+        # Debug output
+        print(f"[DATATABLE DEBUG] Filter called with value type: {type(value)}")
+        print(f"[DATATABLE DEBUG] Value is list: {isinstance(value, list)}")
+        if isinstance(value, list):
+            print(f"[DATATABLE DEBUG] List length: {len(value)}")
+
+        # Validate input
+        if not isinstance(value, list):
+            error_msg = f"<div class='alert alert-danger'>Datatable filter requires a list, got {type(value).__name__}. Value: {str(value)[:100]}</div>"
+            print(f"[DATATABLE DEBUG] Returning error: {error_msg}")
+            return error_msg
+
+        if len(value) == 0:
+            empty_message = self.get_configuration("empty") or "No data available"
+            print(f"[DATATABLE DEBUG] Empty list, returning: {empty_message}")
+            return f"<div class='text-muted'>{empty_message}</div>"
+
+        # Parse configurations
+        cols = self.parse_array_config(self.get_configuration("cols"))
+        headers = self.parse_array_config(self.get_configuration("headers"))
+        expressions = self.parse_array_config(self.get_configuration("expr"), preserve_quotes=True, delimiter=';')
+
+        # Auto-detect columns if not specified
+        if not cols:
+            cols = self.auto_detect_columns(value)
+
+        # Auto-generate headers if not specified
+        if not headers:
+            headers = [self.format_header(col) for col in cols]
+
+        # Validate
+        if len(headers) != len(cols):
+            return f"<span class='text-danger'>Headers count ({len(headers)}) must match columns count ({len(cols)})</span>"
+
+        if expressions and len(expressions) != len(cols):
+            return f"<span class='text-danger'>Expressions count ({len(expressions)}) must match columns count ({len(cols)})</span>"
+
+        # Get datatable-specific options
+        paginate = self.get_configuration("paginate")
+        paginate = paginate is None or paginate.lower() not in ["false", "0", "no"]
+
+        pagesize = int(self.get_configuration("pagesize") or 10)
+        filterable = self.get_configuration("filterable")
+        filterable = filterable is None or filterable.lower() not in ["false", "0", "no"]
+
+        sortable = self.get_configuration("sortable")
+        sortable = sortable is None or sortable.lower() not in ["false", "0", "no"]
+
+        height = self.get_configuration("height") or None
+        layout = self.get_configuration("layout") or "fitColumns"
+
+        responsive = self.get_configuration("responsive")
+        responsive = responsive is None or responsive.lower() not in ["false", "0", "no"]
+
+        # Process data - apply expressions to create clean data for Tabulator
+        print(f"[DATATABLE DEBUG] Processing data with {len(cols)} columns")
+        processed_data = self.process_data_for_tabulator(value, cols, expressions)
+        print(f"[DATATABLE DEBUG] Processed {len(processed_data)} rows")
+
+        # Build the Tabulator HTML and JS
+        print(f"[DATATABLE DEBUG] Building Tabulator table")
+        result = self.build_tabulator_table(processed_data, cols, headers, {
+            'paginate': paginate,
+            'pagesize': pagesize,
+            'filterable': filterable,
+            'sortable': sortable,
+            'height': height,
+            'layout': layout,
+            'responsive': responsive
+        })
+        print(f"[DATATABLE DEBUG] Returning result length: {len(result)}")
+        return result
+
+    def process_data_for_tabulator(self, data, cols, expressions):
+        """Process data and apply filter expressions to create Tabulator-ready data."""
+        processed = []
+        empty_default = self.get_configuration("empty_cell") or ""
+
+        for row_data in data:
+            row = {}
+            for i, col in enumerate(cols):
+                try:
+                    # Extract cell value
+                    cell_value = self.extract_cell_value(row_data, col)
+
+                    # Apply filter expression if specified
+                    if expressions and i < len(expressions) and expressions[i]:
+                        try:
+                            cell_value = self.apply_filter_expression(cell_value, expressions[i], row_data)
+                        except Exception:
+                            cell_value = None
+
+                    # Handle lists within cells
+                    if isinstance(cell_value, list):
+                        join_separator = self.get_configuration("join") or ", "
+                        cell_value = join_separator.join(str(item) for item in cell_value if item is not None)
+
+                    # Handle None/empty values
+                    if cell_value is None or cell_value == "":
+                        cell_value = empty_default
+
+                    row[col] = str(cell_value)
+                except Exception:
+                    row[col] = empty_default
+
+            processed.append(row)
+
+        return processed
+
+    def build_tabulator_table(self, data, cols, headers, options):
+        """Build the Tabulator table HTML and JavaScript."""
+        import json
+        import html as html_module
+
+        # Generate unique IDs
+        table_id = f"datatable-{uuid.uuid4().hex[:8]}"
+        # Function names can't have dashes in JavaScript, so create a sanitized version
+        func_id = table_id.replace('-', '_')
+
+        # Build column definitions
+        columns = []
+        for i, col in enumerate(cols):
+            column_def = {
+                'title': headers[i],
+                'field': col,
+                'headerFilter': options['filterable'],
+                'headerSort': options['sortable'],
+                'formatter': 'html',  # Allow HTML rendering in cells (for badges, links, etc.)
+                'responsive': 0 if i == 0 else None  # First column always visible in responsive mode
+            }
+            columns.append(column_def)
+
+        # Serialize data and columns - use ensure_ascii to prevent encoding issues
+        data_json = json.dumps(data, ensure_ascii=True)
+        columns_json = json.dumps(columns, ensure_ascii=True)
+
+        # Build container
+        container_style = ""
+        if options['height']:
+            container_style = f"height: {options['height']};"
+
+        # Store JSON data in hidden script tags to avoid escaping issues
+        data_script_id = f"{table_id}-data"
+        columns_script_id = f"{table_id}-columns"
+
+        html = f'''<div id="{table_id}" style="{container_style}"></div>
+        <script type="application/json" id="{data_script_id}">{data_json}</script>
+        <script type="application/json" id="{columns_script_id}">{columns_json}</script>'''
+
+        # Build JavaScript
+        pagination_config = "true" if options['paginate'] else "false"
+        pagination_size = options['pagesize']
+
+        script = f"""
+        <script>
+            (function() {{
+                // Ensure Tabulator CSS is loaded
+                if (!document.querySelector('link[href*="tabulator"]')) {{
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = '/static/ndr_core/plugins/tabulator/css/tabulator.min.css';
+                    document.head.appendChild(link);
+                }}
+
+                // Ensure Tabulator JS is loaded
+                if (typeof Tabulator === 'undefined') {{
+                    var script = document.createElement('script');
+                    script.src = '/static/ndr_core/plugins/tabulator/js/tabulator.min.js';
+                    script.onload = function() {{ initTable_{func_id}(); }};
+                    document.head.appendChild(script);
+                }} else {{
+                    initTable_{func_id}();
+                }}
+
+                function initTable_{func_id}() {{
+                    // Parse data from JSON script tags
+                    var data = JSON.parse(document.getElementById('{data_script_id}').textContent);
+                    var columns = JSON.parse(document.getElementById('{columns_script_id}').textContent);
+
+                    // Check current theme
+                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+                    var table = new Tabulator("#{table_id}", {{
+                        data: data,
+                        columns: columns,
+                        layout: "{options['layout']}",
+                        pagination: {pagination_config},
+                        paginationSize: {pagination_size},
+                        paginationSizeSelector: [5, 10, 25, 50, 100],
+                        responsiveLayout: {str(options['responsive']).lower()},
+                        responsiveLayoutCollapseStartOpen: false,
+                        headerFilterPlaceholder: "Filter...",
+                        renderComplete: function() {{
+                            applyTheme_{func_id}();
+                            // Force redraw after a short delay to ensure proper column sizing
+                            setTimeout(function() {{
+                                table.redraw(true);
+                            }}, 10);
+                        }}
+                    }});
+
+                    function applyTheme_{func_id}() {{
+                        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                        var container = document.getElementById('{table_id}');
+
+                        if (isDark) {{
+                            container.classList.add('tabulator-dark');
+                            container.classList.remove('tabulator-light');
+                        }} else {{
+                            container.classList.add('tabulator-light');
+                            container.classList.remove('tabulator-dark');
+                        }}
+                    }}
+
+                    // Apply initial theme
+                    applyTheme_{func_id}();
+
+                    // Watch for theme changes
+                    var observer = new MutationObserver(function(mutations) {{
+                        mutations.forEach(function(mutation) {{
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {{
+                                applyTheme_{func_id}();
+                            }}
+                        }});
+                    }});
+
+                    observer.observe(document.documentElement, {{
+                        attributes: true,
+                        attributeFilter: ['data-theme']
+                    }});
+                }}
+            }})();
+        </script>
+        """
+
+        return html + script
 
 
 class CodeFilter(AbstractFilter):
@@ -1983,3 +2351,223 @@ class CodeFilter(AbstractFilter):
             numbered_lines.append(f'<span class="line-number" data-line="{i}"></span>{line}')
 
         return '\n'.join(numbered_lines)
+
+
+class PlotlyFilter(AbstractFilter):
+    """A filter to render Plotly interactive visualizations.
+
+    Usage:
+        {viz_data|plotly}  # Basic plotly chart
+        {viz_data|plotly:height=400,width=600}  # Custom dimensions
+        {viz_data|plotly:responsive=true}  # Responsive layout
+        {viz_data|plotly:config=displayModeBar:false}  # Custom config
+
+    The filter accepts either:
+    - A dict with 'plotly_figure' key containing the figure data
+    - A dict with 'data' and 'layout' keys (standard Plotly format)
+
+    Configuration:
+        - height: Chart height in pixels (default: 400)
+        - width: Chart width in pixels or '100%' for responsive (default: 100%)
+        - responsive: Enable responsive sizing (true/false, default: true)
+        - displaylogo: Show Plotly logo (true/false, default: false)
+        - displaymodebar: Show mode bar (true/false, default: true)
+        - staticplot: Make plot static (no interactions) (true/false, default: false)
+
+    Note: Requires Plotly.js to be loaded on the page. Add to your base template:
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    """
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["height", "width", "responsive", "displaylogo", "displaymodebar", "staticplot", "config"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        """Returns the Plotly visualization HTML."""
+        value = self.get_value()
+
+        if value is None or value == "":
+            return ""
+
+        # Extract plotly figure data
+        figure_data = self.extract_figure_data(value)
+
+        if not figure_data:
+            return '<div class="alert alert-warning">Invalid Plotly data format</div>'
+
+        # Get configuration
+        height = self.get_configuration("height") or "400"
+        width = self.get_configuration("width") or "100%"
+        responsive = self.get_configuration("responsive") != "false"  # Default true
+        displaylogo = self.get_configuration("displaylogo") == "true"  # Default false
+        displaymodebar = self.get_configuration("displaymodebar") != "false"  # Default true
+        staticplot = self.get_configuration("staticplot") == "true"  # Default false
+
+        # Generate unique ID for the div
+        chart_id = f"plotly-{uuid.uuid4().hex[:8]}"
+
+        # Build Plotly config
+        config = {
+            "displaylogo": displaylogo,
+            "displayModeBar": displaymodebar,
+            "staticPlot": staticplot,
+            "responsive": responsive
+        }
+
+        # Serialize figure data and config to JSON
+        try:
+            figure_json = json.dumps(figure_data, ensure_ascii=False)
+            config_json = json.dumps(config, ensure_ascii=False)
+        except (TypeError, ValueError) as e:
+            return f'<div class="alert alert-danger">Error serializing Plotly data: {e}</div>'
+
+        # Build the HTML
+        container_div = HTMLElement("div")
+        container_div.add_attribute("id", chart_id)
+        container_div.add_attribute("style", f"width: {width}; height: {height}px;")
+
+        # Build the script with dark mode support
+        script = f"""
+        <script>
+            (function() {{
+                var figureData = {figure_json};
+                var config = {config_json};
+                var isInitialized = false;
+
+                // Function to get dark mode layout updates (only styling, no axis ranges)
+                function getDarkModeLayoutUpdate() {{
+                    return {{
+                        paper_bgcolor: '#1E1E1E',
+                        plot_bgcolor: '#1E1E1E',
+                        'font.color': '#E9ECEF',
+                        'xaxis.gridcolor': '#444',
+                        'xaxis.zerolinecolor': '#666',
+                        'xaxis.color': '#E9ECEF',
+                        'yaxis.gridcolor': '#444',
+                        'yaxis.zerolinecolor': '#666',
+                        'yaxis.color': '#E9ECEF',
+                        'legend.bgcolor': 'rgba(30, 30, 30, 0.8)',
+                        'legend.bordercolor': '#666',
+                        'legend.font.color': '#E9ECEF',
+                        colorway: ['#00D4DF', '#00B0B9', '#DC3545', '#198754', '#0DCAF0', '#FFC107', '#E91E63', '#9C27B0']
+                    }};
+                }}
+
+                function getLightModeLayoutUpdate() {{
+                    return {{
+                        paper_bgcolor: '#FFFFFF',
+                        plot_bgcolor: '#FFFFFF',
+                        'font.color': '#212529',
+                        'xaxis.gridcolor': '#E1E1E1',
+                        'xaxis.zerolinecolor': '#969696',
+                        'xaxis.color': '#212529',
+                        'yaxis.gridcolor': '#E1E1E1',
+                        'yaxis.zerolinecolor': '#969696',
+                        'yaxis.color': '#212529',
+                        'legend.bgcolor': 'rgba(255, 255, 255, 0.9)',
+                        'legend.bordercolor': '#CCCCCC',
+                        'legend.font.color': '#212529',
+                        colorway: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
+                    }};
+                }}
+
+                // Function to apply theme
+                function applyTheme() {{
+                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+                    if (!isInitialized) {{
+                        // Initial render with theme
+                        var layout = figureData.layout || {{}};
+
+                        if (isDark) {{
+                            var darkUpdate = getDarkModeLayoutUpdate();
+                            // Deep merge for initial render
+                            layout = Object.assign({{}}, layout);
+                            layout.paper_bgcolor = darkUpdate.paper_bgcolor;
+                            layout.plot_bgcolor = darkUpdate.plot_bgcolor;
+                            if (!layout.font) layout.font = {{}};
+                            layout.font.color = '#E9ECEF';
+                            if (!layout.xaxis) layout.xaxis = {{}};
+                            Object.assign(layout.xaxis, {{
+                                gridcolor: '#444',
+                                zerolinecolor: '#666',
+                                color: '#E9ECEF'
+                            }});
+                            if (!layout.yaxis) layout.yaxis = {{}};
+                            Object.assign(layout.yaxis, {{
+                                gridcolor: '#444',
+                                zerolinecolor: '#666',
+                                color: '#E9ECEF'
+                            }});
+                            if (!layout.legend) layout.legend = {{}};
+                            Object.assign(layout.legend, {{
+                                bgcolor: 'rgba(30, 30, 30, 0.8)',
+                                bordercolor: '#666',
+                                font: {{ color: '#E9ECEF' }}
+                            }});
+                            layout.colorway = darkUpdate.colorway;
+                        }}
+
+                        Plotly.newPlot('{chart_id}', figureData.data, layout, config);
+                        isInitialized = true;
+
+                        // Force resize after a short delay to ensure proper sizing
+                        setTimeout(function() {{
+                            Plotly.Plots.resize('{chart_id}');
+                        }}, 10);
+                    }} else {{
+                        // Use relayout to only update styling, preserving axis ranges
+                        var update = isDark ? getDarkModeLayoutUpdate() : getLightModeLayoutUpdate();
+                        Plotly.relayout('{chart_id}', update);
+                    }}
+                }}
+
+                // Initial render
+                applyTheme();
+
+                // Watch for theme changes
+                var observer = new MutationObserver(function(mutations) {{
+                    mutations.forEach(function(mutation) {{
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {{
+                            applyTheme();
+                        }}
+                    }});
+                }});
+
+                observer.observe(document.documentElement, {{
+                    attributes: true,
+                    attributeFilter: ['data-theme']
+                }});
+            }})();
+        </script>
+        """
+
+        return str(container_div) + script
+
+    def extract_figure_data(self, value):
+        """Extract Plotly figure data from various input formats.
+
+        Accepts:
+        - Dict with 'plotly_figure' key
+        - Dict with 'data' and 'layout' keys
+        - Dict that is the figure itself
+        """
+        if not isinstance(value, dict):
+            return None
+
+        # Check if value has 'plotly_figure' key
+        if 'plotly_figure' in value:
+            figure = value['plotly_figure']
+            if isinstance(figure, dict) and 'data' in figure:
+                return figure
+
+        # Check if value itself is the figure (has 'data' key)
+        if 'data' in value:
+            return value
+
+        return None

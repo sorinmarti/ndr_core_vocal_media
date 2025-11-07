@@ -121,7 +121,7 @@ class _NdrCoreView(View):
         context = {'page': self.ndr_page,
                    'rendered_text': self.pre_render_text(),
                    'navigation': NdrCorePage.objects.filter(parent_page=None).order_by('index'),
-                   'partners': NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.LOGOS)}
+                   'partners': NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.LOGOS).order_by('index_in_group')}
         return context
 
     def pre_render_text(self):
@@ -414,7 +414,7 @@ class AboutUsView(_NdrCoreView):
     def get(self, request, *args, **kwargs):
         context = self.get_context_data()
 
-        team_members = NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.PEOPLE)
+        team_members = NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.PEOPLE).order_by('index_in_group')
         context['data'] = {'team_members': team_members}
 
         return render(request, self.template_name, context)

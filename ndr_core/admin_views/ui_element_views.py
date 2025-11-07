@@ -89,6 +89,21 @@ class UIElementCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
                 manifest_group=form.cleaned_data['item_0_manifest_group'],
                 order_idx=0)
             manifest_item.save()
+        elif ui_element_type == "data_object":
+            # Data object type can have multiple items
+            for x in range(0, 10):
+                search_config = form.cleaned_data.get(f'item_{x}_search_configuration')
+                object_id = form.cleaned_data.get(f'item_{x}_object_id')
+
+                # Only create item if search_configuration and object_id are provided
+                if search_config and object_id:
+                    data_item = NdrCoreUiElementItem.objects.create(
+                        belongs_to=self.object,
+                        search_configuration=search_config,
+                        object_id=object_id,
+                        result_field=form.cleaned_data.get(f'item_{x}_result_field'),
+                        order_idx=x)
+                    data_item.save()
         elif ui_element_type in ["slides", "carousel"]:
             # These are the types that have MULTIPLE items.
             for x in range(0, 10):
@@ -113,6 +128,79 @@ class UIElementEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('ndr_core:configure_ui_elements')
     template_name = 'ndr_core/admin_views/edit/ui_element_edit.html'
     form_class = UIElementEditForm
+
+    def form_valid(self, form):
+        # Update the UIElement object
+        response = super().form_valid(form)
+
+        ui_element_type = form.cleaned_data['type']
+
+        # Delete existing items and recreate them
+        NdrCoreUiElementItem.objects.filter(belongs_to=self.object).delete()
+
+        # Recreate items based on type (same logic as create)
+        if ui_element_type == "card":
+            card_item = NdrCoreUiElementItem.objects.create(
+                belongs_to=self.object,
+                ndr_image=form.cleaned_data['item_0_ndr_card_image'],
+                title=form.cleaned_data['item_0_title'],
+                text=form.cleaned_data['item_0_text'],
+                url=form.cleaned_data['item_0_url'],
+                order_idx=0)
+            card_item.save()
+        elif ui_element_type == "banner":
+            banner_item = NdrCoreUiElementItem.objects.create(
+                belongs_to=self.object,
+                ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
+                order_idx=0)
+            banner_item.save()
+        elif ui_element_type == "iframe":
+            iframe_item = NdrCoreUiElementItem.objects.create(
+                belongs_to=self.object,
+                text=form.cleaned_data['item_0_text'],
+                order_idx=0)
+            iframe_item.save()
+        elif ui_element_type == "jumbotron":
+            jumbotron_item = NdrCoreUiElementItem.objects.create(
+                belongs_to=self.object,
+                ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
+                title=form.cleaned_data['item_0_title'],
+                text=form.cleaned_data['item_0_text'],
+                url=form.cleaned_data['item_0_url'],
+                order_idx=0)
+            jumbotron_item.save()
+        elif ui_element_type == "manifest_viewer":
+            manifest_item = NdrCoreUiElementItem.objects.create(
+                belongs_to=self.object,
+                manifest_group=form.cleaned_data['item_0_manifest_group'],
+                order_idx=0)
+            manifest_item.save()
+        elif ui_element_type == "data_object":
+            for x in range(0, 10):
+                search_config = form.cleaned_data.get(f'item_{x}_search_configuration')
+                object_id = form.cleaned_data.get(f'item_{x}_object_id')
+
+                if search_config and object_id:
+                    data_item = NdrCoreUiElementItem.objects.create(
+                        belongs_to=self.object,
+                        search_configuration=search_config,
+                        object_id=object_id,
+                        result_field=form.cleaned_data.get(f'item_{x}_result_field'),
+                        order_idx=x)
+                    data_item.save()
+        elif ui_element_type in ["slides", "carousel"]:
+            for x in range(0, 10):
+                if form.cleaned_data[f'item_{x}_ndr_slide_image'] is not None:
+                    slide_item = NdrCoreUiElementItem.objects.create(
+                        belongs_to=self.object,
+                        ndr_image=form.cleaned_data[f'item_{x}_ndr_slide_image'],
+                        title=form.cleaned_data[f'item_{x}_title'],
+                        text=form.cleaned_data[f'item_{x}_text'],
+                        url=form.cleaned_data[f'item_{x}_url'],
+                        order_idx=x)
+                    slide_item.save()
+
+        return response
 
 
 class UIElementDeleteView(AdminViewMixin, LoginRequiredMixin, DeleteView):
