@@ -1,63 +1,134 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">How To Create Pages</h5>
+            <h5 class="card-title">Page Management</h5>
             <p class="card-text">
-                Your web site consists of a number of pages. A page has a <strong>title</strong>, a <strong>navigation
-                label</strong>, a <strong>view name</strong> and a <strong>type</strong>. Depending on the type, a
-                number of additional parameters may be specified.
+                Build your website structure by creating and organizing pages. Each page has a specific type that
+                determines its functionality and content.
             </p>
+
+            <h6>Create a New Page</h6>
             <p class="card-text">
-                <ul class="card-text">
-                    <li>
-                        The <strong>title</strong> is displayed on the top of your page. (Or in a different location,
-                        depending on your <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}">UI-Style</a>.)
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_pages' %}">Pages</a> > <a href="{% url 'ndr_core:create_page' %}">Create New Page</a></li>
+                    <li>Choose a <strong>page type</strong> (see types below)</li>
+                    <li>Set basic information:
+                        <ul class="small">
+                            <li><strong>Title:</strong> Displayed at the top of the page</li>
+                            <li><strong>Navigation Label:</strong> Text shown in the navigation menu</li>
+                            <li><strong>View Name:</strong> URL path (e.g., "about" → yoursite.org/p/about/)</li>
+                        </ul>
                     </li>
-                    <li>
-                        The <strong>navigation label</strong> is displayed as part of your navigation.
-                    </li>
-                    <li>
-                        The <strong>type</strong> defines what your page is able to do (for example: show text,
-                        provide a search form, show a list, etc.).
-                    </li>
-                    <li>
-                        The <strong>view name</strong> ist the URL part which is used to display your page. All created
-                        pages have a URL in the form: https://yourhost.org/p/<span class="text-danger">view_name</span>/
-                    </li>
-                    <li>
-                        Optionally, you can set a <strong>parent page</strong>. If you do so, this page becomes a sub-
-                        page of the selected parent page and is not shown in the main navigation.
-                    </li>
-                </ul>
+                    <li>Configure type-specific options (varies by page type)</li>
+                    <li>Save and preview</li>
+                </ol>
+            </p>
+
+            <h6>Organize Pages</h6>
+            <p class="card-text">
+                <strong>Create subpages:</strong>
+                <ol>
+                    <li>When creating a page, set the <strong>Parent Page</strong> field</li>
+                    <li>Subpages don't appear in main navigation</li>
+                    <li>Access them from the parent page or direct URL</li>
+                </ol>
+            </p>
+
+            <p class="card-text">
+                <strong>Reorder navigation:</strong>
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_pages' %}">Pages</a></li>
+                    <li>Use the ordering field to set menu position</li>
+                    <li>Lower numbers appear first</li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> Use clear, descriptive view names (e.g., "contact", "search-authors").
+                Avoid spaces or special characters in view names.
+            </div>
+
+            <h6>Quick Links</h6>
+            <p class="card-text">
+                <a href="{% url 'ndr_core:configure_pages' %}" class="btn btn-sm btn-primary" role="button">Manage Pages</a>
+                <a href="{% url 'ndr_core:create_page' %}" class="btn btn-sm btn-primary" role="button">Create New Page</a>
+                <a href="{% url 'ndr_core:help_chapter' 'page_content' %}" class="btn btn-sm btn-secondary" role="button">Page Content Help</a>
             </p>
         </div>
     </div>
 </div>
-
-{% include 'ndr_core/admin_views/help/page_types/template_page.html' %}
-{% include 'ndr_core/admin_views/help/page_types/search_page.html' %}
-{% include 'ndr_core/admin_views/help/page_types/flip_book_page.html' %}
-{% include 'ndr_core/admin_views/help/page_types/contact.html' %}
-{% include 'ndr_core/admin_views/help/page_types/about.html' %}
-{% include 'ndr_core/admin_views/help/page_types/viewer_page.html' %}
 
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h6>See also</h6>
+            <h5 class="card-title">Page Types</h5>
             <p class="card-text">
-                <i>
-                    (Administration pages in <span class="bg-primary text-white">blue</span>, help pages in
-                    <span class="bg-secondary text-white">grey</span>, external links in
-                    <span class="bg-warning">yellow</span>)
-                </i>
+                NDR Core provides different page types for different purposes. Choose the type that best fits
+                your content and functionality needs.
             </p>
+
+            <h6>Template Page</h6>
             <p class="card-text">
-                <a href="{% url 'ndr_core:configure_pages' %}" class="btn btn-sm btn-primary" role="button">Manage Pages</a>
-                <a href="{% url 'ndr_core:create_page' %}" class="btn btn-sm btn-primary" role="button">Create New Page</a>
-                <a href="{% url 'ndr_core:configure_images' %}" class="btn btn-sm btn-primary" role="button">Manage Page Images</a>
-                <a href="{% url 'ndr_core:configure_messages' %}" class="btn btn-sm btn-primary" role="button">Inbox</a>
+                <strong>Use for:</strong> Static content pages (about, team, news, etc.)
+                <br><strong>Features:</strong> Rich text editor, support for UI Elements
+                <br><small>Most flexible page type for general content</small>
+            </p>
+
+            <h6>Search Page</h6>
+            <p class="card-text">
+                <strong>Use for:</strong> Database search interfaces
+                <br><strong>Features:</strong> Simple search (single field) or advanced search (custom forms)
+                <br><strong>Options:</strong>
+                <ul class="small">
+                    <li><strong>Simple:</strong> Automatic catch-all search field</li>
+                    <li><strong>Advanced:</strong> Custom search forms with multiple fields</li>
+                    <li><strong>Mixed:</strong> Both simple and advanced in tabs</li>
+                </ul>
+                <small>See <a href="{% url 'ndr_core:help_chapter' 'search' %}">Search Configuration</a> for details</small>
+            </p>
+
+            <h6>Contact Form Page</h6>
+            <p class="card-text">
+                <strong>Use for:</strong> Letting visitors send you messages
+                <br><strong>Features:</strong> Subject, email, and message fields
+                <br><strong>Configuration:</strong> Messages can be stored in <a href="{% url 'ndr_core:configure_messages' %}">Inbox</a>
+                or forwarded via email
+                <br><small>Configure email forwarding in <a href="{% url 'ndr_core:view_settings' 'mail' %}">Mail Settings</a></small>
+            </p>
+
+            <h6>About Page</h6>
+            <p class="card-text">
+                <strong>Use for:</strong> Project team and information pages
+                <br><strong>Features:</strong> Automatic team member cards from "People Images" group
+                <br><strong>Setup:</strong>
+                <ol class="small">
+                    <li>Upload team photos to "People Images" group in <a href="{% url 'ndr_core:configure_images' %}">Images</a></li>
+                    <li>Use image title for name, caption for role</li>
+                    <li>Create About page with project description</li>
+                </ol>
+            </p>
+
+            <h6>Flip Book Page</h6>
+            <p class="card-text">
+                <strong>Use for:</strong> Multi-page presentations, case studies, portfolios
+                <br><strong>Features:</strong> Previous/next navigation through child pages
+                <br><strong>Setup:</strong>
+                <ol class="small">
+                    <li>Create a Flip Book page (parent)</li>
+                    <li>Create template pages with this page as parent</li>
+                    <li>Visitors navigate with prev/next buttons</li>
+                </ol>
+            </p>
+
+            <h6>Datalist Page</h6>
+            <p class="card-text">
+                <strong>Use for:</strong> Displaying structured data from APIs in tabular or card format
+                <br><strong>Features:</strong> Automatic data fetching, filtering, sorting, and pagination
+                <br><strong>Configuration:</strong> Connect to an API and define which fields to display
+                <br><small>Ideal for browsing datasets, directories, catalogs, and collections</small>
             </p>
         </div>
     </div>
 </div>
+

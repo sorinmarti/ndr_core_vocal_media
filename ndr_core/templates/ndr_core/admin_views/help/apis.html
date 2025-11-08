@@ -3,7 +3,21 @@
         <div class="card-body">
             <h5 class="card-title">API Implementations</h5>
             <p class="card-text">
-
+                NDR Core connects to external data sources through API implementations. Each implementation defines
+                how NDR Core communicates with a specific type of data source.
+            </p>
+            <p class="card-text">
+                Three API implementations are currently supported:
+            </p>
+            <ul>
+                <li><strong>NDR Core API</strong> - Connect to other NDR Core instances for federated search</li>
+                <li><strong>MongoDB</strong> - Access document-oriented data from MongoDB databases</li>
+                <li><strong>Nodegoat</strong> - Connect to Nodegoat web-based data management systems</li>
+            </ul>
+            <p class="card-text">
+                <strong>Advanced:</strong> You can also <a href="{% url 'ndr_core:help_chapter' 'advanced' %}">create custom API implementations</a>
+                to connect to other data sources. Full documentation is available in the
+                <a href="https://django-ndr-core.readthedocs.io/" target="_blank">Sphinx documentation</a>.
             </p>
         </div>
     </div>
@@ -11,5 +25,4 @@
 
 {% include 'ndr_core/admin_views/help/apis/ndr_core.html' %}
 {% include 'ndr_core/admin_views/help/apis/mongo_db.html' %}
-{% include 'ndr_core/admin_views/help/apis/ddb.html' %}
-{% include 'ndr_core/admin_views/help/apis/api_ninjas.html' %}
+{% include 'ndr_core/admin_views/help/apis/nodegoat.html' %}

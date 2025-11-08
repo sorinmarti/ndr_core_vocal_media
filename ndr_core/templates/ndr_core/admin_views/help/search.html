@@ -1,27 +1,58 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">How To Configure A Search</h5>
+            <h5 class="card-title">Search & API Configuration</h5>
             <p class="card-text">
-                An NDR Core Search takes search terms, searches data over an API, receives results and displays them.
-                NDR Core does not provide the search index and is not the database itself. The search function is
-                a graphical frontend for data which should be stored in repositories according to FAIR principles.
-            </p>
-            <p class="card-text">
-                An NDR Core Search consists of several parts. You need an <strong>API configuration</strong> to tell
-                NDR Core where to search for data with which API. You need <strong>Search Fields</strong> which are
-                composed into <strong>Search Forms</strong>. Finally you need a <strong>Result renderer</strong>
-                configuration and you might want to upload <strong>Sample Data</strong> to test the result rendering.
-            </p>
-            <p class="card-text">
-                You should start with configuring your API access. Then you should think about which search fields
-                you want to use. If a single catch-all search field is enough, you don't need to create a search
-                form and just use the automatically generated simple search. If you want a custom form, create the
-                search fields you need and create the form with these fields.
-                The resulting search configuration can be added to your web site by creating a search page and
-                selecting the configuration.
+                NDR Core connects to external data sources through APIs and provides a search interface for that data.
+                This page shows you how to configure and customize search functionality.
             </p>
 
+            <h6>Quick Workflow</h6>
+            <p class="card-text">
+                <ol>
+                    <li><strong>Configure API connection</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:configure_search' %}">Search Configuration</a> > Create Search Configuration</small>
+                    </li>
+                    <li><strong>Define search fields</strong> (optional - simple search is automatic)
+                        <br><small>→ <a href="{% url 'ndr_core:configure_search' %}">Search Configuration</a> > Manage Search Fields</small>
+                    </li>
+                    <li><strong>Create custom search form</strong> (optional)
+                        <br><small>→ <a href="{% url 'ndr_core:configure_search' %}">Search Configuration</a> > Edit Search Form</small>
+                    </li>
+                    <li><strong>Configure result display</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'results' %}">Result Configuration</a></small>
+                    </li>
+                    <li><strong>Create search page</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'pages' %}">Pages</a> > Create Search Page</small>
+                    </li>
+                </ol>
+            </p>
+
+            <h6>Common Tasks</h6>
+            <p class="card-text">
+                <strong>Create a simple search (single search box):</strong>
+                <ol>
+                    <li>Create a Search Configuration with API connection</li>
+                    <li>No search fields needed - simple search is automatic</li>
+                    <li>Create a search page and select the configuration</li>
+                </ol>
+            </p>
+
+            <p class="card-text">
+                <strong>Create an advanced search (multiple fields):</strong>
+                <ol>
+                    <li>Create a Search Configuration with API connection</li>
+                    <li>Create individual search fields</li>
+                    <li>Compose fields into a search form</li>
+                    <li>Create a search page and select the configuration</li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> Start with a simple search and add fields as needed. Test your configuration
+                on the <a href="{% url 'ndr_core:test' %}">Test Page</a> before creating the final search page.
+            </div>
         </div>
     </div>
 </div>

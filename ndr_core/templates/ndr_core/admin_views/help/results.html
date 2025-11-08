@@ -1,9 +1,62 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">Result Rendering</h5>
+            <h5 class="card-title">Result Display Configuration</h5>
             <p class="card-text">
-                NDR Core uses a powerful template system to display search results. You can use variables, filters, and parameters to format your data exactly how you want it.
+                Control how search results appear to users by configuring result fields, layouts, and styling.
+            </p>
+
+            <h6>Quick Workflow</h6>
+            <p class="card-text">
+                <ol>
+                    <li><strong>Create result fields</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:configure_search' %}">Search Configuration</a> > Manage Result Fields</small>
+                    </li>
+                    <li><strong>Configure field display</strong> (template syntax, filters)
+                        <br><small>→ See Template Syntax Reference below</small>
+                    </li>
+                    <li><strong>Arrange fields in cards</strong> (layout, ordering)
+                        <br><small>→ Edit Result Card Configuration</small>
+                    </li>
+                    <li><strong>Preview results</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:test' %}">Test Page</a></small>
+                    </li>
+                </ol>
+            </p>
+
+            <h6>Common Tasks</h6>
+            <p class="card-text">
+                <strong>Add a result field:</strong>
+                <ol>
+                    <li>Go to your Search Configuration</li>
+                    <li>Click <strong>Manage Result Fields</strong></li>
+                    <li>Click <strong>Create New Result Field</strong></li>
+                    <li>Set field label and map to data field</li>
+                    <li>Apply filters for formatting (see below)</li>
+                </ol>
+            </p>
+
+            <p class="card-text">
+                <strong>Format a field with filters:</strong>
+                <ol>
+                    <li>In the result field configuration, use template syntax</li>
+                    <li>Example: <code>{title|upper|truncate:length=100}</code></li>
+                    <li>Chain multiple filters together</li>
+                    <li>Preview on Test Page</li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> Start with basic fields, then add filters to enhance formatting.
+                Use the Test Page to see changes immediately.
+            </div>
+
+            <hr>
+
+            <h6>Template Syntax Reference</h6>
+            <p class="card-text small">
+                Use this syntax in result field configurations to format data.
             </p>
 
             <h6>Template Variables</h6>

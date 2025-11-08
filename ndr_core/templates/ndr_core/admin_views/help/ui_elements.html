@@ -1,32 +1,96 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">How Configure UI Elements</h5>
+            <h5 class="card-title">UI Elements</h5>
             <p class="card-text">
-                The ck-editor lets you create beautifully styled text but if you want a more sophisticated feature,
-                it is simply not possible. That's where NDR Core's UI Elements come into play. You can configure
-                various UI Elements and insert them into your page text with a simple code.
+                Add rich, interactive components to your pages beyond basic text formatting. UI Elements include
+                image carousels, slideshows, cards, figures, and more.
             </p>
 
-            <h6>Cards</h6>
+            <h6>Create and Insert a UI Element</h6>
             <p class="card-text">
-
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_ui_elements' %}">UI Elements</a> > <strong>Create New UI Element</strong></li>
+                    <li>Choose an element type (see types below)</li>
+                    <li>Configure the element:
+                        <ul class="small">
+                            <li>Add images, text, or other content</li>
+                            <li>Set styling options</li>
+                            <li>Configure behavior (auto-play, transitions, etc.)</li>
+                        </ul>
+                    </li>
+                    <li>Save the element - you'll see an insertion code like <code>[[slideshow|5]]</code></li>
+                    <li>Copy this code into any page's text editor</li>
+                    <li>The element will appear when the page is viewed</li>
+                </ol>
             </p>
 
-            <h6>Carousel</h6>
-            <p class="card-text">
+            <h6>UI Element Types</h6>
 
+            <p class="card-text">
+                <strong>Figures:</strong> Images with captions and automatic sizing
+                <br><small>Usage: <code>[[figure|12]]</code></small>
             </p>
 
-            <h6>Slideshow</h6>
             <p class="card-text">
-
+                <strong>Slideshow:</strong> Rotating image gallery with navigation
+                <br><small>Usage: <code>[[slideshow|5]]</code></small>
             </p>
 
-            <h6>Jumbotron</h6>
             <p class="card-text">
-
+                <strong>Carousel:</strong> Bootstrap-style image carousel with indicators
+                <br><small>Usage: <code>[[carousel|8]]</code></small>
             </p>
+
+            <p class="card-text">
+                <strong>Cards:</strong> Content boxes with images, titles, and text
+                <br><small>Usage: <code>[[card|3]]</code></small>
+            </p>
+
+            <p class="card-text">
+                <strong>Image Cards:</strong> Cards optimized for image galleries
+                <br><small>Usage: <code>[[image_card|7]]</code></small>
+            </p>
+
+            <p class="card-text">
+                <strong>Banner:</strong> Full-width header image with title overlay
+                <br><small>Usage: <code>[[banner|15]]</code></small>
+            </p>
+
+            <p class="card-text">
+                <strong>Jumbotron:</strong> Large showcase section with heading and call-to-action
+                <br><small>Usage: <code>[[jumbotron|2]]</code></small>
+            </p>
+
+            <h6>Managing Images</h6>
+            <p class="card-text">
+                Upload and organize images used in UI Elements:
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_images' %}">Images</a></li>
+                    <li>Click <strong>Upload New Image</strong></li>
+                    <li>Add image description and alt text for accessibility</li>
+                    <li>Select the image when creating UI Elements</li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> After creating a UI Element, the system shows you the exact code to insert.
+                You can also view insertion codes by editing existing elements.
+            </div>
+
+            <h6>Custom Settings in Pages</h6>
+            <p class="card-text">
+                You can also insert custom settings values into pages using:
+                <code>[[setting|setting_name]]</code>
+                <br><small>Example: <code>[[setting|contact_email]]</code></small>
+            </p>
+
+            <div class="alert alert-warning small">
+                <i class="fa-regular fa-exclamation-circle"></i>
+                <strong>Note:</strong> UI Element codes only work in Template pages and other page types that support
+                rich text content. They don't work in search configurations or result templates.
+            </div>
         </div>
     </div>
 </div>

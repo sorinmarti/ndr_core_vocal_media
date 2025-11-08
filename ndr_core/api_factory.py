@@ -3,8 +3,6 @@ from ndr_core.api.nodegoat.nodegoat_result import NodegoatResult
 from ndr_core.api.nodegoat.nodegoat_query import NodegoatQuery
 from ndr_core.api.mongodb.mongodb_query import MongoDBQuery
 from ndr_core.api.mongodb.mongodb_result import MongoDBResult
-from ndr_core.api.api_ninjas.api_ninjas_query import ApiNinjasQuery
-from ndr_core.api.api_ninjas.api_ninjas_result import ApiNinjasResult
 from ndr_core.api.ndr_core.ndr_core_query import NdrCoreQuery
 from ndr_core.api.ndr_core.ndr_core_result import NdrCoreResult
 from ndr_core.exceptions import NdrCoreConfigurationError
@@ -15,7 +13,6 @@ class ApiFactory:
 
     api_mapping = {
         "ndr_core": {"query": NdrCoreQuery, "result": NdrCoreResult},
-        "api_ninjas": {"query": ApiNinjasQuery, "result": ApiNinjasResult},
         "mongodb": {"query": MongoDBQuery, "result": MongoDBResult},
         "nodegoat": {"query": NodegoatQuery, "result": NodegoatResult},
     }

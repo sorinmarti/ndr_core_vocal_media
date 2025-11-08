@@ -1,20 +1,34 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">Mongo DB API</h5>
+            <h5 class="card-title">MongoDB API</h5>
              <p class="card-text">
-                 One of the easiest ways to access your data is with a MongoDB. It lets you store your data in a
-                 document-oriented database without having to worry about a database schema.
-
-                 To access a locally installed MongoDB, you can set the following parameters in the API configuration
-                 form:
-
+                 MongoDB is a document-oriented database that lets you store your data without requiring a fixed schema.
+                 The MongoDB API implementation allows NDR Core to search and retrieve data from MongoDB collections.
+             </p>
+             <h6>Configuration</h6>
+             <p class="card-text">
+                 To connect to a MongoDB database, configure the <strong>Connection URL</strong> field using the following format:
+             </p>
+             <p class="card-text">
+                 <code>mongodb://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;/&lt;collection&gt;</code>
+             </p>
+             <h6>Example</h6>
+             <p class="card-text">
+                 For a locally installed MongoDB with default settings:
+             </p>
+             <p class="card-text">
+                 <code>mongodb://localhost:27017/myDatabase/myCollection</code>
+             </p>
+             <h6>Features</h6>
+             <p class="card-text">
+                 The MongoDB implementation supports:
                  <ul>
-                        <li>Host: localhost</li>
-                        <li>Port: 27017</li>
-                        <li>API Name: collection name</li>
-                        <li>URL stub: database name</li>
-                </ul>
+                     <li>Simple search queries</li>
+                     <li>Advanced search with multiple fields</li>
+                     <li>Comparison operators: =, !=, &gt;, &lt;, &gt;=, &lt;=, contains</li>
+                     <li>Single result retrieval by ID</li>
+                 </ul>
              </p>
         </div>
     </div>

@@ -44,7 +44,7 @@ within a virtual python environment. Nginx is a webserver that will serve our ap
 Django can run with different database backends (This is not your data, but your website configuration). We will use SQLite for this tutorial. You can use any other database backend you like. For production use you can use PostgreSQL or MySQL. The django-database stores the
 page contents, your search and api configuration, user messages and configuration values, so it is not particularly
 large or heavily used and SQLite is fine most of the time. For more information on other databases see
-https://docs.djangoproject.com/en/3.2/ref/databases/. The following command also installs PostgreSQL if you want to
+https://docs.djangoproject.com/en/5.0/ref/databases/. The following command also installs PostgreSQL if you want to
 use it.
 
 .. code-block:: bash
@@ -127,7 +127,7 @@ This will initialize your NDR_CORE system. You will be asked to enter some value
 * Creates an admin user. You can use this user to log in to the admin interface.
 
 The default database backend is SQLite. If you want to use PostgreSQL or MySQL you'll have to change the ``DATABASES`` setting in the ``settings.py`` file.
-See https://docs.djangoproject.com/en/3.2/ref/databases/ for more information.
+See https://docs.djangoproject.com/en/5.0/ref/databases/ for more information.
 
 Now we need to collect all the static files for our project. This will create a directory called ``static``
 in your project directory.
@@ -139,8 +139,8 @@ in your project directory.
 Your django installation is now ready to run and all necessary settings have been made.
 For production use, you'll have to change more settings: Set the ``ALLOWED_HOSTS`` setting
 to include the host name of your server and set the ``DEBUG`` flag to False. Also, you might
-wan to configure your captcha api key or other settings. See the django documentation for more
-information: https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+want to configure your captcha api key or other settings. See the django documentation for more
+information: https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 If you are doing a local installation, run the following command and then visit
 http://localhost:8000 in your browser. This most likely won't work if you are running your

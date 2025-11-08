@@ -1,0 +1,89 @@
+/* NDR Core Base Styles - Structural CSS (non-color related) */
+
+/* TABLES - Structure and Layout */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    font-weight: 600;
+    vertical-align: bottom;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* FORMS - Structure and Layout */
+.form-control,
+input,
+select,
+textarea {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* EQUAL HEIGHT CARDS - Make cards in the same row have equal height */
+.row.pb-3 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.row.pb-3 > [class*='col-'] {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 1rem !important;
+}
+
+.row.pb-3 .card {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+.row.pb-3 .card img.card-img-top {
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    object-fit: cover !important;
+}
+
+.row.pb-3 .card .card-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* RESULT CARDS - Detail Page Scrolling */
+.rc-scrollable-container {
+    transition: max-height 0.3s ease;
+}
+
+.rc-scrollable-container.rc-detail-page {
+    max-height: none;
+    overflow-y: visible;
+}
+
+/* COLLAPSIBLE BLOCKS - Icon rotation */
+.collapse-icon {
+    transition: transform 0.3s ease;
+}
+
+[aria-expanded="false"] .collapse-icon {
+    transform: rotate(180deg);
+}

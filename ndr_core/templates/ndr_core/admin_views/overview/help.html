@@ -2,86 +2,129 @@
 
 {% block content %}
     <h2><i class="fa-regular fa-question"></i> NDR Core Help</h2>
-    <div class="card-deck">
-    <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">General</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:help_chapter' 'about' %}" class="list-group-item small list-group-item-action py-2{% if "/help/about/" in request.path %} active{% endif %}">
-                        About NDR Core
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'pages' %}" class="list-group-item small list-group-item-action py-2{% if "/help/pages/" in request.path %} active{% endif %}">
-                        NDR Core Pages
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'settings' %}" class="list-group-item small list-group-item-action py-2{% if "/help/settings/" in request.path %} active{% endif %}">
-                        Settings
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'advanced' %}" class="list-group-item small list-group-item-action py-2{% if "/help/advanced/" in request.path %} active{% endif %}">
-                        Advanced Editing
-                    </a>
+
+    <!-- First Row -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Getting Started</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'quick_start' %}" class="list-group-item small list-group-item-action py-2{% if "/help/quick_start/" in request.path %} active{% endif %}">
+                            <i class="fa-solid fa-rocket"></i> Quick Start Guide
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'test' %}" class="list-group-item small list-group-item-action py-2{% if "/help/test/" in request.path %} active{% endif %}">
+                            <i class="fa-solid fa-flask"></i> Test Page
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">API & Search</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:help_chapter' 'search' %}" class="list-group-item small list-group-item-action py-2{% if "/help/search/" in request.path %} active{% endif %}">
-                        API & Search Configuration
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'apis' %}" class="list-group-item small list-group-item-action py-2{% if "/help/apis/" in request.path %} active{% endif %}">
-                        API Implementations
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'results' %}" class="list-group-item small list-group-item-action py-2{% if "/help/results/" in request.path %} active{% endif %}">
-                        Result Rendering
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'test' %}" class="list-group-item small list-group-item-action py-2{% if "/help/test/" in request.path %} active{% endif %}">
-                        Test Search
-                    </a>
+        <div class="col-md-3">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Pages</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'pages' %}" class="list-group-item small list-group-item-action py-2{% if "/help/pages/" in request.path %} active{% endif %}">
+                            Page Management
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'page_content' %}" class="list-group-item small list-group-item-action py-2{% if "/help/page_content/" in request.path %} active{% endif %}">
+                            Page Content
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">UI & Resources</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}" class="list-group-item small list-group-item-action py-2{% if "/help/ui_style/" in request.path %} active{% endif %}">
-                        UI Style & Colors
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'ui_elements' %}" class="list-group-item small list-group-item-action py-2{% if "/help/ui_elements/" in request.path %} active{% endif %}">
-                        UI Elements
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'images' %}" class="list-group-item small list-group-item-action py-2{% if "/help/images/" in request.path %} active{% endif %}">
-                        Images
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'files' %}" class="list-group-item small list-group-item-action py-2{% if "/help/files/" in request.path %} active{% endif %}">
-                        Files
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'translations' %}" class="list-group-item small list-group-item-action py-2{% if "/help/translations/" in request.path %} active{% endif %}">
-                        Translations
-                    </a>
+        <div class="col-md-3">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Search Configuration</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'search' %}" class="list-group-item small list-group-item-action py-2{% if "/help/search/" in request.path %} active{% endif %}">
+                            Search & API Configuration
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'apis' %}" class="list-group-item small list-group-item-action py-2{% if "/help/apis/" in request.path %} active{% endif %}">
+                            API Implementations
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Maintenance</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:help_chapter' 'messages' %}" class="list-group-item small list-group-item-action py-2{% if "/help/messages/" in request.path %} active{% endif %}">
-                        Your Inbox
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'corrections' %}" class="list-group-item small list-group-item-action py-2{% if "/help/corrections/" in request.path %} active{% endif %}">
-                        Corrections
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'statistics' %}" class="list-group-item small list-group-item-action py-2{% if "/help/statistics/" in request.path %} active{% endif %}">
-                        Search Statistics
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'seo' %}" class="list-group-item small list-group-item-action py-2{% if "/help/seo/" in request.path %} active{% endif %}">
-                        Search Engine Optimization
-                    </a>
+        <div class="col-md-3">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Result Configuration</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'results' %}" class="list-group-item small list-group-item-action py-2{% if "/help/results/" in request.path %} active{% endif %}">
+                            Result Rendering
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Content & Assets</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'ui_elements' %}" class="list-group-item small list-group-item-action py-2{% if "/help/ui_elements/" in request.path %} active{% endif %}">
+                            UI Elements
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'images' %}" class="list-group-item small list-group-item-action py-2{% if "/help/images/" in request.path %} active{% endif %}">
+                            Images
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'files' %}" class="list-group-item small list-group-item-action py-2{% if "/help/files/" in request.path %} active{% endif %}">
+                            Files
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'translations' %}" class="list-group-item small list-group-item-action py-2{% if "/help/translations/" in request.path %} active{% endif %}">
+                            Translations
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Styling & Appearance</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}" class="list-group-item small list-group-item-action py-2{% if "/help/ui_style/" in request.path %} active{% endif %}">
+                            UI Style & Colors
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Maintenance</h5>
+                    <div class="list-group">
+                        <a href="{% url 'ndr_core:help_chapter' 'settings' %}" class="list-group-item small list-group-item-action py-2{% if "/help/settings/" in request.path %} active{% endif %}">
+                            Settings
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'statistics' %}" class="list-group-item small list-group-item-action py-2{% if "/help/statistics/" in request.path %} active{% endif %}">
+                            Search Statistics
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'messages' %}" class="list-group-item small list-group-item-action py-2{% if "/help/messages/" in request.path %} active{% endif %}">
+                            Your Inbox
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'corrections' %}" class="list-group-item small list-group-item-action py-2{% if "/help/corrections/" in request.path %} active{% endif %}">
+                            Corrections
+                        </a>
+                        <a href="{% url 'ndr_core:help_chapter' 'seo' %}" class="list-group-item small list-group-item-action py-2{% if "/help/seo/" in request.path %} active{% endif %}">
+                            Search Engine Optimization
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,16 +133,7 @@
     {% if chapter %}
         {% include 'ndr_core/admin_views/help/'|add:chapter|add:".html" %}
     {% else %}
-        <div class="card-deck">
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">NDR Core Help</h5>
-                    <p class="card-text">
-                        Welcome to the NDR Core help pages. Choose a topic above.
-                    </p>
-                </div>
-            </div>
-        </div>
+        {% include 'ndr_core/admin_views/help/quick_start.html' %}
     {% endif %}
 
 

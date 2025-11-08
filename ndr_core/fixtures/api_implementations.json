@@ -28,20 +28,6 @@
   {
     "model": "ndr_core.NdrCoreApiImplementation",
     "fields": {
-      "name": "api_ninjas",
-      "label": "API Ninjas",
-      "url": "https://api-ninjas.com/",
-      "description": "",
-      "connection_string_example": "https://api-ninjas.com/api/v1/<collection>",
-      "supports_simple": false,
-      "supports_simple_and_or": false,
-      "supports_advanced": true,
-      "supports_single_result": false
-    }
-  },
-  {
-    "model": "ndr_core.NdrCoreApiImplementation",
-    "fields": {
       "name": "nodegoat",
       "label": "Nodegoat",
       "url": "https://nodegoat.net/",

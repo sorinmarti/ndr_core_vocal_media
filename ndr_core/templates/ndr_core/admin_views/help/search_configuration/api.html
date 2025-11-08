@@ -3,46 +3,53 @@
         <div class="card-body">
             <h5 class="card-title">API Configurations</h5>
             <p class="card-text">
-                NDR Core's main functionality is to get data over an API and display it. In order to achieve this,
-                you need to create a configuration on how to access your data.
-                NDR Core provides multiple implementations of APIs. If your desired API is not in the list, you can
+                NDR Core's main functionality is to retrieve data over an API and display it. To achieve this,
+                you need to create a configuration that defines how to access your data.
+            </p>
+            <p class="card-text">
+                NDR Core provides multiple API implementations. If your desired API is not in the list, you can
                 <a href="{% url 'ndr_core:help_chapter' 'advanced' %}">write your own implementation</a>.
             </p>
-            <h6>Create a configuration</h6>
+            <h6>Configuration Fields</h6>
             <p class="card-text">
                 <ul class="card-text">
                     <li>
-                        The <strong>API Type</strong> defines the API implementation you will use.
+                        <strong>API Type</strong> - Select the API implementation to use (MongoDB, Nodegoat, NDR Core, or custom).
                     </li>
                     <li>
-                        The <strong>API Name</strong> is the computer readable name of this API configuration.
-                        Forms are named with it. It can't contain special characters or spaces and must be unique within
-                        your installation. Choose a short descriptive name.
+                        <strong>Configuration Name</strong> - A computer-readable identifier for this configuration.
+                        Must be unique, contain no special characters or spaces. Used internally and in form naming.
                     </li>
                     <li>
-                        The <strong>Displayable Label</strong> is the label displayed in the administration interface
-                        when you select API configurations for your search. More importantly it is displayed
+                        <strong>Configuration Label</strong> - A human-readable display name shown in the administration
+                        interface and to end users when selecting search configurations.
                     </li>
                     <li>
-                        The <strong>Page Size</strong> is the number of results the API returns in per request.
+                        <strong>Connection URL</strong> - The complete URL endpoint for the API connection.
+                        Format varies by API type (see individual API documentation for examples).
                     </li>
                     <li>
-                        The <strong>Protocol</strong> specifies if the connection is over http or https.
+                        <strong>Authentication</strong> (optional) - Some APIs require authentication credentials:
+                        <ul>
+                            <li>Username - For basic authentication</li>
+                            <li>Password - For basic authentication</li>
+                            <li>Authentication Key - For token/key-based authentication</li>
+                        </ul>
                     </li>
                     <li>
-                        The <strong>API Host</strong> is ...
+                        <strong>Page Size</strong> - Number of results returned per API request.
                     </li>
                     <li>
-                        The <strong>Port</strong> is ...
+                        <strong>Search ID Field</strong> - The field name that uniquely identifies each result entry.
                     </li>
                     <li>
-                        The <strong>URL Stub</strong> is ...
-                    </li>
-                    <li>
-                        The <strong>Description</strong> is informational text for you or your team about this API
-                        configuration. It is not displayed outside of the administration interface.
+                        <strong>Description</strong> - Internal notes about this configuration. Not displayed to end users.
                     </li>
                 </ul>
+            </p>
+            <p class="card-text">
+                <strong>See also:</strong> <a href="{% url 'ndr_core:help_chapter' 'apis' %}">API Implementations</a>
+                for connection URL formats and examples for each API type.
             </p>
         </div>
     </div>

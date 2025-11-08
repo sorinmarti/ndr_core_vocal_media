@@ -1,0 +1,7 @@
+<!-- This template renders DATA_OBJECT UI elements -->
+<!-- The data fetching and rendering is done in ndr_template_tags.py -->
+<div class="data-object-container">
+    {% for rendered_item in rendered_items %}
+        {{ rendered_item|safe }}
+    {% endfor %}
+</div>

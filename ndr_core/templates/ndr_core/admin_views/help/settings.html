@@ -3,63 +3,98 @@
         <div class="card-body">
             <h5 class="card-title">Settings</h5>
             <p class="card-text">
-                NDR Core has a number of settings. Most of them can be changed and custom settings can be added if
-                needed.
+                Configure site-wide settings including site title, language, email, social media links, and custom values.
             </p>
 
-            <h6>Change Settings</h6>
+            <h6>Change a Setting</h6>
             <p class="card-text">
-                Go to your <a href="{% url 'ndr_core:configure_settings' %}">Settings Page</a> and choose a settings
-                group on the right side. Each group contains settings you can change. Refer to the list below:
-                <ul class="card-text">
-                    <li>
-                        <strong>Page Settings</strong>: Set project and browser tab titles.
-                    </li>
-                    <li>
-                        <strong>Language Settings</strong>: Set the language of the resulting website. The
-                        administration interface is english only.
-                    </li>
-                    <li>
-                        <strong>Header Settings</strong>: Set content of HTML header tags.
-                    </li>
-                    <li>
-                        <strong>Search Settings</strong>: Define simple search labels and help texts.
-                    </li>
-                    <li>
-                        <strong>Mail Settings</strong>: Change message forwarding behaviour, set your mail host
-                        settings, set forwarding address.
-                    </li>
-                    <li>
-                        <strong>Social Media</strong>: You can link to your social media profiles. Depending on your UI
-                        style, the links are shown in the footer or elsewhere.
-                    </li>
-                    <li>
-                        <strong>Custom Settings</strong>: Contain settings you created yourself. You can use them
-                        in your template text or in advanced editing methods (see below).
-                    </li>
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_settings' %}">Settings</a></li>
+                    <li>Select a settings group on the right sidebar</li>
+                    <li>Edit the values you want to change</li>
+                    <li>Click <strong>Save</strong></li>
+                </ol>
+            </p>
+
+            <h6>Settings Groups</h6>
+            <p class="card-text">
+                <strong>Page Settings:</strong> Site title, browser tab title, home page configuration
+            </p>
+
+            <p class="card-text">
+                <strong>Language Settings:</strong> Set website language (English, German, French, Italian, Spanish, Hindi).
+                Note: Admin interface is English only.
+                <br><small>See <a href="{% url 'ndr_core:help_chapter' 'translations' %}">Translations</a> for multilingual content.</small>
+            </p>
+
+            <p class="card-text">
+                <strong>Header Settings:</strong> HTML meta tags, keywords, description for SEO
+            </p>
+
+            <p class="card-text">
+                <strong>Search Settings:</strong> Default labels and help text for simple search forms
+            </p>
+
+            <p class="card-text">
+                <strong>Mail Settings:</strong> Configure email forwarding for contact forms
+                <ul class="small">
+                    <li>SMTP host and credentials</li>
+                    <li>Forwarding address</li>
+                    <li>Enable/disable message forwarding</li>
                 </ul>
             </p>
 
-            <h6>Language Settings</h6>
             <p class="card-text">
-                You choose e a base language to create your page in. You can then choose additional languages to
-                translate the page into. Refer to <a href="{% url 'ndr_core:configure_translations' %}">Manage
-                Translations</a>  to translate your elements. Page texts can be translated in the page editor.
+                <strong>Social Media:</strong> Add links to social media profiles (displayed in footer)
+            </p>
+
+            <p class="card-text">
+                <strong>Custom Settings:</strong> Your own key-value pairs for use in templates
+            </p>
+
+            <h6>Create a Custom Setting</h6>
+            <p class="card-text">
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_settings' %}">Settings</a></li>
+                    <li>Select <strong>Custom Settings</strong></li>
+                    <li>Click <strong>Create New Setting</strong></li>
+                    <li>Enter setting name (e.g., "contact_email")</li>
+                    <li>Enter value (e.g., "info@example.com")</li>
+                    <li>Use in templates: <code>[[setting|contact_email]]</code></li>
+                </ol>
             </p>
 
             <h6>Import/Export Settings</h6>
             <p class="card-text">
-                You can import or export your settings, so you can store them or use them in another project. The export
-                function produces a JSON file which can be deserialized into NDR Core's data model. Refer to
-                <a href="#">NDR Core settings serialization</a> for more information.
+                <strong>Export settings:</strong>
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_settings' %}">Settings</a></li>
+                    <li>Click <strong>Export Settings</strong></li>
+                    <li>Download JSON file</li>
+                </ol>
             </p>
 
-            <h6>Custom Settings</h6>
             <p class="card-text">
-                You can save custom settings and use them in your template text. Enter <code>[[setting|setting_name]]
-                </code> to display the settings value. Apart from that, you will only need custom settings if you use
-                <a href="{% url 'ndr_core:help_chapter' 'advanced' %}">Advanced editing</a>.
+                <strong>Import settings:</strong>
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_settings' %}">Settings</a></li>
+                    <li>Click <strong>Import Settings</strong></li>
+                    <li>Upload JSON file</li>
+                    <li>Existing settings with same names will be overwritten</li>
+                </ol>
             </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> Export settings to back up your configuration or transfer settings between
+                NDR Core instances.
+            </div>
+
+            <div class="alert alert-warning small">
+                <i class="fa-regular fa-exclamation-circle"></i>
+                <strong>Note:</strong> Some settings (like language and mail configuration) require application
+                restart to take full effect.
+            </div>
         </div>
     </div>
 </div>

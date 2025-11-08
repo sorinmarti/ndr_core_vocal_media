@@ -1,0 +1,115 @@
+<div class="card-deck">
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Page Content</h5>
+            <p class="card-text">
+                Learn how to add both static and dynamic content to your pages using the CKEditor rich text editor
+                and NDR Core's special codes.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="card-deck">
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add Static Content</h5>
+            <p class="card-text">
+                Use the CKEditor rich text editor to add formatted text, images, tables, and links to your pages.
+            </p>
+
+            <h6>Working with CKEditor</h6>
+            <p class="card-text">
+                <ol>
+                    <li>Click in the template text field when creating/editing a page</li>
+                    <li>Use the toolbar to format text (bold, italic, headings, etc.)</li>
+                    <li>Insert tables, lists, quotes, and links</li>
+                    <li>Add inline images with copy/paste or upload</li>
+                </ol>
+            </p>
+
+            <h6>Best Practices</h6>
+            <p class="card-text small">
+                <ul>
+                    <li><strong>Insert plain text first, format second:</strong> Paste unformatted text, then apply styling in CKEditor for consistent results</li>
+                    <li><strong>Use headings hierarchically:</strong> H2 for main sections, H3 for subsections, etc.</li>
+                    <li><strong>Keep formatting simple:</strong> Consistent, minimal formatting looks more professional</li>
+                    <li><strong>Use NDR Core images:</strong> Instead of inline images, use the <a href="{% url 'ndr_core:configure_images' %}">Image Manager</a>
+                        with UI Elements for better control</li>
+                    <li><strong>Paste from Word:</strong> Copy styled content from Word/Google Docs directly - formatting transfers well</li>
+                </ul>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Tip:</strong> For complex layouts, use UI Elements instead of tables. They're responsive
+                and easier to maintain.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-deck">
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add Dynamic Content</h5>
+            <p class="card-text">
+                Enhance your pages with interactive and dynamic elements using special codes.
+            </p>
+
+            <h6>UI Elements</h6>
+            <p class="card-text">
+                Insert rich components like slideshows, carousels, cards, and figures:
+                <br><code>[[slideshow|5]]</code> <code>[[figure|12]]</code> <code>[[card|3]]</code>
+                <br><small>See <a href="{% url 'ndr_core:help_chapter' 'ui_elements' %}">UI Elements</a> for creating and managing elements</small>
+            </p>
+
+            <h6>Custom Settings</h6>
+            <p class="card-text">
+                Display settings values in your content:
+                <br><code>[[setting|contact_email]]</code> <code>[[setting|project_name]]</code>
+                <br><small>Create custom settings in <a href="{% url 'ndr_core:configure_settings' %}">Settings</a></small>
+            </p>
+
+            <h6>IIIF Manifests</h6>
+            <p class="card-text">
+                Embed IIIF manifest viewers:
+                <br><code>[[manifest_viewer|manifest_id]]</code>
+                <br><small>Upload manifests in <a href="{% url 'ndr_core:configure_uploads' %}">Files</a></small>
+            </p>
+
+            <h6>When to Use What</h6>
+            <p class="card-text small">
+                <ul>
+                    <li><strong>Simple text/images:</strong> Use CKEditor directly</li>
+                    <li><strong>Image galleries:</strong> Use Slideshow or Carousel UI Elements</li>
+                    <li><strong>Feature boxes:</strong> Use Card or Image Card UI Elements</li>
+                    <li><strong>Hero sections:</strong> Use Banner or Jumbotron UI Elements</li>
+                    <li><strong>Team members:</strong> Use About Page type or manually create cards</li>
+                    <li><strong>Reusable content:</strong> Store as custom settings</li>
+                </ul>
+            </p>
+
+            <div class="alert alert-warning small">
+                <i class="fa-regular fa-exclamation-circle"></i>
+                <strong>Note:</strong> UI Element codes only work in page types that support rich text (Template, About, etc.).
+                They don't work in search configurations or result templates.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-deck">
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h6>Quick Links</h6>
+            <p class="card-text">
+                <a href="{% url 'ndr_core:configure_images' %}" class="btn btn-sm btn-primary" role="button">Manage Images</a>
+                <a href="{% url 'ndr_core:configure_ui_elements' %}" class="btn btn-sm btn-primary" role="button">Manage UI Elements</a>
+                <a href="{% url 'ndr_core:configure_uploads' %}" class="btn btn-sm btn-primary" role="button">Manage Files</a>
+                <a href="{% url 'ndr_core:help_chapter' 'pages' %}" class="btn btn-sm btn-secondary" role="button">Page Management Help</a>
+                <a href="{% url 'ndr_core:help_chapter' 'ui_elements' %}" class="btn btn-sm btn-secondary" role="button">UI Elements Help</a>
+            </p>
+        </div>
+    </div>
+</div>

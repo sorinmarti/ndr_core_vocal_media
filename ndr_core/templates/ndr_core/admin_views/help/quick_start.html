@@ -1,0 +1,88 @@
+<div class="card-deck">
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Quick Start Guide</h5>
+            <p class="card-text">
+                Welcome to NDR Core! This guide will help you get started with the administration interface in 5 minutes.
+            </p>
+
+            <h6>What is NDR Core?</h6>
+            <p class="card-text">
+                NDR Core is a Django application that creates customizable search interfaces for your data.
+                It connects to data sources through APIs and displays results in beautifully formatted pages.
+            </p>
+
+            <h6>Main Tasks</h6>
+            <p class="card-text">
+                The admin interface lets you:
+                <ul>
+                    <li><strong>Create and manage pages</strong> - Build your website structure</li>
+                    <li><strong>Configure search</strong> - Connect to data sources and define search fields</li>
+                    <li><strong>Design result displays</strong> - Control how search results appear</li>
+                    <li><strong>Customize appearance</strong> - Style your site with colors and UI elements</li>
+                    <li><strong>Manage content</strong> - Upload images, files, and translations</li>
+                </ul>
+            </p>
+
+            <h6>Getting Started Checklist</h6>
+            <p class="card-text">
+                <ol>
+                    <li><strong>Configure an API connection</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'search' %}">Search Configuration</a>
+                        | <a href="{% url 'ndr_core:help_chapter' 'apis' %}">API Implementations</a></small>
+                    </li>
+                    <li><strong>Create search fields</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'search' %}">Search Configuration</a></small>
+                    </li>
+                    <li><strong>Configure result display</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'results' %}">Result Configuration</a></small>
+                    </li>
+                    <li><strong>Create your pages</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'pages' %}">Pages</a></small>
+                    </li>
+                    <li><strong>Test your search</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'test' %}">Test Page</a></small>
+                    </li>
+                    <li><strong>Customize appearance</strong>
+                        <br><small>→ <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}">UI Style & Colors</a></small>
+                    </li>
+                </ol>
+            </p>
+
+            <h6>Common Workflows</h6>
+            <p class="card-text">
+                <strong>Adding a new search to your site:</strong>
+                <ol>
+                    <li>Configure API connection</li>
+                    <li>Create search configuration</li>
+                    <li>Define search fields</li>
+                    <li>Configure result display</li>
+                    <li>Create a search page</li>
+                </ol>
+            </p>
+
+            <p class="card-text">
+                <strong>Creating a new page:</strong>
+                <ol>
+                    <li>Choose a page type (About, Search, Template, etc.)</li>
+                    <li>Add content using the CKEditor</li>
+                    <li>Use template tags for dynamic content</li>
+                    <li>Preview and publish</li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Need more details?</strong> Each help topic provides in-depth information.
+                For comprehensive documentation, visit the
+                <a href="https://django-ndr-core.readthedocs.io/" target="_blank">full documentation</a>.
+            </div>
+
+            <h6>Test Your Setup</h6>
+            <p class="card-text">
+                Use the <a href="{% url 'ndr_core:test' %}">Test Page</a> to verify your configuration and see how
+                your search interface will look to end users.
+            </p>
+        </div>
+    </div>
+</div>

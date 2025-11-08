@@ -23,7 +23,7 @@
                         (<strong>Important:</strong> These changes are immediate and change your page.)
                     </li>
                     <li>
-                        You can check out the changes on your <a href="{% url 'ndr:test_ui_settings' %}">Test Page</a>.
+                        You can check out the changes on your <a href="{% url 'ndr_core:test' %}">Test Page</a>.
                         You might have to force-reload your page to show the changes.
                     </li>
                 </ul>
@@ -41,7 +41,7 @@
                         (<strong>Important:</strong> These changes are immediate and change your page.)
                     </li>
                     <li>
-                        You can check out the changes on your <a href="{% url 'ndr:test_ui_settings' %}">Test Page</a>.
+                        You can check out the changes on your <a href="{% url 'ndr_core:test' %}">Test Page</a>.
                         You might have to force-reload your page to show the changes.
                     </li>
                 </ul>
@@ -56,8 +56,8 @@
 
             <h6>Import and Export Palette</h6>
             <p class="card-text">
-                Palettes can be exported and imported. They need to be in a specific JSON format (see <a href="#">NDR
-                Core settings serialization</a>). They define a <code>pk</code> key which is the unique name of the palette.
+                Palettes can be exported and imported. They need to be in a specific JSON format. Exported palettes
+                define a <code>pk</code> key which is the unique name of the palette.
                 If you import a palette with an existing <code>pk</code>, it will be overwritten.
             </p>
 
@@ -89,9 +89,9 @@
                 </i>
             </p>
             <p class="card-text">
-                <a href="#" class="btn btn-sm btn-secondary" role="button">XXX</a>
-                <a href="#" class="btn btn-sm btn-secondary" role="button">XXX</a>
-                <a href="#" class="btn btn-sm btn-warning" role="button">NDR Core Settings Serialization</a>
+                <a href="{% url 'ndr_core:help_chapter' 'ui_elements' %}" class="btn btn-sm btn-secondary" role="button">UI Elements</a>
+                <a href="{% url 'ndr_core:help_chapter' 'settings' %}" class="btn btn-sm btn-secondary" role="button">Settings</a>
+                <a href="https://django-ndr-core.readthedocs.io/" target="_blank" class="btn btn-sm btn-warning" role="button">Full Documentation</a>
             </p>
         </div>
     </div>

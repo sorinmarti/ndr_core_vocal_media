@@ -1,19 +1,71 @@
 <div class="card-deck">
     <div class="card bg-light mb-3">
         <div class="card-body">
-            <h5 class="card-title">Search Forms</h5>
+            <h5 class="card-title">Search Fields & Forms</h5>
             <p class="card-text">
-
+                Search fields define what users can search for. Individual fields can be combined into custom forms
+                for advanced search interfaces.
             </p>
 
             <h6>Create Search Fields</h6>
             <p class="card-text">
-
+                <ol>
+                    <li>Go to <a href="{% url 'ndr_core:configure_search' %}">Search Configuration</a></li>
+                    <li>Select your Search Configuration</li>
+                    <li>Click <strong>Manage Search Fields</strong></li>
+                    <li>Click <strong>Create New Search Field</strong></li>
+                    <li>Configure the field:
+                        <ul class="small">
+                            <li><strong>Label:</strong> Display name for users</li>
+                            <li><strong>Field Type:</strong> Text input, dropdown, date range, etc.</li>
+                            <li><strong>API Parameter:</strong> Which parameter this field maps to in the API</li>
+                            <li><strong>Required:</strong> Whether users must fill this field</li>
+                        </ul>
+                    </li>
+                    <li>Save the field</li>
+                </ol>
             </p>
 
-            <h6>Create Search Forms</h6>
-            <p class="card-text">
+            <h6>Field Types</h6>
+            <p class="card-text small">
+                <ul>
+                    <li><strong>Text:</strong> Single-line text input</li>
+                    <li><strong>Textarea:</strong> Multi-line text input</li>
+                    <li><strong>Select:</strong> Dropdown menu with predefined choices</li>
+                    <li><strong>Date:</strong> Date picker</li>
+                    <li><strong>Date Range:</strong> Start and end date</li>
+                    <li><strong>Number:</strong> Numeric input</li>
+                    <li><strong>Boolean:</strong> Checkbox</li>
+                </ul>
+            </p>
 
+            <h6>Compose Search Forms</h6>
+            <p class="card-text">
+                <ol>
+                    <li>Create all the search fields you need (see above)</li>
+                    <li>In your Search Configuration, click <strong>Edit Search Form</strong></li>
+                    <li>Drag and drop fields to arrange them</li>
+                    <li>Group related fields together</li>
+                    <li>Set form layout options (single column, multi-column, etc.)</li>
+                    <li>Preview the form on the <a href="{% url 'ndr_core:test' %}">Test Page</a></li>
+                </ol>
+            </p>
+
+            <div class="alert alert-info small">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>Note:</strong> If you don't create a custom form, NDR Core provides a default simple search
+                with a single search box. This is perfect for basic keyword searches.
+            </div>
+
+            <h6>Field Configuration Tips</h6>
+            <p class="card-text small">
+                <ul>
+                    <li>Use clear, user-friendly labels (not technical field names)</li>
+                    <li>Set sensible defaults for dropdown fields</li>
+                    <li>Mark frequently-used fields as required</li>
+                    <li>Test the API parameter mapping to ensure results match expectations</li>
+                    <li>Use field help text to guide users</li>
+                </ul>
             </p>
         </div>
     </div>
