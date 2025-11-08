@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 
 from ndr_core.admin_forms.translation_forms import TranslatePageForm, TranslateFieldForm, TranslateSettingsForm, \
-    TranslateFormForm, TranslateUIElementsForm, TranslateImagesForm, TranslateResultForm
+    TranslateFormForm, TranslateUIElementsForm, TranslateResultForm
 from ndr_core.admin_views.result_views import (
     ResultFieldCreateView,
     ResultFieldEditView,
@@ -79,11 +79,9 @@ from ndr_core.admin_views.corrections_views import (
 )
 from ndr_core.admin_views.images_views import (
     ConfigureImages,
-    ImagesGroupView,
-    ImagesCreateView,
+    ImagesUploadView,
     ImagesEditView,
-    ImagesDeleteView,
-    move_image_up
+    ImagesDeleteView
 )
 from ndr_core.admin_views.settings_views import (
     ConfigureSettingsView,
@@ -96,6 +94,7 @@ from ndr_core.admin_views.settings_views import (
     SetPageEditableView,
     SetPageUnderConstructionView,
     SetPageLiveView,
+    ManageLogosView,
 )
 from ndr_core.admin_views.ui_style_views import (
     ConfigureUI,
@@ -155,6 +154,7 @@ urlpatterns = [
     path('configure/settings/set/under_construction/', SetPageUnderConstructionView.as_view(),
          name='set_page_under_construction'),
     path('configure/settings/set/live/', SetPageLiveView.as_view(), name='set_page_live'),
+    path('configure/logos/', ManageLogosView.as_view(), name='manage_logos'),
 
 
     # UI STYLE
@@ -164,11 +164,9 @@ urlpatterns = [
 
     # IMAGES
     path('configure/images/', ConfigureImages.as_view(), name='configure_images'),
-    path('configure/images/view/<str:group>/', ImagesGroupView.as_view(), name='view_images'),
-    path('configure/images/create/new/', ImagesCreateView.as_view(), name='create_image'),
+    path('configure/images/create/', ImagesUploadView.as_view(), name='create_image'),
     path('configure/images/edit/<int:pk>/', ImagesEditView.as_view(), name='edit_image'),
     path('configure/images/delete/<int:pk>/', ImagesDeleteView.as_view(), name='delete_image'),
-    path('configure/images/move/up/<int:pk>/', move_image_up, name='move_image_up'),
 
     # UPLOADS
     path('configure/uploads/', ConfigureUploads.as_view(), name='configure_uploads'),
@@ -208,8 +206,6 @@ urlpatterns = [
          name='edit_ui_elements_translations'),
     path('configure/translations/edit/images/', SelectTranslationView.as_view(),
          name='select_images_translations'),
-    path('configure/translations/edit/images/<str:lang>/',TranslateView.as_view(form_class=TranslateImagesForm),
-         name='edit_images_translations'),
 
     # USER MESSAGES
     path('configure/messages/', ConfigureMessages.as_view(), name='configure_messages'),

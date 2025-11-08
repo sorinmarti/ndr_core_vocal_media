@@ -18,7 +18,6 @@ TRANSLATABLE_TABLES = (
     ('ndrcorepage', 'Page Table'),
     ('ndrcorevalue', 'Settings Table'),
     ('ndrcoresearchconfiguration', 'Search Configuration Table'),
-    ('ndrcoreimage', 'Image Table'),
     ('ndrcoreuielementitem', 'UI Element Table'),
 )
 """Tables which contain translatable fields."""
@@ -1214,74 +1213,35 @@ class NdrCoreSearchStatisticEntry(models.Model):
     """Language of the search. """
 
 
-class NdrCoreImage(models.Model, TranslatableMixin):
-    """ Directory of all images used outside the ckeditor and the logo. """
-
-    class ImageGroup(models.TextChoices):
-        """Images are grouped into different groups."""
-        PAGE_LOGOS = "page_logos", "Page Logos"
-        BGS = "backgrounds", "Background Images"
-        ELEMENTS = "elements", "Slideshow Images"
-        FIGURES = "figures", "Figures"
-        LOGOS = "logos", "Partner Images"
-        PEOPLE = "people", "People"
-
-        @staticmethod
-        def get_label_by_value(group_value, choices):
-            """Returns the label for a given value. """
-            for choice in choices:
-                if choice[0] == group_value:
-                    return choice[1]
-
-    title = models.CharField(max_length=200, blank=True, default='',
-                             help_text='Title of the image.')
-    """Title of the image"""
-
-    caption = models.CharField(max_length=200, blank=True, default='',
-                               help_text='Caption of the image.')
-    """Caption of the image"""
-
-    citation = models.CharField(max_length=200, blank=True, default='',
-                                help_text='Citation text of the image.')
-    """Source of the image"""
-
-    url = models.URLField(null=True, blank=True, default=None,
-                          help_text='URL to image or source')
-    """URL to image or source"""
+class NdrCoreImage(models.Model):
+    """Simple image library for storing images.
+    Contextual data (title, caption, etc.) is handled by NdrCoreUiElementItem when the image is used."""
 
     image = models.ImageField(upload_to='images',
                               help_text='Upload an image file')
-    """Actual image"""
+    """Actual image file"""
 
-    image_group = models.CharField(max_length=100,
-                                   choices=ImageGroup.choices,
-                                   help_text='Group the image belongs to.')
-    """Group the image belongs to. """
+    alt_text = models.CharField(max_length=200, blank=True, default='',
+                                help_text='Alternative text for accessibility')
+    """Alt text for accessibility (important for screen readers)"""
 
-    index_in_group = models.IntegerField(default=0)
-    """For ordering the images within the group. """
-
-    image_active = models.BooleanField(default=True)
+    image_active = models.BooleanField(default=True,
+                                       help_text='Set to false to hide this image from selection')
     """To indicate that this image is not to be used in automatic collections."""
 
-    language = models.CharField(max_length=10, null=True, default=None,
-                                blank=True,
-                                help_text='Language of the image.')
-    """Language of the image. """
-
-    def __getattribute__(self, item):
-        """Returns the translated field for a given language. If no translation exists,
-        the default value is returned. """
-        if item in ['title', 'caption', 'citation']:
-            return self.translated_field(super().__getattribute__(item), item, str(self.pk))
-        return super().__getattribute__(item)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    """Timestamp when the image was uploaded"""
 
     def get_absolute_url(self):
         """Returns the absolute url of the image. """
-        return reverse('ndr_core:view_images', kwargs={'group': self.image_group})
+        return reverse('ndr_core:configure_images')
 
     def __str__(self):
-        return self.title
+        """String representation of the image."""
+        return f"Image {self.pk} - {self.alt_text[:50] if self.alt_text else 'No alt text'}"
+
+    class Meta:
+        ordering = ['-uploaded_at']  # Newest first
 
 
 class NdrCoreUpload(models.Model):
@@ -1491,3 +1451,60 @@ class NdrCoreRichTextTranslation(models.Model):
     translation = CKEditor5Field(config_name='page_editor', null=True, blank=True,
                                          help_text='Text for your template page')
     """Template Pages can be filled with RichText content (instead of 'manual' HTML). """
+
+
+# Signal handlers for automatic file cleanup
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
+
+
+@receiver(pre_delete, sender=NdrCoreImage)
+def delete_image_file_on_delete(sender, instance, **kwargs):
+    """Deletes the image file from filesystem when the NdrCoreImage object is deleted."""
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+
+@receiver(pre_save, sender=NdrCoreImage)
+def delete_old_image_file_on_update(sender, instance, **kwargs):
+    """Deletes the old image file from filesystem when a new one is uploaded."""
+    if not instance.pk:
+        return  # New instance, nothing to delete
+
+    try:
+        old_file = NdrCoreImage.objects.get(pk=instance.pk).image
+    except NdrCoreImage.DoesNotExist:
+        return  # Object doesn't exist yet
+
+    # Check if the image field has changed
+    new_file = instance.image
+    if old_file and old_file != new_file:
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)
+
+
+@receiver(pre_delete, sender=NdrCoreUpload)
+def delete_upload_file_on_delete(sender, instance, **kwargs):
+    """Deletes the upload file from filesystem when the NdrCoreUpload object is deleted."""
+    if instance.file:
+        if os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+
+
+@receiver(pre_save, sender=NdrCoreUpload)
+def delete_old_upload_file_on_update(sender, instance, **kwargs):
+    """Deletes the old upload file from filesystem when a new one is uploaded."""
+    if not instance.pk:
+        return  # New instance, nothing to delete
+
+    try:
+        old_file = NdrCoreUpload.objects.get(pk=instance.pk).file
+    except NdrCoreUpload.DoesNotExist:
+        return  # Object doesn't exist yet
+
+    # Check if the file field has changed
+    new_file = instance.file
+    if old_file and old_file != new_file:
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)

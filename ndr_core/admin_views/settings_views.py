@@ -17,6 +17,7 @@ from ndr_core.admin_forms.settings_forms import (
     SettingsSetEditableForm,
     SettingsSetUnderConstructionForm,
     SettingsSetLiveForm,
+    LogoManagementForm,
 )
 from ndr_core.admin_views.admin_views import AdminViewMixin
 from ndr_core.models import NdrCoreValue
@@ -249,3 +250,27 @@ class SetPageLiveView(AdminViewMixin, LoginRequiredMixin, FormView):
     def form_valid(self, form):
         NdrCoreValue.objects.filter(value_name='under_construction').update(value_value='false')
         return super().form_valid(form)
+
+
+class ManageLogosView(AdminViewMixin, LoginRequiredMixin, View):
+    """View to manage page logos (per language) and footer partner logos."""
+
+    template_name = 'ndr_core/admin_views/overview/manage_logos.html'
+
+    def get(self, request, *args, **kwargs):
+        """GET request for this view."""
+        form = LogoManagementForm()
+        context = {'form': form}
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        """POST request for this view. Gets executed when logo settings are saved."""
+        form = LogoManagementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Logo settings saved successfully")
+        else:
+            messages.error(request, "Error saving logo settings")
+
+        context = {'form': form}
+        return render(request, self.template_name, context=context)

@@ -1,6 +1,6 @@
 """Contains forms used in the NDRCore admin interface for the creation or edit of image objects."""
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML
+from crispy_forms.layout import Layout, Row, Column
 from django import forms
 
 from ndr_core.admin_forms.admin_forms import get_form_buttons, get_info_box
@@ -8,57 +8,47 @@ from ndr_core.models import NdrCoreImage
 
 
 class ImageForm(forms.ModelForm):
-    """Base form to upload/edit image objects. Image-objects mean database objects with an image file
-    linked to them. """
+    """Simplified form to upload/edit images in the image library."""
 
     class Meta:
         model = NdrCoreImage
-        fields = ['image_group', 'image', 'title', 'caption', 'citation', 'url', 'language']
+        fields = ['image', 'alt_text', 'image_active']
 
     @property
     def helper(self):
         """Creates and returns the form helper property."""
         helper = FormHelper()
         helper.form_method = "POST"
+        helper.form_enctype = 'multipart/form-data'
         layout = helper.layout = Layout()
 
         form_row = Row(
-            Column(get_info_box("Select an Image Group"), css_class='form-group col-12'),
+            Column(get_info_box("Upload an image to the library. "
+                               "You can add contextual information (title, caption, etc.) "
+                               "when using the image in UI Elements."),
+                   css_class='form-group col-12'),
             css_class='form-row'
         )
         layout.append(form_row)
 
         form_row = Row(
-            Column('image_group', css_class='form-group col-6'),
-            Column('image', css_class='form-group col-6'),
+            Column('image', css_class='form-group col-12'),
             css_class='form-row'
         )
         layout.append(form_row)
 
         form_row = Row(
-            Column('title', css_class='form-group col-6'),
-            Column('caption', css_class='form-group col-6'),
+            Column('alt_text', css_class='form-group col-9'),
+            Column('image_active', css_class='form-group col-3'),
             css_class='form-row'
         )
         layout.append(form_row)
 
-        form_row = Row(
-            Column('citation', css_class='form-group col-6'),
-            Column('url', css_class='form-group col-6'),
-            css_class='form-row'
-        )
-        layout.append(form_row)
-
-        form_row = Row(
-            Column("language", css_class="form-group col-6"),
-            css_class="form-row",
-        )
-        layout.append(form_row)
         return helper
 
 
-class ImageCreateForm(ImageForm):
-    """Form to upload images"""
+class ImageUploadForm(ImageForm):
+    """Form to upload images to the library"""
 
     @property
     def helper(self):
@@ -69,13 +59,24 @@ class ImageCreateForm(ImageForm):
 
 
 class ImageEditForm(ImageForm):
-    """Form to edit images"""
+    """Form to edit images in the library"""
+
+    class Meta:
+        model = NdrCoreImage
+        fields = ['image', 'alt_text', 'image_active']  # Allow changing the image file
 
     @property
     def helper(self):
         """Creates and returns the form helper property."""
         helper = super().helper
-        helper.layout.append(get_form_buttons('Save Image'))
+        # Update the info box for edit mode
+        helper.layout[0] = Row(
+            Column(get_info_box("Edit image information. "
+                               "You can replace the image file if needed (e.g., replacing a placeholder with the actual image)."),
+                   css_class='form-group col-12'),
+            css_class='form-row'
+        )
+        helper.layout.append(get_form_buttons('Save Changes'))
         return helper
 
 

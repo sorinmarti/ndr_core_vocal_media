@@ -1,10 +1,52 @@
 """Forms used in the NDRCore admin interface for in-app settings."""
+import json
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, HTML, ButtonHolder, Submit
 from django import forms
+from django.forms.widgets import Select, SelectMultiple
 
-from ndr_core.admin_forms.admin_forms import get_form_buttons
-from ndr_core.models import NdrCoreValue
+from ndr_core.admin_forms.admin_forms import get_form_buttons, get_info_box
+from ndr_core.models import NdrCoreValue, NdrCoreImage, get_available_languages
+
+
+class ImagePickerWidget(Select):
+    """Widget that displays images using the image-picker plugin."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attrs['class'] = 'image-picker show_html'
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        if value:
+            try:
+                image = NdrCoreImage.objects.get(pk=value)
+                option['attrs']['data-img-src'] = image.image.url
+                option['attrs']['data-img-label'] = image.alt_text or 'Image'
+            except NdrCoreImage.DoesNotExist:
+                pass
+        return option
+
+
+class ImagePickerMultipleWidget(SelectMultiple):
+    """Widget that displays multiple images using the image-picker plugin."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attrs['class'] = 'image-picker show_html'
+        self.attrs['multiple'] = 'multiple'
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        if value:
+            try:
+                image = NdrCoreImage.objects.get(pk=value)
+                option['attrs']['data-img-src'] = image.image.url
+                option['attrs']['data-img-label'] = image.alt_text or 'Image'
+            except NdrCoreImage.DoesNotExist:
+                pass
+        return option
 
 
 class SettingsListForm(forms.Form):
@@ -265,4 +307,134 @@ class SettingsSetLiveForm(forms.Form):
             css_class="modal-footer",
         )
         helper.layout.append(bh)
+        return helper
+
+
+class LogoManagementForm(forms.Form):
+    """Form to manage page logos (per language) and footer partner logos."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Get all available images for selection
+        image_choices = [('', '-- No Logo --')]
+        for img in NdrCoreImage.objects.filter(image_active=True).order_by('-uploaded_at'):
+            image_choices.append((str(img.pk), img.alt_text or 'Image'))
+
+        # Get current logo settings
+        page_logos_setting = NdrCoreValue.get_or_initialize('page_logo_images')
+        try:
+            page_logos_data = json.loads(page_logos_setting.value_value) if page_logos_setting.value_value else {}
+        except (json.JSONDecodeError, ValueError):
+            page_logos_data = {}
+
+        partner_logos_setting = NdrCoreValue.get_or_initialize('footer_partner_logo_images')
+        partner_logos_data = [x.strip() for x in partner_logos_setting.value_value.split(',') if x.strip()]
+
+        # Get base language
+        base_lang_setting = NdrCoreValue.get_or_initialize('ndr_language')
+        base_language = base_lang_setting.get_value()
+
+        # Create field for base language
+        self.fields[f'logo_{base_language}'] = forms.ChoiceField(
+            label=f'Logo for {base_language.upper()}',
+            choices=image_choices,
+            required=False,
+            initial=page_logos_data.get(base_language, ''),
+            widget=ImagePickerWidget()
+        )
+
+        # Create fields for additional languages
+        available_languages = get_available_languages()
+        for lang_code, lang_name in available_languages:
+            if lang_code != base_language:
+                self.fields[f'logo_{lang_code}'] = forms.ChoiceField(
+                    label=f'Logo for {lang_name}',
+                    choices=image_choices,
+                    required=False,
+                    initial=page_logos_data.get(lang_code, ''),
+                    widget=ImagePickerWidget()
+                )
+
+        # Create field for partner logos (multiple selection)
+        self.fields['partner_logos'] = forms.MultipleChoiceField(
+            label='Footer Partner Logos',
+            choices=image_choices[1:],  # Exclude the "No Logo" option
+            required=False,
+            initial=partner_logos_data,
+            help_text='Select multiple logos',
+            widget=ImagePickerMultipleWidget()
+        )
+
+    def save(self):
+        """Save the logo settings to the database."""
+        # Save page logos
+        page_logos_data = {}
+        for field_name, value in self.cleaned_data.items():
+            if field_name.startswith('logo_'):
+                lang_code = field_name[5:]  # Remove 'logo_' prefix
+                if value:  # Only save if a logo is selected
+                    page_logos_data[lang_code] = int(value)
+
+        page_logos_setting = NdrCoreValue.get_or_initialize('page_logo_images')
+        page_logos_setting.value_value = json.dumps(page_logos_data)
+        page_logos_setting.save()
+
+        # Save partner logos
+        partner_logos = self.cleaned_data.get('partner_logos', [])
+        partner_logos_setting = NdrCoreValue.get_or_initialize('footer_partner_logo_images')
+        partner_logos_setting.value_value = ','.join(partner_logos)
+        partner_logos_setting.save()
+
+    @property
+    def helper(self):
+        """Creates and returns the form helper property."""
+        helper = FormHelper()
+        helper.form_method = "POST"
+        layout = helper.layout = Layout()
+
+        # Info box
+        layout.append(Row(
+            Column(get_info_box(
+                "Configure logos for your site. Page logos can be set per language for internationalization. "
+                "Partner logos appear in the footer."
+            ), css_class='form-group col-12'),
+            css_class='form-row'
+        ))
+
+        # Page logos section
+        layout.append(Row(
+            Column(HTML('<h5 class="mt-3 mb-3">Page Logos (Per Language)</h5>'), css_class='col-12'),
+            css_class='form-row'
+        ))
+
+        # Add fields for each language
+        base_lang_setting = NdrCoreValue.get_or_initialize('ndr_language')
+        base_language = base_lang_setting.get_value()
+
+        layout.append(Row(
+            Column(f'logo_{base_language}', css_class='form-group col-md-6'),
+            css_class='form-row'
+        ))
+
+        available_languages = get_available_languages()
+        for lang_code, lang_name in available_languages:
+            if lang_code != base_language:
+                layout.append(Row(
+                    Column(f'logo_{lang_code}', css_class='form-group col-md-6'),
+                    css_class='form-row'
+                ))
+
+        # Partner logos section
+        layout.append(Row(
+            Column(HTML('<h5 class="mt-4 mb-3">Footer Partner Logos</h5>'), css_class='col-12'),
+            css_class='form-row'
+        ))
+
+        layout.append(Row(
+            Column('partner_logos', css_class='form-group col-md-12'),
+            css_class='form-row'
+        ))
+
+        layout.append(get_form_buttons('Save Logo Settings'))
         return helper

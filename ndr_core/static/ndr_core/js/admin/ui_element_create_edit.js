@@ -298,6 +298,97 @@ function show_item_preview(item_id, number) {
 
 $(document).ready(function() {
 
+    // Initialize image picker for all image selection fields
+    $('select.image-picker').imagepicker({
+        hide_select: false,
+        show_label: false,
+    });
+
+    // Make the image picker grids collapsible
+    $('select.image-picker').each(function() {
+        var $select = $(this);
+
+        // Find the image picker grid - it's a sibling of the select element
+        var $grid = $select.siblings('.image_picker_selector');
+
+        // Debug logging
+        console.log('Select element:', $select.attr('id'));
+        console.log('Found grid:', $grid.length);
+
+        // Hide the grid initially
+        $grid.hide();
+
+        // Add a toggle button
+        var $toggleBtn = $('<button type="button" class="btn btn-sm btn-outline-secondary mt-2 mb-2 browse-images-btn">' +
+            '<i class="fa fa-images"></i> Browse Images</button>');
+
+        $select.after($toggleBtn);
+
+        $toggleBtn.on('click', function(e) {
+            e.preventDefault();
+
+            if ($grid.is(':visible')) {
+                $grid.slideUp();
+                $toggleBtn.html('<i class="fa fa-images"></i> Browse Images');
+            } else {
+                // Hide all other grids
+                $('.image_picker_selector').slideUp();
+                $('.browse-images-btn').html('<i class="fa fa-images"></i> Browse Images');
+
+                // Show this one
+                $grid.slideDown();
+                $toggleBtn.html('<i class="fa fa-times"></i> Close');
+            }
+        });
+    });
+
+    // Show selected image info
+    $('select.image-picker').on('change', function() {
+        var $select = $(this);
+        var selectedOptions = $select.find('option:selected');
+
+        if (selectedOptions.length > 0) {
+            var $preview = $select.siblings('.current-selection');
+            if ($preview.length === 0) {
+                $preview = $('<div class="current-selection mt-2 p-2 border rounded bg-white"></div>');
+                $select.before($preview);
+            }
+
+            var previewHtml = '<strong>Selected:</strong> ';
+
+            // Handle multiple selections
+            if (selectedOptions.length > 1) {
+                previewHtml = '<strong>Selected (' + selectedOptions.length + '):</strong><div class="d-flex flex-wrap mt-2" style="gap: 10px;">';
+                selectedOptions.each(function() {
+                    var imgSrc = $(this).attr('data-img-src');
+                    var imgLabel = $(this).attr('data-img-label');
+                    if (imgSrc) {
+                        previewHtml += '<div class="text-center">' +
+                            '<img src="' + imgSrc + '" style="max-height: 60px; border: 1px solid #ddd; border-radius: 4px; padding: 4px;">' +
+                            '<div class="small text-muted">' + imgLabel + '</div>' +
+                            '</div>';
+                    }
+                });
+                previewHtml += '</div>';
+            } else {
+                // Single selection
+                var imgSrc = selectedOptions.attr('data-img-src');
+                var imgLabel = selectedOptions.attr('data-img-label');
+                if (imgSrc) {
+                    previewHtml += imgLabel +
+                        '<img src="' + imgSrc + '" style="max-height: 60px; margin-left: 10px;">';
+                }
+            }
+
+            $preview.html(previewHtml);
+        } else {
+            $select.siblings('.current-selection').remove();
+        }
+    });
+
+    // Trigger change for pre-selected values
+    $('select.image-picker').trigger('change');
+
     setComponents($('#id_type').val())
     $('#id_type').change(function() {
         setComponents(this.value)

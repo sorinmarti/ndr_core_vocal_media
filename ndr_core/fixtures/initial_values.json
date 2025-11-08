@@ -352,5 +352,27 @@
       "value_value": "",
       "is_translatable": true
     }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "page_logo_images",
+      "value_label": "Page Logo Images",
+      "value_help_text": "Logo images per language (JSON format: {\"en\": image_id, \"de\": image_id})",
+      "value_type": "string",
+      "value_value": "{}",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "footer_partner_logo_images",
+      "value_label": "Footer Partner Logo Images",
+      "value_help_text": "Partner logo image IDs (comma-separated: 1,2,3)",
+      "value_type": "string",
+      "value_value": "",
+      "is_translatable": false
+    }
   }
 ]

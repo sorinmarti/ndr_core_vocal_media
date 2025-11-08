@@ -44,20 +44,34 @@ def tag_get_available_languages():
 
 @register.simple_tag(name="logo_image_path")
 def get_logo_image_path():
-    """Returns the path to the logo image."""
+    """Returns the path to the logo image based on current language settings."""
+    import json
+    from ndr_core.models import NdrCoreValue
+
+    # Get page logos from settings
+    page_logos_setting = NdrCoreValue.get_or_initialize('page_logo_images')
     try:
-        logo_image = NdrCoreImage.objects.get(
-            image_group=NdrCoreImage.ImageGroup.PAGE_LOGOS, language=get_language()
-        ).image.url
-    except NdrCoreImage.DoesNotExist:
+        page_logos_data = json.loads(page_logos_setting.value_value) if page_logos_setting.value_value else {}
+    except (json.JSONDecodeError, ValueError):
+        page_logos_data = {}
+
+    # Try to get logo for current language
+    current_lang = get_language()
+    logo_id = page_logos_data.get(current_lang)
+
+    # If no logo for current language, try base language
+    if not logo_id:
+        base_lang_setting = NdrCoreValue.get_or_initialize('ndr_language')
+        base_lang = base_lang_setting.get_value()
+        logo_id = page_logos_data.get(base_lang)
+
+    # Get the image object
+    if logo_id:
         try:
-            logo_image = NdrCoreImage.objects.filter(
-                image_group=NdrCoreImage.ImageGroup.PAGE_LOGOS
-            )
-            if logo_image:
-                logo_image = logo_image.first().image.url
-            else:
-                logo_image = "static/ndr_core/images/logo.png"
+            logo_image = NdrCoreImage.objects.get(pk=logo_id, image_active=True)
+            return logo_image.image.url
         except NdrCoreImage.DoesNotExist:
-            logo_image = "static/ndr_core/images/logo.png"
-    return logo_image
+            pass
+
+    # Default logo if none configured
+    return "static/ndr_core/images/logo.png"

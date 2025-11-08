@@ -3,17 +3,39 @@ from crispy_forms.bootstrap import TabHolder, Tab
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, HTML, Div
 from django import forms
+from django.forms.widgets import Select
 
 from ndr_core.admin_forms.admin_forms import get_form_buttons
 from ndr_core.models import (NdrCoreUIElement, NdrCoreImage, NdrCoreManifestGroup,
                               NdrCoreSearchConfiguration, NdrCoreResultField)
 
 
+class ImagePickerWidget(Select):
+    """Widget that displays images using the image-picker plugin."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attrs['class'] = 'image-picker show_html'
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        if value:
+            try:
+                image = NdrCoreImage.objects.get(pk=value)
+                option['attrs']['data-img-src'] = image.image.url
+                option['attrs']['data-img-label'] = image.alt_text or 'Image'
+            except NdrCoreImage.DoesNotExist:
+                pass
+        return option
+
+
 class ImageChoiceField(forms.ModelChoiceField):
-    """Used to display images in a select field."""
+    """Used to display images in a select field with thumbnails."""
+
+    widget = ImagePickerWidget
 
     def label_from_instance(self, obj):
-        return f'{obj.image.url}'
+        return obj.alt_text or 'Image'
 
 
 class UIElementForm(forms.ModelForm):
@@ -29,16 +51,15 @@ class UIElementForm(forms.ModelForm):
 
         for x in range(0, 10):
             self.fields[f'item_{x}_ndr_banner_image'] = ImageChoiceField(
-                queryset=NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.BGS),
+                queryset=NdrCoreImage.objects.filter(image_active=True),
                 required=False,
                 label='Background Image')
             self.fields[f'item_{x}_ndr_slide_image'] = ImageChoiceField(
-                queryset=NdrCoreImage.objects.filter(image_group=NdrCoreImage.ImageGroup.ELEMENTS),
+                queryset=NdrCoreImage.objects.filter(image_active=True),
                 required=False,
                 label='Slide Image')
             self.fields[f'item_{x}_ndr_card_image'] = ImageChoiceField(
-                queryset=NdrCoreImage.objects.filter(image_group__in=[NdrCoreImage.ImageGroup.ELEMENTS,
-                                                                      NdrCoreImage.ImageGroup.FIGURES]),
+                queryset=NdrCoreImage.objects.filter(image_active=True),
                 required=False,
                 label='Card Image')
 

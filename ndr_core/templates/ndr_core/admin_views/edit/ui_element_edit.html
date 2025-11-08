@@ -9,6 +9,51 @@
     Update UI Element
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Constrain image picker thumbnail sizes */
+    ul.thumbnails.image_picker_selector li .thumbnail {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    ul.thumbnails.image_picker_selector li .thumbnail img {
+        max-width: 138px;
+        max-height: 138px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+    ul.thumbnails.image_picker_selector li {
+        display: inline-block;
+        float: left;
+    }
+
+    /* Hide the original select dropdown */
+    select.image-picker {
+        display: none !important;
+    }
+
+    /* Style for current selection preview */
+    .current-selection {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .current-selection img {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px;
+    }
+</style>
+{% endblock %}
+
 {% block page_js %}
     <script src="{% static 'ndr_core/js/admin/ui_element_create_edit.js' %}"></script>
 {% endblock %}

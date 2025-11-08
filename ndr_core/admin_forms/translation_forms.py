@@ -261,20 +261,3 @@ class TranslateUIElementsForm(TranslateForm):
     def helper(self):
         """Creates and returns the form helper property."""
         return self.do_helper()
-
-
-class TranslateImagesForm(TranslateForm):
-    """Form to translate settings values."""
-
-    items = NdrCoreImage.objects.filter(image_group="figures")
-    translatable_fields = ["title", "caption"]
-    table_name = "NdrCoreImage"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.init_form()
-
-    @property
-    def helper(self):
-        """Creates and returns the form helper property."""
-        return self.do_helper()
