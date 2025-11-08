@@ -5,39 +5,34 @@
 
 {% block content %}
     <h2><i class="fa-brands fa-google"></i> Search Engine Optimization</h2>
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:seo_ndrcore_org' %}" class="list-group-item list-group-item-action py-2{% if "/configure/seo/ndrcore-org" in request.path %} active{% endif %}">
-                        <i class="fa-regular fa-n"></i>
-                        Connect with ndrcore.org
-                    </a>
-                    <a href="{% url 'ndr_core:seo_google_ver' %}" class="list-group-item list-group-item-action py-2{% if "/configure/seo/google-verification" in request.path %} active{% endif %}">
-                        <i class="fa-brands fa-google"></i>
-                        Google Indexing
-                    </a>
-                    <a href="{% url 'ndr_core:seo_robots' %}" class="list-group-item list-group-item-action py-2{% if "/configure/seo/robots" in request.path %} active{% endif %}">
-                        <i class="fa-regular fa-r"></i>
-                        Robots File
-                    </a>
-                    <a href="{% url 'ndr_core:seo_sitemap' %}" class="list-group-item list-group-item-action py-2{% if "/configure/seo/sitemap" in request.path %} active{% endif %}">
-                        <i class="fa-regular fa-map"></i>
-                        Site Map
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'seo' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i>
-                        Help
-                    </a>
-                </div>
-            </div>
-        </div>
 
-        <div class="card bg-light mb-3" style="max-height: 50vh;">
-            <div class="overflow-auto">
-                <div class="card-body">
-                    {% if "/configure/seo/ndrcore-org" in request.path %}
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            <a href="{% url 'ndr_core:seo_ndrcore_org' %}" class="btn btn-sm btn-primary m-1{% if "/configure/seo/ndrcore-org" in request.path %} active{% endif %}">
+                <i class="fa-regular fa-n"></i> NDRCore.org
+            </a>
+            <a href="{% url 'ndr_core:seo_google_ver' %}" class="btn btn-sm btn-primary m-1{% if "/configure/seo/google-verification" in request.path %} active{% endif %}">
+                <i class="fa-brands fa-google"></i> Google
+            </a>
+            <a href="{% url 'ndr_core:seo_robots' %}" class="btn btn-sm btn-primary m-1{% if "/configure/seo/robots" in request.path %} active{% endif %}">
+                <i class="fa-regular fa-r"></i> Robots
+            </a>
+            <a href="{% url 'ndr_core:seo_sitemap' %}" class="btn btn-sm btn-primary m-1{% if "/configure/seo/sitemap" in request.path %} active{% endif %}">
+                <i class="fa-regular fa-map"></i> Sitemap
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'ndr_core:help_chapter' 'seo' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i> Help
+            </a>
+        </div>
+    </div>
+
+    <div class="card bg-light mb-3" style="max-height: 50vh;">
+        <div class="overflow-auto">
+            <div class="card-body">
+                {% if "/configure/seo/ndrcore-org" in request.path %}
                         <h5 class="card-title">Connect with ndrcore.org</h5>
                         <p>
                         You can connect your site with ndrcore.org to help us keep track of your site and to help us
@@ -70,8 +65,7 @@
                         what pages they should ignore. You can use this file to prevent search engines from indexing
                         pages that you do not want to be indexed.
                         </p>
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>

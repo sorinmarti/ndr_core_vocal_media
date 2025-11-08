@@ -4,61 +4,62 @@
 
 {% block content %}
     <h2><i class="fa-regular fa-window-maximize"></i> Change UI Style</h2>
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i>
-                        Help
-                    </a>
-                </div>
-                <p></p>
-                <h5 class="card-title">Settings</h5>
-                Your UI Style is:<br/>
-                <div class="list-group-item list-group-item-action py-2">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-4">
-                                {% with 'ndr_core/images/admin/'|add:ui_style.filename|add:'.png' as image_static %}
-                                    <img src="{% static image_static %}" class="img-fluid" alt="Image 1">
-                                {% endwith %}
-                            </div>
-                            <div class="col-8">
-                                {{ ui_style.label }}<br/>
-                                <small>{{ ui_style.description }}</small>
-                            </div>
-                        </div>
+
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            <span class="text-muted">Select a UI style below to change your site's layout</span>
+        </div>
+        <div>
+            <a href="{% url 'ndr_core:help_chapter' 'ui_style' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i> Help
+            </a>
+        </div>
+    </div>
+
+    <!-- Current Selection -->
+    <div class="card bg-light mb-3">
+        <div class="card-body py-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="mr-3" style="max-width: 100px;">
+                        {% with 'ndr_core/images/admin/'|add:ui_style.filename|add:'.png' as image_static %}
+                            <img src="{% static image_static %}" class="img-fluid border" alt="{{ ui_style.label }}">
+                        {% endwith %}
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Current UI Style: <strong>{{ ui_style.label }}</strong></h6>
+                        <small class="text-muted">{{ ui_style.description }}</small>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card bg-light mb-3" style="max-height: 50vh;">
-            <div class="overflow-auto">
-                <div class="card-body">
-                    <h5 class="card-title">Available UI Styles</h5>
-                    <div class="list-group">
-                        {% for ui_style in ui_styles %}
-                            <a href="{% url 'ndr_core:view_ui_style' ui_style.pk %}" class="list-group-item list-group-item-action">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            {% with 'ndr_core/images/admin/'|add:ui_style.filename|add:'.png' as image_static %}
-                                                <img src="{% static image_static %}" class="img-fluid" alt="Image 1">
-                                            {% endwith %}
-                                        </div>
-                                        <div class="col-8">
-                                            {{ ui_style.label }}<br/>
-                                            <small>{{ ui_style.description }}</small>
-                                        </div>
-                                    </div>
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Available UI Styles</h5>
+            <div class="row">
+                {% for style in ui_styles %}
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100 {% if object.pk == style.pk or ui_style.pk == style.pk %}border-primary{% endif %}">
+                            <a href="{% url 'ndr_core:view_ui_style' style.pk %}" style="text-decoration: none; color: inherit;">
+                                {% with 'ndr_core/images/admin/'|add:style.filename|add:'.png' as image_static %}
+                                    <img src="{% static image_static %}" class="card-img-top" alt="{{ style.label }}" style="border-bottom: 1px solid #dee2e6;">
+                                {% endwith %}
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">
+                                        {{ style.label }}
+                                        {% if ui_style.pk == style.pk %}
+                                            <span class="badge badge-success badge-sm ml-1">Current</span>
+                                        {% endif %}
+                                    </h6>
+                                    <p class="card-text small text-muted mb-0">{{ style.description }}</p>
                                 </div>
                             </a>
-                        {% endfor %}
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

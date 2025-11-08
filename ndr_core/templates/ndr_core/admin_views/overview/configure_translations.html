@@ -7,37 +7,32 @@
 
 {% block content %}
     <h2><i class="fa-regular fa-language"></i> Manage Translations</h2>
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:select_page_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_page_translations' or request.resolver_match.url_name == 'edit_page_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Page Titles and Labels
-                    </a>
-                    <a href="{% url 'ndr_core:select_form_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_form_translations' or request.resolver_match.url_name == 'edit_form_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Forms
-                    </a>
-                    <a href="{% url 'ndr_core:select_field_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_field_translations' or request.resolver_match.url_name == 'edit_field_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Form Fields
-                    </a>
-                    <a href="{% url 'ndr_core:select_result_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_result_translations' or request.resolver_match.url_name == 'edit_result_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Result Fields
-                    </a>
-                    <a href="{% url 'ndr_core:select_images_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_images_translations' or request.resolver_match.url_name == 'edit_images_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Image Texts
-                    </a>
-                    <a href="{% url 'ndr_core:select_settings_translations' %}" class="list-group-item list-group-item-action py-2 {% if request.resolver_match.url_name == 'select_settings_translations' or request.resolver_match.url_name == 'edit_settings_translations' %}bg-selected{% endif %}">
-                        <i class="fa-regular fa-language"></i>
-                        Translate Settings
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'translations' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i>
+
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            <a href="{% url 'ndr_core:select_page_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_page_translations' or request.resolver_match.url_name == 'edit_page_translations' %}active{% endif %}">
+                <i class="fa-regular fa-file"></i> Pages
+            </a>
+            <a href="{% url 'ndr_core:select_form_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_form_translations' or request.resolver_match.url_name == 'edit_form_translations' %}active{% endif %}">
+                <i class="fa-regular fa-list"></i> Forms
+            </a>
+            <a href="{% url 'ndr_core:select_field_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_field_translations' or request.resolver_match.url_name == 'edit_field_translations' %}active{% endif %}">
+                <i class="fa-regular fa-table-list"></i> Fields
+            </a>
+            <a href="{% url 'ndr_core:select_result_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_result_translations' or request.resolver_match.url_name == 'edit_result_translations' %}active{% endif %}">
+                <i class="fa-regular fa-square"></i> Results
+            </a>
+            <a href="{% url 'ndr_core:select_images_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_images_translations' or request.resolver_match.url_name == 'edit_images_translations' %}active{% endif %}">
+                <i class="fa-regular fa-image"></i> Images
+            </a>
+            <a href="{% url 'ndr_core:select_settings_translations' %}" class="btn btn-sm btn-primary m-1 {% if request.resolver_match.url_name == 'select_settings_translations' or request.resolver_match.url_name == 'edit_settings_translations' %}active{% endif %}">
+                <i class="fa-regular fa-gear"></i> Settings
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'ndr_core:help_chapter' 'translations' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i>
                         Help
                     </a>
                 </div>

@@ -7,41 +7,36 @@
 {% block content %}
     <h2><i class="fa-regular fa-chart-simple"></i> View Statistics</h2>
 
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    {% if statistics_enabled %}
-                        <a href="{% url 'ndr_core:set_statistics_option' 'false' %}" class="list-group-item list-group-item-action py-2">
-                            <i class="fa-regular fa-toggle-on"></i>
-                            Disable Statistics Feature
-                        </a>
-                    {% else %}
-                        <a href="{% url 'ndr_core:set_statistics_option' 'true' %}" class="list-group-item list-group-item-action py-2">
-                            <i class="fa-regular fa-toggle-off"></i>
-                            Enable Statistics Feature
-                        </a>
-                    {% endif %}
-                    <a href="{% url 'ndr_core:not_implemented' %}" class="list-group-item list-group-item-action py-2{% if not apis %} disabled{% endif %}">
-                        <i class="fa-regular fa-file-arrow-up"></i>
-                        Reset Statistics
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'test' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i>
-                        Help
-                    </a>
-                </div>
-                <p></p>
-                <h5 class="card-title">Settings</h5>
-                The Statistics Option is {% if statistics_enabled %}<strong class="text-success">enabled</strong>{% else %}<strong class="text-danger">disabled</strong>{% endif %}.
-            </div>
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            {% if statistics_enabled %}
+                <a href="{% url 'ndr_core:set_statistics_option' 'false' %}" class="btn btn-sm btn-warning m-1">
+                    <i class="fa-regular fa-toggle-on"></i> Disable Statistics
+                </a>
+            {% else %}
+                <a href="{% url 'ndr_core:set_statistics_option' 'true' %}" class="btn btn-sm btn-success m-1">
+                    <i class="fa-regular fa-toggle-off"></i> Enable Statistics
+                </a>
+            {% endif %}
+            <a href="{% url 'ndr_core:not_implemented' %}" class="btn btn-sm btn-danger m-1{% if not apis %} disabled{% endif %}">
+                <i class="fa-regular fa-trash"></i> Reset Statistics
+            </a>
         </div>
+        <div>
+            <span class="mr-2">
+                Status: {% if statistics_enabled %}<strong class="text-success">Enabled</strong>{% else %}<strong class="text-danger">Disabled</strong>{% endif %}
+            </span>
+            <a href="{% url 'ndr_core:help_chapter' 'statistics' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i> Help
+            </a>
+        </div>
+    </div>
 
-        <div class="card bg-light mb-3" style="max-height: 50vh;">
-            <div class="overflow-auto">
-                <div class="card-body">
-                    {% if statistics_enabled %}
+    <div class="card bg-light mb-3" style="max-height: 50vh;">
+        <div class="overflow-auto">
+            <div class="card-body">
+                {% if statistics_enabled %}
                         <h5 class="card-title">Summary</h5>
                         <p>Every time a user searches for something, the search term is logged.</p>
                         <div class="container">
@@ -96,8 +91,7 @@
                             before enabling this feature when your site expects a lot of traffic.
                         </div>
                         No information is logged, when a user performs a search.
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>

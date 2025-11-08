@@ -1,3 +1,8 @@
+/* Admin container width override - wider than default Bootstrap (1600px vs 1140px) */
+.container {
+    max-width: 1600px;
+}
+
 /* to display color palettes in admin interface */
 .palette-display {
     min-width: 15px;

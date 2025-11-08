@@ -4,129 +4,101 @@
 
 {% block content %}
     <h2><i class="fa-regular fa-file"></i> Manage Pages</h2>
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    <a href="{% url 'ndr_core:create_page' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-file"></i> Create New Page
-                    </a>
-                    <a href="{% url 'ndr_core:page_footer' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-window-minimize"></i> Manage Page Footer
-                    </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'pages' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i> Help
-                    </a>
-                </div>
-            </div>
+
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            <a href="{% url 'ndr_core:configure_pages' %}" class="btn btn-sm btn-primary m-1{% if not footer_form and not not_found_form %} active{% endif %}">
+                <i class="fa-regular fa-list"></i> Manage Pages
+            </a>
+            <a href="{% url 'ndr_core:create_page' %}" class="btn btn-sm btn-secondary m-1">
+                <i class="fa-regular fa-file"></i> Create Page
+            </a>
+            <a href="{% url 'ndr_core:page_footer' %}" class="btn btn-sm btn-primary m-1{% if footer_form %} active{% endif %}">
+                <i class="fa-regular fa-window-minimize"></i> Manage Footer
+            </a>
         </div>
-
-        <div class="card bg-light mb-3" style="max-height: 50vh;">
-            <div class="overflow-auto">
-                <div class="card-body">
-                    <h5 class="card-title">Configured Pages</h5>
-                    <ul class="list-group">
-                        {% for page in pages %}
-                            <li class="list-group-item list-group-item-action d-flex py-2{% if request.resolver_match.kwargs.pk == page.pk %} bg-selected {% endif%}">
-                                <p class="p-0 m-0 flex-grow-1">
-                                    <i class="fa-regular fa-file"></i>
-                                    <a href="{% url 'ndr_core:view_page' page.pk %}">{{ page.name }}</a> <small>(Nav: {{ page.label }})</small><br/>
-                                    <small>Type: {{ page.get_page_type_display }}, URL: {{ page.url }} </small>
-                                </p>
-
-                                <p class="p-0 m-0">
-                                    <div style="white-space: nowrap;">
-                                        {% if not forloop.first %}
-                                            <a href="{% url 'ndr_core:move_page_up' page.pk %}" class="btn btn-sm btn-secondary">
-                                               <i class="fa-regular fa-arrow-up"></i>
-                                            </a>
-                                        {% endif %}
-                                        <a href="{% url 'ndr_core:edit_page' page.pk %}" class="btn btn-sm btn-secondary">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </a>
-                                        {% if not page.view_name == 'index' %}
-                                            <a href="{% url 'ndr_core:delete_page' page.pk %}" class="btn btn-sm btn-danger">
-                                                <i class="fa-regular fa-delete-left"></i>
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                </p>
-                            </li>
-                            {% for sub_page in page.ndrcorepage_set.all|dictsort:"index" %}
-                                <li class="list-group-item list-group-item-action d-flex pl-5 py-2{% if request.resolver_match.kwargs.pk == sub_page.pk %} bg-selected {% endif%}">
-                                    <p class="p-0 m-0 flex-grow-1">
-                                        <a href="{% url 'ndr_core:view_page' sub_page.pk %}">{{ sub_page.name }}</a> <small>(Nav: {{ page.label }} -> {{ sub_page.label }})</small><br/>
-                                    </p>
-                                </li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-               </div>
-            </div>
+        <div>
+            <a href="{% url 'ndr_core:help_chapter' 'pages' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i> Help
+            </a>
         </div>
     </div>
 
-    {% if object %}
+    {% if not footer_form and not not_found_form %}
         <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">{{ object.label }}</h5>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-2">Navigation Label</div>
-                        <div class="col">{{ object.label }} <small>(This is displayed as the page's navigation label)</small></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">Page Name</div>
-                        <div class="col">{{ object.name }} <small>(This name is displayed as the page's Title)</small></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">Page Type</div>
-                        <div class="col">{{ object.get_page_type_display }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">Page URL</div>
-                        <div class="col">{{ object.url }} <small>(The chosen view name is part of the URL)</small></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">Sub Pages</div>
-                        <div class="col">
-                            <ul class="list-group">
-                            {% for sub_page in object.ndrcorepage_set.all %}
-                                <li class="list-group-item list-group-item-action d-flex ml-2 py-2{% if request.resolver_match.kwargs.pk == sub_page.pk %} bg-selected {% endif%}">
-                                    <p class="p-0 m-0 flex-grow-1">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 25%;">Page Name</th>
+                                <th style="width: 20%;">Navigation Label</th>
+                                <th style="width: 15%;">Type</th>
+                                <th style="width: 20%;">URL</th>
+                                <th style="width: 20%;" class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for page in pages %}
+                                <tr>
+                                    <td>
                                         <i class="fa-regular fa-file"></i>
-                                        <a href="{% url 'ndr_core:view_page' sub_page.pk %}">{{ sub_page.name }}</a> <small>(Nav: {{ page.label }} -> {{ sub_page.label }})</small><br/>
-                                        <small>Type: {{ sub_page.get_page_type_display }}, URL: {{ sub_page.url }} </small>
-                                    </p>
-
-                                    <p class="p-0 m-0">
+                                        <strong>{{ page.name }}</strong>
+                                    </td>
+                                    <td>{{ page.label }}</td>
+                                    <td><span class="badge badge-secondary">{{ page.get_page_type_display }}</span></td>
+                                    <td><small><code>{{ page.url }}</code></small></td>
+                                    <td class="text-right">
                                         <div style="white-space: nowrap;">
-                                            <a href="{% url 'ndr_core:move_page_up' sub_page.pk %}" class="btn btn-sm btn-secondary">
-                                               <i class="fa-regular fa-arrow-up"></i>
-                                            </a>
-                                            <a href="{% url 'ndr_core:edit_page' sub_page.pk %}" class="btn btn-sm btn-secondary">
+                                            {% if not forloop.first %}
+                                                <a href="{% url 'ndr_core:move_page_up' page.pk %}" class="btn btn-sm btn-secondary" title="Move Up">
+                                                    <i class="fa-regular fa-arrow-up"></i>
+                                                </a>
+                                            {% endif %}
+                                            <a href="{% url 'ndr_core:edit_page' page.pk %}" class="btn btn-sm btn-secondary" title="Edit">
                                                 <i class="fa-regular fa-pen-to-square"></i>
                                             </a>
-                                            {% if not sub_page.view_name == 'index' %}
-                                                <a href="{% url 'ndr_core:delete_page' sub_page.pk %}" class="btn btn-sm btn-danger">
+                                            {% if not page.view_name == 'index' %}
+                                                <a href="{% url 'ndr_core:delete_page' page.pk %}" class="btn btn-sm btn-danger" title="Delete">
                                                     <i class="fa-regular fa-delete-left"></i>
                                                 </a>
                                             {% endif %}
                                         </div>
-                                    </p>
-                                </li>
+                                    </td>
+                                </tr>
+                                {% for sub_page in page.ndrcorepage_set.all|dictsort:"index" %}
+                                    <tr class="table-active">
+                                        <td class="pl-5">
+                                            <i class="fa-regular fa-level-down-alt"></i>
+                                            {{ sub_page.name }}
+                                        </td>
+                                        <td>{{ page.label }} → {{ sub_page.label }}</td>
+                                        <td><span class="badge badge-light">{{ sub_page.get_page_type_display }}</span></td>
+                                        <td><small><code>{{ sub_page.url }}</code></small></td>
+                                        <td class="text-right">
+                                            <div style="white-space: nowrap;">
+                                                {% if not forloop.first %}
+                                                    <a href="{% url 'ndr_core:move_page_up' sub_page.pk %}" class="btn btn-sm btn-secondary" title="Move Up">
+                                                        <i class="fa-regular fa-arrow-up"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'ndr_core:edit_page' sub_page.pk %}" class="btn btn-sm btn-secondary" title="Edit">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </a>
+                                                {% if not sub_page.view_name == 'index' %}
+                                                    <a href="{% url 'ndr_core:delete_page' sub_page.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                                        <i class="fa-regular fa-delete-left"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'ndr_core:edit_page' object.pk %}" class="btn btn-secondary">Edit</a>
-                <a href="{% url 'ndr_core:move_page_up' object.pk %}" class="btn btn-secondary">Move Up</a>
-                <a href="{% url 'ndr_core:delete_page' object.pk %}" class="btn btn-danger">Delete</a>
             </div>
         </div>
     {% endif %}

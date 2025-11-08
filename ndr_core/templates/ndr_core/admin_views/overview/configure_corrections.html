@@ -2,42 +2,38 @@
 
 {% block content %}
     <h2><i class="fa-regular fa-check-double"></i> Manage Corrections</h2>
-    <div class="card-deck">
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Options</h5>
-                <div class="list-group">
-                    {% if correction_enabled %}
-                        <a href="{% url 'ndr_core:set_correction_option' 'false' %}" class="list-group-item list-group-item-action py-2">
-                            <i class="fa-regular fa-toggle-on"></i>
-                            Disable Correction Feature
-                        </a>
-                    {% else %}
-                        <a href="{% url 'ndr_core:set_correction_option' 'true' %}" class="list-group-item list-group-item-action py-2">
-                            <i class="fa-regular fa-toggle-off"></i>
-                            Enable Correction Feature
-                        </a>
-                    {% endif %}
-                    <a href="{% url 'ndr_core:set_correction_option' 'true' %}" class="list-group-item list-group-item-action py-2">
-                            <i class="fa-regular fa-file-export"></i>
-                            Export All Corrections To TSV
-                        </a>
-                    <a href="{% url 'ndr_core:help_chapter' 'corrections' %}" class="list-group-item list-group-item-action py-2">
-                        <i class="fa-regular fa-circle-info"></i>
-                        Help
-                    </a>
-                </div>
-                <p></p>
-                <h5 class="card-title">Settings</h5>
-                The correction Option is {% if correction_enabled %}<strong class="text-success">enabled</strong>{% else %}<strong class="text-danger">disabled</strong>{% endif %}.
-            </div>
-        </div>
 
-        <div class="card bg-light mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Open Suggestions</h5>
-                <ul class="list-group">
-                    {% for api in apis %}
+    <!-- Options Bar -->
+    <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+        <div class="mr-auto">
+            {% if correction_enabled %}
+                <a href="{% url 'ndr_core:set_correction_option' 'false' %}" class="btn btn-sm btn-warning m-1">
+                    <i class="fa-regular fa-toggle-on"></i> Disable Corrections
+                </a>
+            {% else %}
+                <a href="{% url 'ndr_core:set_correction_option' 'true' %}" class="btn btn-sm btn-success m-1">
+                    <i class="fa-regular fa-toggle-off"></i> Enable Corrections
+                </a>
+            {% endif %}
+            <a href="{% url 'ndr_core:set_correction_option' 'true' %}" class="btn btn-sm btn-secondary m-1">
+                <i class="fa-regular fa-file-export"></i> Export to TSV
+            </a>
+        </div>
+        <div>
+            <span class="mr-2">
+                Status: {% if correction_enabled %}<strong class="text-success">Enabled</strong>{% else %}<strong class="text-danger">Disabled</strong>{% endif %}
+            </span>
+            <a href="{% url 'ndr_core:help_chapter' 'corrections' %}" class="btn btn-sm btn-outline-secondary m-1">
+                <i class="fa-regular fa-circle-info"></i> Help
+            </a>
+        </div>
+    </div>
+
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Open Suggestions</h5>
+            <ul class="list-group">
+                {% for api in apis %}
                         <li class="list-group-item list-group-item-action d-flex py-2">
                             <p class="p-0 m-0 flex-grow-1">
                                 <i class="fa-regular fa-code"></i> {{ api.api_label }} ({{ api.api_name }})
@@ -52,9 +48,8 @@
                                 </a>
                             </p>
                         </li>
-                    {% endfor %}
-                </ul>
-            </div>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 
