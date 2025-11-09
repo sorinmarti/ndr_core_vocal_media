@@ -4,47 +4,8 @@
 
 {% block extra_css %}
 <style>
-    /* Constrain image picker thumbnail sizes */
-    ul.thumbnails.image_picker_selector li .thumbnail {
-        width: 150px;
-        height: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    ul.thumbnails.image_picker_selector li .thumbnail img {
-        max-width: 138px;
-        max-height: 138px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-    }
-
-    ul.thumbnails.image_picker_selector li {
-        display: inline-block;
-        float: left;
-    }
-
-    /* Hide the original select dropdown */
-    select.image-picker {
-        display: none !important;
-    }
-
-    /* Style for current selection preview */
-    .current-selection {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .current-selection img {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 4px;
-    }
-
+    {% include 'ndr_core/admin_views/includes/image_picker_init_css.html' %}
+<style>
     /* Formset item styling */
     .formset-item {
         border: 1px solid #dee2e6;
@@ -139,42 +100,34 @@
 
 {% block page_js %}
     <script>
-        $(document).ready(function() {
-            initializeImagePickers();
-        });
-
+                // Re-initialize image pickers for dynamically added formset items
+        // Initial page load initialization is handled by the included template
         function initializeImagePickers() {
-            // Initialize image picker for all image selection fields
-            $('select.image-picker').each(function() {
-                if (!$(this).data('image-picker-initialized')) {
-                    $(this).imagepicker({
-                        hide_select: false,
-                        show_label: false,
-                    });
-                    $(this).data('image-picker-initialized', true);
-                }
-            });
-
-            // Make the image picker grids collapsible
+            // Initialize image picker for any new select elements
             $('select.image-picker').each(function() {
                 var $select = $(this);
 
-                // Skip if already has browse button
+                // Skip if already has browse button (already initialized)
                 if ($select.siblings('.browse-images-btn').length > 0) {
                     return;
                 }
 
+                // Initialize the plugin
+                $select.imagepicker({
+                    hide_select: false,
+                    show_label: false,
+                });
+
+                // Add collapsible grid
                 var $grid = $select.siblings('.image_picker_selector');
                 $grid.hide();
 
                 var $toggleBtn = $('<button type="button" class="btn btn-sm btn-outline-secondary mt-2 mb-2 browse-images-btn">' +
                     '<i class="fa fa-images"></i> Browse Images</button>');
-
                 $select.after($toggleBtn);
 
                 $toggleBtn.on('click', function(e) {
                     e.preventDefault();
-
                     if ($grid.is(':visible')) {
                         $grid.slideUp();
                         $toggleBtn.html('<i class="fa fa-images"></i> Browse Images');
@@ -185,35 +138,30 @@
                         $toggleBtn.html('<i class="fa fa-times"></i> Close');
                     }
                 });
-            });
 
-            // Show selected image info
-            $('select.image-picker').off('change.imagepicker').on('change.imagepicker', function() {
-                var $select = $(this);
-                var selectedOptions = $select.find('option:selected');
-
-                if (selectedOptions.length > 0 && selectedOptions.val()) {
-                    var $preview = $select.siblings('.current-selection');
-                    if ($preview.length === 0) {
-                        $preview = $('<div class="current-selection mt-2 p-2 border rounded bg-white"></div>');
-                        $select.before($preview);
+                // Add change handler
+                $select.on('change', function() {
+                    var selectedOptions = $select.find('option:selected');
+                    if (selectedOptions.length > 0 && selectedOptions.val()) {
+                        var $preview = $select.siblings('.current-selection');
+                        if ($preview.length === 0) {
+                            $preview = $('<div class="current-selection mt-2 p-2 border rounded bg-white"></div>');
+                            $select.before($preview);
+                        }
+                        var imgSrc = selectedOptions.attr('data-img-src');
+                        var imgLabel = selectedOptions.attr('data-img-label');
+                        if (imgSrc) {
+                            $preview.html('<strong>Selected:</strong> ' + imgLabel +
+                                '<img src="' + imgSrc + '" style="max-height: 60px; margin-left: 10px;">');
+                        }
+                    } else {
+                        $select.siblings('.current-selection').remove();
                     }
-
-                    var imgSrc = selectedOptions.attr('data-img-src');
-                    var imgLabel = selectedOptions.attr('data-img-label');
-                    if (imgSrc) {
-                        var previewHtml = '<strong>Selected:</strong> ' + imgLabel +
-                            '<img src="' + imgSrc + '" style="max-height: 60px; margin-left: 10px;">';
-                        $preview.html(previewHtml);
-                    }
-                } else {
-                    $select.siblings('.current-selection').remove();
-                }
+                });
             });
-
-            // Trigger change for pre-selected values
-            $('select.image-picker').trigger('change.imagepicker');
         }
+
+
 
         function deleteFormsetItem(btn) {
             var $item = $(btn).closest('.formset-item');
