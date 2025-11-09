@@ -1,0 +1,140 @@
+"""Forms for Data Object UI Element type."""
+from crispy_forms.layout import Layout, Row, Column, HTML
+from django import forms
+
+from ndr_core.admin_forms.admin_forms import get_form_buttons
+from ndr_core.models import (NdrCoreUIElement, NdrCoreUiElementItem,
+                              NdrCoreSearchConfiguration, NdrCoreResultField)
+from .base_forms import BaseUIElementForm
+
+
+class DataObjectForm(BaseUIElementForm):
+    """Form for Data Object UI Element - fetches and displays a single database item."""
+
+    # Data Object-specific fields (single item)
+    search_configuration = forms.ModelChoiceField(
+        queryset=NdrCoreSearchConfiguration.objects.all(),
+        required=False,
+        label='Search Configuration',
+        help_text='Search configuration to fetch data from'
+    )
+    object_id = forms.CharField(
+        max_length=100,
+        required=False,
+        label='Object ID',
+        help_text='ID of the object to fetch from the API'
+    )
+    result_field = forms.ModelChoiceField(
+        queryset=NdrCoreResultField.objects.all(),
+        required=False,
+        label='Result Field',
+        help_text='Result field to use for rendering this data object'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, ui_element_type='data_object', **kwargs)
+
+    def save(self, commit=True):
+        """Save the Data Object UI Element and its single item."""
+        instance = super().save(commit=commit)
+
+        if commit:
+            # Delete existing items and create a new one
+            instance.ndrcoreuielementitem_set.all().delete()
+
+            # Create the data object item
+            NdrCoreUiElementItem.objects.create(
+                belongs_to=instance,
+                order_idx=0,
+                search_configuration=self.cleaned_data.get('search_configuration'),
+                object_id=self.cleaned_data.get('object_id', ''),
+                result_field=self.cleaned_data.get('result_field')
+            )
+
+        return instance
+
+    @property
+    def helper(self):
+        """Creates and returns the form helper property."""
+        helper = self.get_base_helper()
+        layout = helper.layout
+
+        # Info section
+        self.add_info_section(
+            layout,
+            'Data Object UI Element',
+            'A Data Object fetches and displays a single item from your configured APIs. '
+            'Specify the search configuration (API), object ID, and result field (how to display it).'
+        )
+
+        # Name and Label fields
+        self.add_field_row(layout, 'name', 'label', col_class='col-md-6')
+
+        # Data Object content section
+        layout.append(Row(
+            Column(HTML('<h5 class="mt-3 mb-3">Data Object Configuration</h5>'), css_class='col-12'),
+            css_class='form-row'
+        ))
+
+        self.add_field_row(layout, 'search_configuration', col_class='col-md-6')
+        self.add_field_row(layout, 'object_id', col_class='col-md-6')
+        self.add_field_row(layout, 'result_field', col_class='col-md-6')
+
+        return helper
+
+
+class DataObjectCreateForm(DataObjectForm):
+    """Form to create a new Data Object UI Element."""
+
+    @property
+    def helper(self):
+        helper = super().helper
+        helper.layout.append(get_form_buttons('Create Data Object'))
+        return helper
+
+
+class DataObjectEditForm(DataObjectForm):
+    """Form to edit an existing Data Object UI Element."""
+
+    def __init__(self, *args, **kwargs):
+        # Store original name for rename detection
+        self._original_name = kwargs['instance'].name if 'instance' in kwargs else None
+        super().__init__(*args, **kwargs)
+
+        # Update help text to indicate renaming is possible
+        self.fields['name'].help_text = 'Unique slug/identifier. Can be changed - renaming will preserve all settings.'
+
+        # Populate form fields with existing item data
+        if self.instance and self.instance.pk:
+            items = self.instance.items()
+            if items:
+                item = items[0]  # Data Object only has one item
+                self.fields['search_configuration'].initial = item.search_configuration
+                self.fields['object_id'].initial = item.object_id
+                self.fields['result_field'].initial = item.result_field
+
+    def save(self, commit=True):
+        """Save with special handling for name changes (PK changes)."""
+        # Check if name was changed
+        name_changed = self._original_name and self._original_name != self.cleaned_data.get('name')
+
+        if name_changed and commit:
+            # Handle rename: The new instance will be created, we need to delete the old one
+            old_instance = NdrCoreUIElement.objects.get(name=self._original_name)
+
+            # Call parent save to create new instance with new name
+            new_instance = super().save(commit=True)
+
+            # Delete old instance (the new one already has the correct data from the form)
+            old_instance.delete()
+
+            return new_instance
+        else:
+            # Normal save
+            return super().save(commit=commit)
+
+    @property
+    def helper(self):
+        helper = super().helper
+        helper.layout.append(get_form_buttons('Save Data Object'))
+        return helper

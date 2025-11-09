@@ -1,33 +1,45 @@
-"""Views for the UI Element admin pages. """
+"""Views for the UI Element admin pages."""
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 
-from ndr_core.admin_forms.ui_element_forms import (
-    UIElementCreateForm,
-    UIElementEditForm
+from ndr_core.admin_forms.ui_element_types import (
+    CardCreateForm, CardEditForm,
+    JumbotronCreateForm, JumbotronEditForm,
+    BannerCreateForm, BannerEditForm,
+    IFrameCreateForm, IFrameEditForm,
+    ManifestViewerCreateForm, ManifestViewerEditForm,
+    SlidesCreateForm, SlidesEditForm,
+    CarouselCreateForm, CarouselEditForm,
+    DataObjectCreateForm, DataObjectEditForm,
 )
+from ndr_core.admin_forms.ui_element_types.slides_forms import SlidesItemFormSet
+from ndr_core.admin_forms.ui_element_types.carousel_forms import CarouselItemFormSet
 from ndr_core.admin_views.admin_views import AdminViewMixin
-from ndr_core.models import NdrCoreUIElement, NdrCoreUiElementItem, NdrCoreImage
+from ndr_core.models import NdrCoreUIElement, NdrCoreImage
 
 
 class ConfigureUIElements(AdminViewMixin, LoginRequiredMixin, View):
-    """View to add/edit/delete UI Elements. """
+    """View to manage UI Elements list."""
 
     def get(self, request, *args, **kwargs):
-        """GET request for this view. """
-
         context = {'ui_elements': NdrCoreUIElement.objects.all()}
-
         return render(self.request, template_name='ndr_core/admin_views/overview/configure_ui_elements.html',
                       context=context)
 
 
+class UIElementShowcaseView(AdminViewMixin, LoginRequiredMixin, View):
+    """View to display UI Element types gallery."""
+
+    def get(self, request, *args, **kwargs):
+        return render(self.request, template_name='ndr_core/admin_views/overview/ui_element_showcase.html')
+
+
 class UIElementDetailView(AdminViewMixin, LoginRequiredMixin, DetailView):
-    """TODO """
+    """View to display a single UI Element with preview."""
 
     model = NdrCoreUIElement
     template_name = 'ndr_core/admin_views/overview/configure_ui_elements.html'
@@ -38,182 +50,260 @@ class UIElementDetailView(AdminViewMixin, LoginRequiredMixin, DetailView):
         return context
 
 
-class UIElementCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
-    """ View to create a new NdrCoreUIElement """
-
-    model = NdrCoreUIElement
-    success_url = reverse_lazy('ndr_core:configure_ui_elements')
-    template_name = 'ndr_core/admin_views/create/ui_element_create.html'
-    form_class = UIElementCreateForm
-
-    def form_valid(self, form):
-        # Creates object and returns HttpResponse
-        response = super().form_valid(form)
-
-        ui_element_type = form.cleaned_data['type']
-
-        if ui_element_type == "card":
-            # These are the types that have ONE item.
-            card_item = NdrCoreUiElementItem.objects.create(belongs_to=self.object,
-                                                            ndr_image=form.cleaned_data['item_0_ndr_card_image'],
-                                                            title=form.cleaned_data['item_0_title'],
-                                                            text=form.cleaned_data['item_0_text'],
-                                                            url=form.cleaned_data['item_0_url'],
-                                                            order_idx=0)
-            card_item.save()
-        elif ui_element_type == "banner":
-            # These are the types that have ONE item.
-            banner_item = NdrCoreUiElementItem.objects.create(belongs_to=self.object,
-                                                              ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
-                                                              order_idx=0)
-            banner_item.save()
-        elif ui_element_type == "iframe":
-            # These are the types that have ONE item.
-            iframe_item = NdrCoreUiElementItem.objects.create(belongs_to=self.object,
-                                                              text=form.cleaned_data['item_0_text'],
-                                                              order_idx=0)
-            iframe_item.save()
-        elif ui_element_type == "jumbotron":
-            # These are the types that have ONE item.
-            jumbotron_item = NdrCoreUiElementItem.objects.create(belongs_to=self.object,
-                                                                 ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
-                                                                 title=form.cleaned_data['item_0_title'],
-                                                                 text=form.cleaned_data['item_0_text'],
-                                                                 url=form.cleaned_data['item_0_url'],
-                                                                 order_idx=0)
-            jumbotron_item.save()
-        elif ui_element_type == "manifest_viewer":
-            # These are the types that have ONE item.
-            manifest_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                manifest_group=form.cleaned_data['item_0_manifest_group'],
-                order_idx=0)
-            manifest_item.save()
-        elif ui_element_type == "data_object":
-            # Data object type can have multiple items
-            for x in range(0, 10):
-                search_config = form.cleaned_data.get(f'item_{x}_search_configuration')
-                object_id = form.cleaned_data.get(f'item_{x}_object_id')
-
-                # Only create item if search_configuration and object_id are provided
-                if search_config and object_id:
-                    data_item = NdrCoreUiElementItem.objects.create(
-                        belongs_to=self.object,
-                        search_configuration=search_config,
-                        object_id=object_id,
-                        result_field=form.cleaned_data.get(f'item_{x}_result_field'),
-                        order_idx=x)
-                    data_item.save()
-        elif ui_element_type in ["slides", "carousel"]:
-            # These are the types that have MULTIPLE items.
-            for x in range(0, 10):
-                if form.cleaned_data[f'item_{x}_ndr_slide_image'] is not None:
-                    slide_item = NdrCoreUiElementItem.objects.create(belongs_to=self.object,
-                                                                     ndr_image=form.cleaned_data[f'item_{x}_ndr_slide_image'],
-                                                                     title=form.cleaned_data[f'item_{x}_title'],
-                                                                     text=form.cleaned_data[f'item_{x}_text'],
-                                                                     url=form.cleaned_data[f'item_{x}_url'],
-                                                                     order_idx=x)
-                    slide_item.save()
-                else:
-                    pass
-
-        return response
-
-
-class UIElementEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
-    """ View to edit an existing NdrCoreUIElement """
-
-    model = NdrCoreUIElement
-    success_url = reverse_lazy('ndr_core:configure_ui_elements')
-    template_name = 'ndr_core/admin_views/edit/ui_element_edit.html'
-    form_class = UIElementEditForm
-
-    def form_valid(self, form):
-        # Update the UIElement object
-        response = super().form_valid(form)
-
-        ui_element_type = form.cleaned_data['type']
-
-        # Delete existing items and recreate them
-        NdrCoreUiElementItem.objects.filter(belongs_to=self.object).delete()
-
-        # Recreate items based on type (same logic as create)
-        if ui_element_type == "card":
-            card_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                ndr_image=form.cleaned_data['item_0_ndr_card_image'],
-                title=form.cleaned_data['item_0_title'],
-                text=form.cleaned_data['item_0_text'],
-                url=form.cleaned_data['item_0_url'],
-                order_idx=0)
-            card_item.save()
-        elif ui_element_type == "banner":
-            banner_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
-                order_idx=0)
-            banner_item.save()
-        elif ui_element_type == "iframe":
-            iframe_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                text=form.cleaned_data['item_0_text'],
-                order_idx=0)
-            iframe_item.save()
-        elif ui_element_type == "jumbotron":
-            jumbotron_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                ndr_image=form.cleaned_data['item_0_ndr_banner_image'],
-                title=form.cleaned_data['item_0_title'],
-                text=form.cleaned_data['item_0_text'],
-                url=form.cleaned_data['item_0_url'],
-                order_idx=0)
-            jumbotron_item.save()
-        elif ui_element_type == "manifest_viewer":
-            manifest_item = NdrCoreUiElementItem.objects.create(
-                belongs_to=self.object,
-                manifest_group=form.cleaned_data['item_0_manifest_group'],
-                order_idx=0)
-            manifest_item.save()
-        elif ui_element_type == "data_object":
-            for x in range(0, 10):
-                search_config = form.cleaned_data.get(f'item_{x}_search_configuration')
-                object_id = form.cleaned_data.get(f'item_{x}_object_id')
-
-                if search_config and object_id:
-                    data_item = NdrCoreUiElementItem.objects.create(
-                        belongs_to=self.object,
-                        search_configuration=search_config,
-                        object_id=object_id,
-                        result_field=form.cleaned_data.get(f'item_{x}_result_field'),
-                        order_idx=x)
-                    data_item.save()
-        elif ui_element_type in ["slides", "carousel"]:
-            for x in range(0, 10):
-                if form.cleaned_data[f'item_{x}_ndr_slide_image'] is not None:
-                    slide_item = NdrCoreUiElementItem.objects.create(
-                        belongs_to=self.object,
-                        ndr_image=form.cleaned_data[f'item_{x}_ndr_slide_image'],
-                        title=form.cleaned_data[f'item_{x}_title'],
-                        text=form.cleaned_data[f'item_{x}_text'],
-                        url=form.cleaned_data[f'item_{x}_url'],
-                        order_idx=x)
-                    slide_item.save()
-
-        return response
-
-
 class UIElementDeleteView(AdminViewMixin, LoginRequiredMixin, DeleteView):
-    """ View to delete an NdrCoreUIElement from the database. """
+    """View to delete a UI Element (works for all types)."""
 
     model = NdrCoreUIElement
     success_url = reverse_lazy('ndr_core:configure_ui_elements')
     template_name = 'ndr_core/admin_views/delete/ui_element_confirm_delete.html'
 
 
-def get_ndr_image_path(request, pk):
-    """Returns the path to an image. """
+# ============================================================================
+# Single-Item Type Views (Card, Jumbotron, Banner, IFrame, Manifest Viewer)
+# ============================================================================
 
+class CardCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Card UI Element."""
+    model = NdrCoreUIElement
+    form_class = CardCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_card_create.html'
+
+
+class CardEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Card UI Element."""
+    model = NdrCoreUIElement
+    form_class = CardEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_card_edit.html'
+
+
+class JumbotronCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Jumbotron UI Element."""
+    model = NdrCoreUIElement
+    form_class = JumbotronCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_jumbotron_create.html'
+
+
+class JumbotronEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Jumbotron UI Element."""
+    model = NdrCoreUIElement
+    form_class = JumbotronEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_jumbotron_edit.html'
+
+
+class BannerCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Banner UI Element."""
+    model = NdrCoreUIElement
+    form_class = BannerCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_banner_create.html'
+
+
+class BannerEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Banner UI Element."""
+    model = NdrCoreUIElement
+    form_class = BannerEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_banner_edit.html'
+
+
+class IFrameCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new IFrame UI Element."""
+    model = NdrCoreUIElement
+    form_class = IFrameCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_iframe_create.html'
+
+
+class IFrameEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing IFrame UI Element."""
+    model = NdrCoreUIElement
+    form_class = IFrameEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_iframe_edit.html'
+
+
+class ManifestViewerCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Manifest Viewer UI Element."""
+    model = NdrCoreUIElement
+    form_class = ManifestViewerCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_manifest_viewer_create.html'
+
+
+class ManifestViewerEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Manifest Viewer UI Element."""
+    model = NdrCoreUIElement
+    form_class = ManifestViewerEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_manifest_viewer_edit.html'
+
+
+# ============================================================================
+# Multi-Item Type Views (Slides, Carousel, Data Object)
+# ============================================================================
+
+class SlidesCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Slides UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = SlidesCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_slides_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = SlidesItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = SlidesItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class SlidesEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Slides UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = SlidesEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_slides_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = SlidesItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = SlidesItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+
+            # Check if this was a rename operation (name is PK)
+            old_instance_to_delete = getattr(self.object, '_old_instance_to_delete', None)
+            if old_instance_to_delete:
+                # Clear PKs from formset items so they're created fresh on the new instance
+                for formset_form in formset.forms:
+                    if formset_form.instance.pk:
+                        formset_form.instance.pk = None
+
+            formset.instance = self.object
+            formset.save()
+
+            # Delete old instance after formset is saved
+            if old_instance_to_delete:
+                old_instance_to_delete.delete()
+
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class CarouselCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Carousel UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = CarouselCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_carousel_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = CarouselItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = CarouselItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class CarouselEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Carousel UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = CarouselEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_carousel_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = CarouselItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = CarouselItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+
+            # Check if this was a rename operation (name is PK)
+            old_instance_to_delete = getattr(self.object, '_old_instance_to_delete', None)
+            if old_instance_to_delete:
+                # Clear PKs from formset items so they're created fresh on the new instance
+                for formset_form in formset.forms:
+                    if formset_form.instance.pk:
+                        formset_form.instance.pk = None
+
+            formset.instance = self.object
+            formset.save()
+
+            # Delete old instance after formset is saved
+            if old_instance_to_delete:
+                old_instance_to_delete.delete()
+
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class DataObjectCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Data Object UI Element."""
+    model = NdrCoreUIElement
+    form_class = DataObjectCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_data_object_create.html'
+
+
+class DataObjectEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Data Object UI Element."""
+    model = NdrCoreUIElement
+    form_class = DataObjectEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_data_object_edit.html'
+
+
+# ============================================================================
+# Helper Functions
+# ============================================================================
+
+def get_ndr_image_path(request, pk):
+    """Returns the path to an image."""
     try:
         ndr_image = NdrCoreImage.objects.get(pk=pk)
         return HttpResponse(ndr_image.image.url)

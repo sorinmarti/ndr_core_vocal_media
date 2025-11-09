@@ -103,10 +103,21 @@ from ndr_core.admin_views.ui_style_views import (
 )
 from ndr_core.admin_views.ui_element_views import (
     ConfigureUIElements,
+    UIElementShowcaseView,
     UIElementDetailView,
-    UIElementCreateView,
-    UIElementEditView,
-    UIElementDeleteView, get_ndr_image_path
+    UIElementDeleteView,
+    # Single-item types
+    CardCreateView, CardEditView,
+    JumbotronCreateView, JumbotronEditView,
+    BannerCreateView, BannerEditView,
+    IFrameCreateView, IFrameEditView,
+    ManifestViewerCreateView, ManifestViewerEditView,
+    # Multi-item types
+    SlidesCreateView, SlidesEditView,
+    CarouselCreateView, CarouselEditView,
+    DataObjectCreateView, DataObjectEditView,
+    # Helper
+    get_ndr_image_path
 )
 from ndr_core.admin_views.messages_views import (
     ConfigureMessages,
@@ -232,10 +243,29 @@ urlpatterns = [
 
     # UI ELEMENTS
     path('configure/ui_elements/', ConfigureUIElements.as_view(), name='configure_ui_elements'),
+    path('configure/ui_elements/showcase/', UIElementShowcaseView.as_view(), name='ui_element_showcase'),
     path('configure/ui_elements/view/<str:pk>/', UIElementDetailView.as_view(), name='view_ui_element'),
-    path('configure/ui_elements/create/new/', UIElementCreateView.as_view(), name='create_ui_element'),
-    path('configure/ui_elements/edit/<str:pk>/', UIElementEditView.as_view(), name='edit_ui_element'),
     path('configure/ui_elements/delete/<str:pk>/', UIElementDeleteView.as_view(), name='delete_ui_element'),
+
+    # Single-item type routes
+    path('configure/ui_elements/create/card/', CardCreateView.as_view(), name='create_ui_element_card'),
+    path('configure/ui_elements/edit/card/<str:pk>/', CardEditView.as_view(), name='edit_ui_element_card'),
+    path('configure/ui_elements/create/jumbotron/', JumbotronCreateView.as_view(), name='create_ui_element_jumbotron'),
+    path('configure/ui_elements/edit/jumbotron/<str:pk>/', JumbotronEditView.as_view(), name='edit_ui_element_jumbotron'),
+    path('configure/ui_elements/create/banner/', BannerCreateView.as_view(), name='create_ui_element_banner'),
+    path('configure/ui_elements/edit/banner/<str:pk>/', BannerEditView.as_view(), name='edit_ui_element_banner'),
+    path('configure/ui_elements/create/iframe/', IFrameCreateView.as_view(), name='create_ui_element_iframe'),
+    path('configure/ui_elements/edit/iframe/<str:pk>/', IFrameEditView.as_view(), name='edit_ui_element_iframe'),
+    path('configure/ui_elements/create/manifest_viewer/', ManifestViewerCreateView.as_view(), name='create_ui_element_manifest_viewer'),
+    path('configure/ui_elements/edit/manifest_viewer/<str:pk>/', ManifestViewerEditView.as_view(), name='edit_ui_element_manifest_viewer'),
+
+    # Multi-item type routes
+    path('configure/ui_elements/create/slides/', SlidesCreateView.as_view(), name='create_ui_element_slides'),
+    path('configure/ui_elements/edit/slides/<str:pk>/', SlidesEditView.as_view(), name='edit_ui_element_slides'),
+    path('configure/ui_elements/create/carousel/', CarouselCreateView.as_view(), name='create_ui_element_carousel'),
+    path('configure/ui_elements/edit/carousel/<str:pk>/', CarouselEditView.as_view(), name='edit_ui_element_carousel'),
+    path('configure/ui_elements/create/data_object/', DataObjectCreateView.as_view(), name='create_ui_element_data_object'),
+    path('configure/ui_elements/edit/data_object/<str:pk>/', DataObjectEditView.as_view(), name='edit_ui_element_data_object'),
 
     # SEARCH CONFIGURATIONS
     path('configure/search/', ConfigureSearch.as_view(), name='configure_search'),

@@ -472,9 +472,11 @@ class TextPreRenderer:
         # Special handling for DATA_OBJECT type
         if element.type == NdrCoreUIElement.UIElementType.DATA_OBJECT:
             try:
-                # Render data objects for each item
-                rendered_items = []
-                for item in element.items():
+                # Render single data object (Data Object is now single-item type)
+                rendered_item = None
+                items = element.items()
+                if items:
+                    item = items[0]  # Get first (and only) item
                     if item.search_configuration and item.object_id and item.result_field:
                         # Fetch data from API
                         api_result = self._fetch_data_object(item.search_configuration, item.object_id)
@@ -487,9 +489,9 @@ class TextPreRenderer:
                             field_content = template_string.get_formatted_string()
                             field_content = template_string.sanitize_html(field_content)
 
-                            rendered_items.append(field_content)
+                            rendered_item = field_content
 
-                context['rendered_items'] = rendered_items
+                context['rendered_item'] = rendered_item
             except Exception as e:
                 error_html = f"<span class='text-danger'>Error fetching data: {e}</span>"
                 return text.replace(f'[[element|{element_name}]]', error_html)

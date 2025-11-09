@@ -21,10 +21,15 @@ class ImagePickerWidget(Select):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value:
             try:
-                image = NdrCoreImage.objects.get(pk=value)
-                option['attrs']['data-img-src'] = image.image.url
-                option['attrs']['data-img-label'] = image.alt_text or 'Image'
-            except NdrCoreImage.DoesNotExist:
+                # Extract the actual value from ModelChoiceIteratorValue if needed
+                actual_value = value.value if hasattr(value, 'value') else value
+
+                # Skip if it's not a valid ID
+                if actual_value and actual_value != '':
+                    image = NdrCoreImage.objects.get(pk=actual_value)
+                    option['attrs']['data-img-src'] = image.image.url
+                    option['attrs']['data-img-label'] = image.alt_text or 'Image'
+            except (NdrCoreImage.DoesNotExist, ValueError, TypeError):
                 pass
         return option
 
@@ -41,10 +46,15 @@ class ImagePickerMultipleWidget(SelectMultiple):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value:
             try:
-                image = NdrCoreImage.objects.get(pk=value)
-                option['attrs']['data-img-src'] = image.image.url
-                option['attrs']['data-img-label'] = image.alt_text or 'Image'
-            except NdrCoreImage.DoesNotExist:
+                # Extract the actual value from ModelChoiceIteratorValue if needed
+                actual_value = value.value if hasattr(value, 'value') else value
+
+                # Skip if it's not a valid ID
+                if actual_value and actual_value != '':
+                    image = NdrCoreImage.objects.get(pk=actual_value)
+                    option['attrs']['data-img-src'] = image.image.url
+                    option['attrs']['data-img-label'] = image.alt_text or 'Image'
+            except (NdrCoreImage.DoesNotExist, ValueError, TypeError):
                 pass
         return option
 

@@ -1,0 +1,129 @@
+{% extends 'ndr_core/admin_views/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Constrain image picker thumbnail sizes */
+    ul.thumbnails.image_picker_selector li .thumbnail {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    ul.thumbnails.image_picker_selector li .thumbnail img {
+        max-width: 138px;
+        max-height: 138px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+    ul.thumbnails.image_picker_selector li {
+        display: inline-block;
+        float: left;
+    }
+
+    /* Hide the original select dropdown */
+    select.image-picker {
+        display: none !important;
+    }
+
+    /* Style for current selection preview */
+    .current-selection {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .current-selection img {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h2><i class="fa-regular fa-browser"></i> Create IFrame UI Element</h2>
+
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            {% crispy form %}
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'ndr_core:configure_ui_elements' %}" class="btn btn-secondary">
+            <i class="fa-regular fa-arrow-left"></i> Back to UI Elements
+        </a>
+    </div>
+{% endblock %}
+
+{% block page_js %}
+    <script>
+        $(document).ready(function() {
+            // Initialize image picker for all image selection fields
+            $('select.image-picker').imagepicker({
+                hide_select: false,
+                show_label: false,
+            });
+
+            // Make the image picker grids collapsible
+            $('select.image-picker').each(function() {
+                var $select = $(this);
+                var $grid = $select.siblings('.image_picker_selector');
+                $grid.hide();
+
+                var $toggleBtn = $('<button type="button" class="btn btn-sm btn-outline-secondary mt-2 mb-2 browse-images-btn">' +
+                    '<i class="fa fa-images"></i> Browse Images</button>');
+
+                $select.after($toggleBtn);
+
+                $toggleBtn.on('click', function(e) {
+                    e.preventDefault();
+
+                    if ($grid.is(':visible')) {
+                        $grid.slideUp();
+                        $toggleBtn.html('<i class="fa fa-images"></i> Browse Images');
+                    } else {
+                        $('.image_picker_selector').slideUp();
+                        $('.browse-images-btn').html('<i class="fa fa-images"></i> Browse Images');
+                        $grid.slideDown();
+                        $toggleBtn.html('<i class="fa fa-times"></i> Close');
+                    }
+                });
+            });
+
+            // Show selected image info
+            $('select.image-picker').on('change', function() {
+                var $select = $(this);
+                var selectedOptions = $select.find('option:selected');
+
+                if (selectedOptions.length > 0 && selectedOptions.val()) {
+                    var $preview = $select.siblings('.current-selection');
+                    if ($preview.length === 0) {
+                        $preview = $('<div class="current-selection mt-2 p-2 border rounded bg-white"></div>');
+                        $select.before($preview);
+                    }
+
+                    var imgSrc = selectedOptions.attr('data-img-src');
+                    var imgLabel = selectedOptions.attr('data-img-label');
+                    if (imgSrc) {
+                        var previewHtml = '<strong>Selected:</strong> ' + imgLabel +
+                            '<img src="' + imgSrc + '" style="max-height: 60px; margin-left: 10px;">';
+                        $preview.html(previewHtml);
+                    }
+                } else {
+                    $select.siblings('.current-selection').remove();
+                }
+            });
+
+            // Trigger change for pre-selected values
+            $('select.image-picker').trigger('change');
+        });
+    </script>
+{% endblock %}

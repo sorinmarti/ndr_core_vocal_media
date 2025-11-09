@@ -1344,8 +1344,14 @@ class NdrCoreUIElement(models.Model):
 
     name = models.CharField(primary_key=True,
                             max_length=100,
-                            help_text='Name of the element for your reference.')
-    """Name and primary key of the element. """
+                            help_text='Unique slug/identifier for calling this element via [[element|name]].')
+    """Name and primary key of the element. Used as slug for calling element. """
+
+    label = models.CharField(max_length=200,
+                             blank=True,
+                             default='',
+                             help_text='Descriptive label for display in admin interface.')
+    """Label for display purposes in admin. """
 
     show_indicators = models.BooleanField(default=False,
                                           help_text='Show the indicators for slideshows and carousels?')
