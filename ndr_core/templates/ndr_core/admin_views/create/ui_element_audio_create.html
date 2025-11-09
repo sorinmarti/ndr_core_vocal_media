@@ -1,13 +1,8 @@
 {% extends 'ndr_core/admin_views/base.html' %}
 {% load crispy_forms_tags %}
-{% load static %}
-
-{% block extra_css %}
-{% include 'ndr_core/admin_views/includes/image_picker_init_css.html' %}
-{% endblock %}
 
 {% block content %}
-    <h2><i class="fa-regular fa-book-open"></i> Edit Manifest Viewer UI Element</h2>
+    <h2><i class="fa-regular fa-music"></i> Create Audio Player UI Element</h2>
 
     <div class="card bg-light mb-3">
         <div class="card-body">
@@ -20,8 +15,4 @@
             <i class="fa-regular fa-arrow-left"></i> Back to UI Elements
         </a>
     </div>
-{% endblock %}
-
-{% block page_js %}
-{% include 'ndr_core/admin_views/includes/image_picker_init_js.html' %}
 {% endblock %}

@@ -1,0 +1,33 @@
+<!-- This template renders AUDIO UI elements -->
+{% load i18n %}
+
+<div class="audio-container mb-4">
+    {% if audio_title %}
+        <h4>{{ audio_title }}</h4>
+    {% endif %}
+
+    {% if audio_description %}
+        <p>{{ audio_description }}</p>
+    {% endif %}
+
+    {% if audio_file %}
+        <div class="audio-player">
+            <audio controls style="width: 100%; max-width: 600px;">
+                <source src="{{ audio_file.file.url }}" type="audio/mpeg">
+                <source src="{{ audio_file.file.url }}" type="audio/wav">
+                <source src="{{ audio_file.file.url }}" type="audio/ogg">
+                {% trans "Your browser does not support the audio element." %}
+            </audio>
+        </div>
+
+        {% if audio_file.title %}
+            <p class="text-muted mt-2">
+                <small>{% trans "File" %}: {{ audio_file.title }}</small>
+            </p>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning">
+            {% trans "No audio file specified. Please upload an audio file." %}
+        </div>
+    {% endif %}
+</div>

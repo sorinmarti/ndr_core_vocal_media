@@ -147,6 +147,12 @@
                     {% include 'ndr_core/ui_elements/manifest_viewer.html' with data=object %}
                 {% elif object.type == "data_object" %}
                     {% include 'ndr_core/ui_elements/data_object.html' with data=object %}
+                {% elif object.type == "video" %}
+                    {% include 'ndr_core/ui_elements/video.html' with data=object %}
+                {% elif object.type == "audio" %}
+                    {% include 'ndr_core/ui_elements/audio.html' with data=object %}
+                {% elif object.type == "academic_about" %}
+                    {% include 'ndr_core/ui_elements/academic_about.html' with data=object %}
                 {% endif %}
             </div>
             <div class="card-footer">

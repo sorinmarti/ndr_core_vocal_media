@@ -116,6 +116,10 @@ from ndr_core.admin_views.ui_element_views import (
     SlidesCreateView, SlidesEditView,
     CarouselCreateView, CarouselEditView,
     DataObjectCreateView, DataObjectEditView,
+    # New types
+    VideoCreateView, VideoEditView,
+    AudioCreateView, AudioEditView,
+    AcademicAboutCreateView, AcademicAboutEditView,
     # Helper
     get_ndr_image_path
 )
@@ -266,6 +270,14 @@ urlpatterns = [
     path('configure/ui_elements/edit/carousel/<str:pk>/', CarouselEditView.as_view(), name='edit_ui_element_carousel'),
     path('configure/ui_elements/create/data_object/', DataObjectCreateView.as_view(), name='create_ui_element_data_object'),
     path('configure/ui_elements/edit/data_object/<str:pk>/', DataObjectEditView.as_view(), name='edit_ui_element_data_object'),
+
+    # New UI element types
+    path('configure/ui_elements/create/video/', VideoCreateView.as_view(), name='create_ui_element_video'),
+    path('configure/ui_elements/edit/video/<str:pk>/', VideoEditView.as_view(), name='edit_ui_element_video'),
+    path('configure/ui_elements/create/audio/', AudioCreateView.as_view(), name='create_ui_element_audio'),
+    path('configure/ui_elements/edit/audio/<str:pk>/', AudioEditView.as_view(), name='edit_ui_element_audio'),
+    path('configure/ui_elements/create/academic_about/', AcademicAboutCreateView.as_view(), name='create_ui_element_academic_about'),
+    path('configure/ui_elements/edit/academic_about/<str:pk>/', AcademicAboutEditView.as_view(), name='edit_ui_element_academic_about'),
 
     # SEARCH CONFIGURATIONS
     path('configure/search/', ConfigureSearch.as_view(), name='configure_search'),

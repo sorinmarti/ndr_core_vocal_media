@@ -501,6 +501,37 @@ class TextPreRenderer:
             group_id = element.items().first().manifest_group if element and element.items().exists() else None
             context['manifest_selection_form'] = ManifestSelectionForm(self.request.GET or None, manifest_group=group_id)
 
+        # Special handling for VIDEO type
+        if element.type == NdrCoreUIElement.UIElementType.VIDEO:
+            items = element.items()
+            if items:
+                item = items[0]
+                context['provider'] = item.provider
+                context['video_id'] = item.object_id
+                context['video_title'] = item.title
+                context['video_description'] = item.text
+
+        # Special handling for AUDIO type
+        if element.type == NdrCoreUIElement.UIElementType.AUDIO:
+            items = element.items()
+            if items:
+                item = items[0]
+                context['audio_file'] = item.upload_file
+                context['audio_title'] = item.title
+                context['audio_description'] = item.text
+
+        # Special handling for ACADEMIC_ABOUT type
+        if element.type == NdrCoreUIElement.UIElementType.ACADEMIC_ABOUT:
+            items = element.items()
+            if items:
+                item = items[0]
+                context['profile_image'] = item.ndr_image
+                context['person_name'] = item.title
+                context['title_position'] = item.text
+                context['bio'] = item.rich_text
+                context['website'] = item.url
+                context['orcid_id'] = item.object_id
+
         # Render the template
         try:
             element_html_string = render_to_string(f'ndr_core/ui_elements/{template_name}.html',

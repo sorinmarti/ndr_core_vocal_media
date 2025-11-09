@@ -201,6 +201,75 @@
                 </div>
             </div>
         </div>
+
+        <!-- Video -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'ndr_core/images/admin/ui_elements/video.png' %}"
+                     class="card-img-top"
+                     alt="Video"
+                     style="height: 180px; object-fit: contain; padding: 20px; background: #f8f9fa;"
+                     onerror="this.src='{% static 'ndr_core/images/admin/ui_elements/none.png' %}'">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fa-regular fa-video"></i> Video
+                    </h5>
+                    <p class="card-text flex-grow-1">
+                        Embed videos from YouTube, Vimeo, or SwitchTube. Just enter the video ID
+                        and select the provider for a responsive video player.
+                    </p>
+                    <a href="{% url 'ndr_core:create_ui_element_video' %}" class="btn btn-primary btn-block">
+                        <i class="fa-regular fa-plus-circle"></i> Create Video
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Player -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'ndr_core/images/admin/ui_elements/audio.png' %}"
+                     class="card-img-top"
+                     alt="Audio Player"
+                     style="height: 180px; object-fit: contain; padding: 20px; background: #f8f9fa;"
+                     onerror="this.src='{% static 'ndr_core/images/admin/ui_elements/none.png' %}'">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fa-regular fa-music"></i> Audio Player
+                    </h5>
+                    <p class="card-text flex-grow-1">
+                        Upload and play audio files with a simple HTML5 audio player.
+                        Supports MP3, WAV, and OGG formats.
+                    </p>
+                    <a href="{% url 'ndr_core:create_ui_element_audio' %}" class="btn btn-primary btn-block">
+                        <i class="fa-regular fa-plus-circle"></i> Create Audio Player
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Me -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'ndr_core/images/admin/ui_elements/academic_about.png' %}"
+                     class="card-img-top"
+                     alt="About Me"
+                     style="height: 180px; object-fit: contain; padding: 20px; background: #f8f9fa;"
+                     onerror="this.src='{% static 'ndr_core/images/admin/ui_elements/none.png' %}'">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fa-regular fa-user-graduate"></i> About Me
+                    </h5>
+                    <p class="card-text flex-grow-1">
+                        Professional profile widget with photo, biography, ORCID badge,
+                        and website link. Perfect for researcher, faculty, and personal pages.
+                    </p>
+                    <a href="{% url 'ndr_core:create_ui_element_academic_about' %}" class="btn btn-primary btn-block">
+                        <i class="fa-regular fa-plus-circle"></i> Create About Me
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock %}

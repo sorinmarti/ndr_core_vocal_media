@@ -1336,6 +1336,9 @@ class NdrCoreUIElement(models.Model):
         BANNER = "banner", "Banner"
         MANIFEST_VIEWER = "manifest_viewer", "Manifest Viewer"
         DATA_OBJECT = "data_object", "Data Object"
+        VIDEO = "video", "Video"
+        AUDIO = "audio", "Audio Player"
+        ACADEMIC_ABOUT = "academic_about", "About Me"
 
     type = models.CharField(max_length=100,
                             choices=UIElementType.choices,
@@ -1412,12 +1415,57 @@ class NdrCoreUiElementItem(models.Model, TranslatableMixin):
                                     help_text='Result field to use for rendering the data object')
     """Result field containing the rich_expression to render the data object. """
 
+    rich_text = CKEditor5Field(
+        config_name='page_editor',
+        null=True,
+        blank=True,
+        help_text='Rich formatted text content'
+    )
+    """Rich formatted text content (e.g., for bios, detailed descriptions). """
+
+    upload_file = models.ForeignKey(
+        'NdrCoreUpload',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ui_element_items',
+        help_text='Uploaded file (audio, documents, etc.)'
+    )
+    """Uploaded file reference for audio players and other file-based elements. """
+
+    provider = models.CharField(
+        max_length=50,
+        blank=True,
+        default='',
+        help_text='Provider type (youtube, vimeo, switchtube, etc.)'
+    )
+    """Provider type for video embeds and social media widgets. """
+
+    translatable_fields = ['title', 'text', 'rich_text']
+    """Fields which are translatable for this model. """
+
     def __getattribute__(self, item):
         """Returns the translated field for a given language. If no translation exists,
         the default value is returned. """
-        if item in ['title', 'text']:
+        if item in ['title', 'text', 'rich_text']:
             return self.translated_field(super().__getattribute__(item), item, str(self.pk))
         return super().__getattribute__(item)
+
+    def translated_rich_text(self):
+        """Get translated version of rich_text field."""
+        from django.utils.translation import get_language
+        try:
+            translation = NdrCoreRichTextTranslation.objects.get(
+                language=get_language(),
+                table_name='ndrcoreuielementitem',
+                field_name='rich_text',
+                object_id=str(self.id)
+            )
+            if translation.translation:
+                return translation.translation
+            return self.rich_text
+        except NdrCoreRichTextTranslation.DoesNotExist:
+            return self.rich_text
 
 
 class NdrCoreTranslation(models.Model):

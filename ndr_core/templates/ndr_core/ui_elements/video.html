@@ -1,0 +1,51 @@
+<!-- This template renders VIDEO UI elements -->
+{% load i18n %}
+
+<div class="video-container mb-4">
+    {% if video_title %}
+        <h4>{{ video_title }}</h4>
+    {% endif %}
+
+    {% if video_description %}
+        <p>{{ video_description }}</p>
+    {% endif %}
+
+    {% if provider and video_id %}
+        <div class="embed-responsive embed-responsive-16by9">
+            {% if provider == 'youtube' %}
+                <iframe class="embed-responsive-item"
+                        src="https://www.youtube.com/embed/{{ video_id }}"
+                        title="{% if video_title %}{{ video_title }}{% else %}Video{% endif %}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                </iframe>
+            {% elif provider == 'vimeo' %}
+                <iframe class="embed-responsive-item"
+                        src="https://player.vimeo.com/video/{{ video_id }}"
+                        title="{% if video_title %}{{ video_title }}{% else %}Video{% endif %}"
+                        frameborder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
+            {% elif provider == 'switchtube' %}
+                <iframe class="embed-responsive-item"
+                        src="https://tube.switch.ch/embed/{{ video_id }}"
+                        title="{% if video_title %}{{ video_title }}{% else %}Video{% endif %}"
+                        frameborder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
+            {% else %}
+                <div class="alert alert-warning">
+                    {% trans "Unsupported video provider" %}: {{ provider }}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            {% trans "Video configuration incomplete. Please specify provider and video ID." %}
+        </div>
+    {% endif %}
+</div>

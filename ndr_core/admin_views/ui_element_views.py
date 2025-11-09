@@ -16,6 +16,9 @@ from ndr_core.admin_forms.ui_element_types import (
     CarouselCreateForm, CarouselEditForm,
     DataObjectCreateForm, DataObjectEditForm,
 )
+from ndr_core.admin_forms.ui_element_types.video_forms import VideoCreateForm, VideoEditForm
+from ndr_core.admin_forms.ui_element_types.audio_forms import AudioCreateForm, AudioEditForm
+from ndr_core.admin_forms.ui_element_types.academic_about_forms import AcademicAboutCreateForm, AcademicAboutEditForm
 from ndr_core.admin_forms.ui_element_types.slides_forms import SlidesItemFormSet
 from ndr_core.admin_forms.ui_element_types.carousel_forms import CarouselItemFormSet
 from ndr_core.admin_views.admin_views import AdminViewMixin
@@ -296,6 +299,54 @@ class DataObjectEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     form_class = DataObjectEditForm
     success_url = reverse_lazy('ndr_core:configure_ui_elements')
     template_name = 'ndr_core/admin_views/edit/ui_element_data_object_edit.html'
+
+
+class VideoCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Video UI Element."""
+    model = NdrCoreUIElement
+    form_class = VideoCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_video_create.html'
+
+
+class VideoEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Video UI Element."""
+    model = NdrCoreUIElement
+    form_class = VideoEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_video_edit.html'
+
+
+class AudioCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Audio UI Element."""
+    model = NdrCoreUIElement
+    form_class = AudioCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_audio_create.html'
+
+
+class AudioEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Audio UI Element."""
+    model = NdrCoreUIElement
+    form_class = AudioEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_audio_edit.html'
+
+
+class AcademicAboutCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new About Me UI Element."""
+    model = NdrCoreUIElement
+    form_class = AcademicAboutCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_academic_about_create.html'
+
+
+class AcademicAboutEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing About Me UI Element."""
+    model = NdrCoreUIElement
+    form_class = AcademicAboutEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_academic_about_edit.html'
 
 
 # ============================================================================
