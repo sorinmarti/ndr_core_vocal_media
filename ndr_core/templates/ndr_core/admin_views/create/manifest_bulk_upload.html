@@ -1,0 +1,51 @@
+{% extends 'ndr_core/admin_views/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fa-regular fa-file-zipper"></i> Bulk Upload Manifests</h2>
+        <a href="{% url 'ndr_core:configure_uploads' %}" class="btn btn-secondary">
+            <i class="fa-regular fa-arrow-left"></i> Back to Uploads
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fa-regular fa-circle-info"></i> About Bulk Upload</h5>
+            <p>
+                Upload a ZIP file containing multiple IIIF manifest JSON files. All manifests will be:
+            </p>
+            <ul>
+                <li>Validated to ensure they are valid IIIF v2 or v3 manifests</li>
+                <li>Added to the selected manifest group (or a new group you create)</li>
+                <li>Automatically extracted with metadata (title, order values)</li>
+            </ul>
+            <div class="alert alert-info mb-0">
+                <strong>Tip:</strong> The manifest filenames (without .json extension) will be used as identifiers.
+                Titles and order values will be extracted from the manifest metadata when possible.
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% crispy form %}
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fa-regular fa-book"></i> Order Values</h5>
+            <p>
+                If your manifest group has <strong>Order Value Titles</strong> configured (e.g., "Year", "Author", "Volume"),
+                the bulk upload will attempt to extract these values from the manifest metadata.
+            </p>
+            <p class="mb-0">
+                The system looks for metadata fields in the manifest whose labels match the order value titles.
+                For example, if your group's Order Value 1 is titled "Year", it will search for a metadata field
+                labeled "Year" or "year" in each manifest.
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

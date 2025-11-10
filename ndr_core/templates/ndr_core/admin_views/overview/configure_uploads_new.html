@@ -1,0 +1,746 @@
+{% extends 'ndr_core/admin_views/base.html' %}
+{% load django_tables2 %}
+{% load static %}
+{% load ndr_utils %}
+
+{% block extra_css %}
+<style>
+    .file-icon {
+        width: 24px;
+        text-align: center;
+        margin-right: 8px;
+    }
+    .file-size {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    .file-list-item {
+        transition: background-color 0.15s ease-in-out;
+    }
+    .file-list-item:hover {
+        background-color: #f8f9fa;
+    }
+    .group-card {
+        border-left: 4px solid #007bff;
+        margin-bottom: 1rem;
+    }
+    .manifest-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .collapse-icon {
+        transition: transform 0.2s ease-in-out;
+    }
+    .collapsed .collapse-icon {
+        transform: rotate(-90deg);
+    }
+    .badge-file-type {
+        font-weight: 600;
+        padding: 0.25em 0.6em;
+    }
+    .copy-btn {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    .copy-btn:hover {
+        opacity: 1;
+    }
+    .upload-zone {
+        border: 2px dashed #dee2e6;
+        border-radius: 0.25rem;
+        padding: 2rem;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s;
+    }
+    .upload-zone.dragover {
+        border-color: #007bff;
+        background: #e7f3ff;
+    }
+    .upload-progress {
+        margin-top: 1rem;
+    }
+    .upload-item {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        background: white;
+    }
+    .upload-item.success {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+    .upload-item.error {
+        border-color: #dc3545;
+        background: #f8d7da;
+    }
+    .progress-bar-custom {
+        height: 4px;
+        background: #007bff;
+        transition: width 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h2><i class="fa-regular fa-file-upload"></i> Manage Uploads</h2>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-3" id="uploadTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="files-tab" data-toggle="tab" href="#files" role="tab" aria-controls="files" aria-selected="true">
+                <i class="fa-regular fa-file"></i> General Files
+                <span class="badge badge-primary">{{ files|length }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="groups-tab" data-toggle="tab" href="#groups" role="tab" aria-controls="groups" aria-selected="false">
+                <i class="fa-regular fa-folder"></i> Manifest Groups
+                <span class="badge badge-primary">{{ manifest_groups|length }}</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="uploadTabsContent">
+
+        <!-- FILES TAB -->
+        <div class="tab-pane fade show active" id="files" role="tabpanel" aria-labelledby="files-tab">
+
+            <!-- Action Bar -->
+            <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+                <div class="mr-auto">
+                    <a href="{% url 'ndr_core:create_upload' %}" class="btn btn-sm btn-success m-1">
+                        <i class="fa-regular fa-plus"></i> Upload File
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary m-1" id="toggleUploadZone">
+                        <i class="fa-regular fa-cloud-upload"></i> Show Upload Zone
+                    </button>
+                </div>
+                <div>
+                    <input type="search" class="form-control form-control-sm" id="fileSearch" placeholder="Search files...">
+                </div>
+                <div class="ml-2">
+                    <select class="form-control form-control-sm" id="fileTypeFilter">
+                        <option value="">All Types</option>
+                        <option value="pdf">PDF</option>
+                        <option value="audio">Audio</option>
+                        <option value="json">JSON</option>
+                        <option value="image">Images</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="ml-2">
+                    <a href="{% url 'ndr_core:help_chapter' 'files' %}" class="btn btn-sm btn-outline-secondary m-1">
+                        <i class="fa-regular fa-circle-info"></i> Help
+                    </a>
+                </div>
+            </div>
+
+            <!-- Drag & Drop Upload Zone (Hidden by default) -->
+            <div class="upload-zone mb-3" id="uploadZone" style="display: none;">
+                <i class="fa-regular fa-cloud-upload fa-3x text-muted mb-2"></i>
+                <h5>Drag files here or click to browse</h5>
+                <p class="text-muted mb-0">Maximum file size: 100MB</p>
+                <input type="file" id="fileInput" multiple style="display: none;">
+            </div>
+
+            <!-- Upload Progress Area -->
+            <div id="uploadProgress" class="upload-progress" style="display: none;"></div>
+
+            <!-- Files List -->
+            <div class="card">
+                <div class="card-body">
+                    {% if files %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="filesTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 40px;"></th>
+                                        <th>Title</th>
+                                        <th>File Name</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th style="width: 200px;">Markup Tags</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for file in files %}
+                                        <tr class="file-list-item" data-file-type="{{ file.get_file_extension }}">
+                                            <td class="text-center">
+                                                <i class="fa-regular {{ file.get_file_icon_class }} fa-lg" style="color: #007bff;"></i>
+                                            </td>
+                                            <td>
+                                                <strong>{{ file.title|default:"Untitled" }}</strong>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">{{ file.file.name|default:"N/A" }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-secondary badge-file-type">{{ file.get_file_type }}</span>
+                                            </td>
+                                            <td class="file-size">{{ file.get_file_size_display }}</td>
+                                            <td>
+                                                {% if file.get_file_extension == 'json' %}
+                                                    {# JSON files can use both file and plotly tags #}
+                                                    <div class="mb-1">
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" class="form-control" value="[[file|{{ file.pk }}]]" readonly>
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[file|{{ file.pk }}]]" title="Copy file tag">
+                                                                    <i class="fa-regular fa-copy"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control" value="[[plotly|{{ file.pk }}]]" readonly>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[plotly|{{ file.pk }}]]" title="Copy plotly tag">
+                                                                <i class="fa-regular fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    {# Non-JSON files only show file tag #}
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control" value="[[file|{{ file.pk }}]]" readonly>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[file|{{ file.pk }}]]">
+                                                                <i class="fa-regular fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-right">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="{% url 'ndr_core:edit_upload' file.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                                        <i class="fa-regular fa-pen-to-square"></i>
+                                                    </a>
+                                                    <a href="{% url 'ndr_core:delete_upload' file.pk %}" class="btn btn-outline-danger" title="Delete">
+                                                        <i class="fa-regular fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fa-regular fa-file fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No files uploaded yet</h5>
+                            <p class="text-muted">Upload your first file to get started</p>
+                            <a href="{% url 'ndr_core:create_upload' %}" class="btn btn-primary">
+                                <i class="fa-regular fa-plus"></i> Upload File
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Files Info Alert -->
+            <div class="alert alert-info mt-3 small" role="alert">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>About File Uploads:</strong>
+                Use <code>[[file|ID]]</code> to create a download link or <code>[[file-href|ID]]</code> to get just the URL in your pages.
+                Supported types: PDFs, Audio (MP3, WAV, OGG), JSON data, Images, and more.
+            </div>
+        </div>
+
+        <!-- MANIFEST GROUPS TAB -->
+        <div class="tab-pane fade" id="groups" role="tabpanel" aria-labelledby="groups-tab">
+
+            <!-- Action Bar -->
+            <div class="d-flex flex-wrap align-items-center bg-light border rounded p-2 mb-3">
+                <div class="mr-auto">
+                    <a href="{% url 'ndr_core:create_manifest_group' %}" class="btn btn-sm btn-success m-1">
+                        <i class="fa-regular fa-plus"></i> Create Group
+                    </a>
+                    <a href="{% url 'ndr_core:create_manifest_upload' %}" class="btn btn-sm btn-primary m-1">
+                        <i class="fa-regular fa-file-import"></i> Upload Manifest
+                    </a>
+                    <a href="{% url 'ndr_core:manifest_bulk_upload' %}" class="btn btn-sm btn-primary m-1">
+                        <i class="fa-regular fa-file-zipper"></i> Bulk Upload (ZIP)
+                    </a>
+                </div>
+                <div>
+                    <input type="search" class="form-control form-control-sm" id="groupSearch" placeholder="Search groups...">
+                </div>
+                <div class="ml-2">
+                    <a href="{% url 'ndr_core:help_chapter' 'files' %}" class="btn btn-sm btn-outline-secondary m-1">
+                        <i class="fa-regular fa-circle-info"></i> Help
+                    </a>
+                </div>
+            </div>
+
+            <!-- Manifest Groups List -->
+            {% if manifest_groups %}
+                <div id="manifestGroupsAccordion">
+                    {% for group in manifest_groups %}
+                        <div class="card group-card">
+                            <div class="card-header" id="heading{{ group.pk }}">
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-link flex-grow-1 text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse{{ group.pk }}" aria-expanded="false" aria-controls="collapse{{ group.pk }}">
+                                        <i class="fa-regular fa-chevron-down collapse-icon"></i>
+                                        <i class="fa-regular fa-folder mr-2"></i>
+                                        <strong>{{ group.title }}</strong>
+                                        <span class="badge badge-info ml-2">{{ group.get_manifest_count }} manifests</span>
+                                    </button>
+                                    <div class="btn-group btn-group-sm mr-2" role="group">
+                                        <a href="{% url 'ndr_core:edit_manifest_group' group.pk %}" class="btn btn-outline-secondary" title="Edit Group">
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </a>
+                                        <a href="{% url 'ndr_core:delete_manifest_group' group.pk %}" class="btn btn-outline-danger" title="Delete Group">
+                                            <i class="fa-regular fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% if group.order_value_1_title or group.order_value_2_title or group.order_value_3_title %}
+                                    <div class="ml-4 mt-1">
+                                        <small class="text-muted">
+                                            <i class="fa-regular fa-tags"></i>
+                                            {% if group.order_value_1_title %}{{ group.order_value_1_title }}{% endif %}
+                                            {% if group.order_value_2_title %} | {{ group.order_value_2_title }}{% endif %}
+                                            {% if group.order_value_3_title %} | {{ group.order_value_3_title }}{% endif %}
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div id="collapse{{ group.pk }}" class="collapse" aria-labelledby="heading{{ group.pk }}" data-parent="#manifestGroupsAccordion">
+                                <div class="card-body">
+                                    {% with manifests=group.ndrcoremanifest_set.all %}
+                                        {% if manifests %}
+                                            <div class="manifest-list">
+                                                <table class="table table-sm table-hover mb-0">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Identifier</th>
+                                                            <th>Title</th>
+                                                            {% if group.order_value_1_title %}<th>{{ group.order_value_1_title }}</th>{% endif %}
+                                                            {% if group.order_value_2_title %}<th>{{ group.order_value_2_title }}</th>{% endif %}
+                                                            {% if group.order_value_3_title %}<th>{{ group.order_value_3_title }}</th>{% endif %}
+                                                            <th>Size</th>
+                                                            <th style="width: 100px;">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for manifest in manifests %}
+                                                            <tr>
+                                                                <td><code>{{ manifest.identifier }}</code></td>
+                                                                <td>{{ manifest.title|default:"Untitled" }}</td>
+                                                                {% if group.order_value_1_title %}<td><small>{{ manifest.order_value_1|default:"-" }}</small></td>{% endif %}
+                                                                {% if group.order_value_2_title %}<td><small>{{ manifest.order_value_2|default:"-" }}</small></td>{% endif %}
+                                                                {% if group.order_value_3_title %}<td><small>{{ manifest.order_value_3|default:"-" }}</small></td>{% endif %}
+                                                                <td><small class="text-muted">{{ manifest.get_file_size_display }}</small></td>
+                                                                <td>
+                                                                    <div class="btn-group btn-group-sm" role="group">
+                                                                        <a href="{% url 'ndr_core:edit_manifest_upload' manifest.pk %}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                                                                            <i class="fa-regular fa-pen-to-square"></i>
+                                                                        </a>
+                                                                        <a href="{% url 'ndr_core:delete_manifest_upload' manifest.pk %}" class="btn btn-outline-danger btn-sm" title="Delete">
+                                                                            <i class="fa-regular fa-trash"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted text-center mb-0">
+                                                <i class="fa-regular fa-info-circle"></i>
+                                                No manifests in this group yet.
+                                                <a href="{% url 'ndr_core:create_manifest_upload' %}">Upload a manifest</a>
+                                            </p>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fa-regular fa-folder fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No manifest groups created yet</h5>
+                        <p class="text-muted">Create your first manifest group to organize IIIF manifests</p>
+                        <a href="{% url 'ndr_core:create_manifest_group' %}" class="btn btn-primary">
+                            <i class="fa-regular fa-plus"></i> Create Manifest Group
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Manifest Groups Info Alert -->
+            <div class="alert alert-info mt-3 small" role="alert">
+                <i class="fa-regular fa-circle-info"></i>
+                <strong>About Manifest Groups:</strong>
+                Organize IIIF manifests into groups with custom order values. Each group can contain hundreds of manifest files.
+                Use the Manifest Viewer UI element to display these groups on your pages.
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+<script>
+    // Copy to clipboard functionality
+    function copyToClipboard(button) {
+        const text = button.getAttribute('data-text');
+        navigator.clipboard.writeText(text).then(() => {
+            const icon = button.querySelector('i');
+            const originalClass = icon.className;
+            icon.className = 'fa-regular fa-check';
+            setTimeout(() => {
+                icon.className = originalClass;
+            }, 1500);
+        });
+    }
+
+    // File search functionality
+    document.getElementById('fileSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#filesTable tbody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // File type filter
+    document.getElementById('fileTypeFilter').addEventListener('change', function(e) {
+        const filterValue = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#filesTable tbody tr');
+
+        rows.forEach(row => {
+            if (!filterValue) {
+                row.style.display = '';
+                return;
+            }
+
+            const fileType = row.getAttribute('data-file-type').toLowerCase();
+            let shouldShow = false;
+
+            if (filterValue === 'audio' && ['mp3', 'wav', 'ogg'].includes(fileType)) {
+                shouldShow = true;
+            } else if (filterValue === 'image' && ['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                shouldShow = true;
+            } else if (filterValue === fileType) {
+                shouldShow = true;
+            } else if (filterValue === 'other' && !['pdf', 'json', 'mp3', 'wav', 'ogg', 'jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                shouldShow = true;
+            }
+
+            row.style.display = shouldShow ? '' : 'none';
+        });
+    });
+
+    // Group search functionality
+    document.getElementById('groupSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const groups = document.querySelectorAll('.group-card');
+
+        groups.forEach(group => {
+            const text = group.textContent.toLowerCase();
+            group.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Toggle upload zone
+    document.getElementById('toggleUploadZone').addEventListener('click', function() {
+        const zone = document.getElementById('uploadZone');
+        const btn = this;
+
+        if (zone.style.display === 'none') {
+            zone.style.display = 'block';
+            btn.innerHTML = '<i class="fa-regular fa-times"></i> Hide Upload Zone';
+        } else {
+            zone.style.display = 'none';
+            btn.innerHTML = '<i class="fa-regular fa-cloud-upload"></i> Show Upload Zone';
+        }
+    });
+
+    // Drag and drop file upload functionality
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadProgress = document.getElementById('uploadProgress');
+
+    // Get CSRF token for Django
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+    }
+
+    // Click to browse files
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    // Drag over effect
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+
+    // Drag leave effect
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+
+    // Drop files
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFileUpload(files);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        handleFileUpload(files);
+        fileInput.value = ''; // Reset input
+    });
+
+    // Handle multiple file uploads
+    function handleFileUpload(files) {
+        if (files.length === 0) return;
+
+        uploadProgress.style.display = 'block';
+
+        Array.from(files).forEach(file => {
+            uploadSingleFile(file);
+        });
+    }
+
+    // Upload a single file
+    function uploadSingleFile(file) {
+        const uploadId = 'upload-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+        // Create upload item UI
+        const uploadItem = document.createElement('div');
+        uploadItem.className = 'upload-item';
+        uploadItem.id = uploadId;
+        uploadItem.innerHTML = `
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-regular fa-file mr-2"></i>
+                        <strong>${escapeHtml(file.name)}</strong>
+                        <small class="text-muted ml-2">(${formatFileSize(file.size)})</small>
+                    </div>
+                    <div class="progress-bar-custom mt-1" style="width: 0%;"></div>
+                </div>
+                <span class="badge badge-secondary">Uploading...</span>
+            </div>
+        `;
+        uploadProgress.appendChild(uploadItem);
+
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', file.name);
+
+        // Create XMLHttpRequest for progress tracking
+        const xhr = new XMLHttpRequest();
+
+        // Progress handler
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                const progressBar = uploadItem.querySelector('.progress-bar-custom');
+                progressBar.style.width = percentComplete + '%';
+            }
+        });
+
+        // Success/Error handler
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        handleUploadSuccess(uploadItem, response);
+                    } else {
+                        handleUploadError(uploadItem, response.error || 'Upload failed');
+                    }
+                } catch (e) {
+                    handleUploadError(uploadItem, 'Invalid response from server');
+                }
+            } else {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    handleUploadError(uploadItem, response.error || 'Upload failed');
+                } catch (e) {
+                    handleUploadError(uploadItem, `Upload failed (${xhr.status})`);
+                }
+            }
+        });
+
+        // Network error handler
+        xhr.addEventListener('error', () => {
+            handleUploadError(uploadItem, 'Network error occurred');
+        });
+
+        // Send request
+        xhr.open('POST', '{% url "ndr_core:ajax_file_upload" %}');
+        xhr.setRequestHeader('X-CSRFToken', getCsrfToken());
+        xhr.send(formData);
+    }
+
+    // Handle successful upload
+    function handleUploadSuccess(uploadItem, response) {
+        uploadItem.className = 'upload-item success';
+        const progressBar = uploadItem.querySelector('.progress-bar-custom');
+        progressBar.style.width = '100%';
+        progressBar.style.background = '#28a745';
+
+        const badge = uploadItem.querySelector('.badge');
+        badge.className = 'badge badge-success';
+        badge.textContent = 'Uploaded';
+
+        // Add the new file to the table
+        addFileToTable(response);
+
+        // Remove upload item after 3 seconds
+        setTimeout(() => {
+            uploadItem.style.opacity = '0';
+            uploadItem.style.transition = 'opacity 0.3s';
+            setTimeout(() => uploadItem.remove(), 300);
+        }, 3000);
+    }
+
+    // Handle upload error
+    function handleUploadError(uploadItem, errorMsg) {
+        uploadItem.className = 'upload-item error';
+        const progressBar = uploadItem.querySelector('.progress-bar-custom');
+        progressBar.style.background = '#dc3545';
+
+        const badge = uploadItem.querySelector('.badge');
+        badge.className = 'badge badge-danger';
+        badge.textContent = 'Failed';
+
+        // Add error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'mt-1';
+        errorDiv.innerHTML = `<small class="text-danger"><i class="fa-regular fa-exclamation-circle"></i> ${escapeHtml(errorMsg)}</small>`;
+        uploadItem.querySelector('.flex-grow-1').appendChild(errorDiv);
+    }
+
+    // Add uploaded file to table
+    function addFileToTable(fileData) {
+        const filesTable = document.getElementById('filesTable');
+        if (!filesTable) {
+            // If table doesn't exist, reload page to show it
+            location.reload();
+            return;
+        }
+
+        const tbody = filesTable.querySelector('tbody');
+        const newRow = document.createElement('tr');
+        newRow.className = 'file-list-item';
+        newRow.setAttribute('data-file-type', fileData.file_name.split('.').pop().toLowerCase());
+
+        // Build markup tags HTML
+        let markupTagsHtml = '';
+        if (fileData.is_json) {
+            markupTagsHtml = `
+                <div class="mb-1">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" value="[[file|${fileData.file_id}]]" readonly>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[file|${fileData.file_id}]]" title="Copy file tag">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" value="[[plotly|${fileData.file_id}]]" readonly>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[plotly|${fileData.file_id}]]" title="Copy plotly tag">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            markupTagsHtml = `
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" value="[[file|${fileData.file_id}]]" readonly>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary copy-btn" type="button" onclick="copyToClipboard(this)" data-text="[[file|${fileData.file_id}]]">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        newRow.innerHTML = `
+            <td class="text-center">
+                <i class="fa-regular ${fileData.file_icon} fa-lg" style="color: #007bff;"></i>
+            </td>
+            <td>
+                <strong>${escapeHtml(fileData.file_name)}</strong>
+            </td>
+            <td>
+                <small class="text-muted">${escapeHtml(fileData.file_name)}</small>
+            </td>
+            <td>
+                <span class="badge badge-secondary badge-file-type">${escapeHtml(fileData.file_type)}</span>
+            </td>
+            <td class="file-size">${escapeHtml(fileData.file_size)}</td>
+            <td>${markupTagsHtml}</td>
+            <td class="text-right">
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="{% url 'ndr_core:edit_upload' 0 %}".replace('0', fileData.file_id) class="btn btn-outline-secondary" title="Edit">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </a>
+                    <a href="{% url 'ndr_core:delete_upload' 0 %}".replace('0', fileData.file_id) class="btn btn-outline-danger" title="Delete">
+                        <i class="fa-regular fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        `;
+
+        // Add to top of table with animation
+        tbody.insertBefore(newRow, tbody.firstChild);
+        newRow.style.backgroundColor = '#d4edda';
+        setTimeout(() => {
+            newRow.style.transition = 'background-color 1s';
+            newRow.style.backgroundColor = '';
+        }, 100);
+
+        // Update file count badge
+        const filesBadge = document.querySelector('#files-tab .badge');
+        if (filesBadge) {
+            const currentCount = parseInt(filesBadge.textContent) || 0;
+            filesBadge.textContent = currentCount + 1;
+        }
+    }
+
+    // Utility: Escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Utility: Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+</script>
+{% endblock %}

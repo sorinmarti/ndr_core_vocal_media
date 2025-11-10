@@ -1254,6 +1254,72 @@ class NdrCoreUpload(models.Model):
     file = models.FileField(upload_to='uploads/files/')
     """Actual file"""
 
+    def get_file_extension(self):
+        """Returns the file extension in lowercase."""
+        import os
+        if self.file and self.file.name:
+            return os.path.splitext(self.file.name)[1].lower().lstrip('.')
+        return ''
+
+    def get_file_type(self):
+        """Returns a human-readable file type based on extension."""
+        ext = self.get_file_extension()
+        type_map = {
+            'pdf': 'PDF Document',
+            'json': 'JSON Data',
+            'mp3': 'MP3 Audio',
+            'wav': 'WAV Audio',
+            'ogg': 'OGG Audio',
+            'mp4': 'MP4 Video',
+            'jpg': 'JPEG Image',
+            'jpeg': 'JPEG Image',
+            'png': 'PNG Image',
+            'gif': 'GIF Image',
+            'csv': 'CSV Data',
+            'xlsx': 'Excel Spreadsheet',
+            'docx': 'Word Document',
+            'txt': 'Text File',
+            'zip': 'ZIP Archive',
+        }
+        return type_map.get(ext, ext.upper() if ext else 'Unknown')
+
+    def get_file_size(self):
+        """Returns file size in bytes."""
+        if self.file and hasattr(self.file, 'size'):
+            return self.file.size
+        return 0
+
+    def get_file_size_display(self):
+        """Returns human-readable file size."""
+        size = self.get_file_size()
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024.0:
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+        return f"{size:.1f} TB"
+
+    def get_file_icon_class(self):
+        """Returns FontAwesome icon class based on file type."""
+        ext = self.get_file_extension()
+        icon_map = {
+            'pdf': 'fa-file-pdf',
+            'json': 'fa-file-code',
+            'mp3': 'fa-file-audio',
+            'wav': 'fa-file-audio',
+            'ogg': 'fa-file-audio',
+            'mp4': 'fa-file-video',
+            'jpg': 'fa-file-image',
+            'jpeg': 'fa-file-image',
+            'png': 'fa-file-image',
+            'gif': 'fa-file-image',
+            'csv': 'fa-file-csv',
+            'xlsx': 'fa-file-excel',
+            'docx': 'fa-file-word',
+            'txt': 'fa-file-lines',
+            'zip': 'fa-file-zipper',
+        }
+        return icon_map.get(ext, 'fa-file')
+
 
 class NdrCoreManifestGroup(TranslatableMixin, models.Model):
     """ Directory of all manifest groups. """
@@ -1283,6 +1349,10 @@ class NdrCoreManifestGroup(TranslatableMixin, models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_manifest_count(self):
+        """Returns the number of manifests in this group."""
+        return self.ndrcoremanifest_set.count()
 
 
 class NdrCoreManifest(TranslatableMixin, models.Model):
@@ -1321,6 +1391,21 @@ class NdrCoreManifest(TranslatableMixin, models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_file_size(self):
+        """Returns file size in bytes."""
+        if self.file and hasattr(self.file, 'size'):
+            return self.file.size
+        return 0
+
+    def get_file_size_display(self):
+        """Returns human-readable file size."""
+        size = self.get_file_size()
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024.0:
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+        return f"{size:.1f} TB"
 
 
 class NdrCoreUIElement(models.Model):

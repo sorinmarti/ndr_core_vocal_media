@@ -1,0 +1,146 @@
+{% extends 'ndr_core/admin_views/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fa-regular fa-check-circle"></i> Bulk Upload Results</h2>
+        <div>
+            <a href="{% url 'ndr_core:manifest_bulk_upload' %}" class="btn btn-primary">
+                <i class="fa-regular fa-file-zipper"></i> Upload Another ZIP
+            </a>
+            <a href="{% url 'ndr_core:configure_uploads' %}" class="btn btn-secondary">
+                <i class="fa-regular fa-arrow-left"></i> Back to Uploads
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fa-regular fa-folder"></i> Manifest Group: <strong>{{ results.group.title }}</strong>
+            </h5>
+            <div class="row text-center mt-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded">
+                        <h3 class="text-primary mb-0">{{ results.success|length }}</h3>
+                        <small class="text-muted">Successfully Uploaded</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded">
+                        <h3 class="text-danger mb-0">{{ results.errors|length }}</h3>
+                        <small class="text-muted">Failed</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded">
+                        <h3 class="text-info mb-0">{{ results.group.get_manifest_count }}</h3>
+                        <small class="text-muted">Total in Group</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Successful Uploads -->
+    {% if results.success %}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="fa-regular fa-check-circle"></i> Successfully Uploaded ({{ results.success|length }})
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Filename</th>
+                            <th>Identifier</th>
+                            <th>Title</th>
+                            {% if results.group.order_value_1_title %}<th>{{ results.group.order_value_1_title }}</th>{% endif %}
+                            {% if results.group.order_value_2_title %}<th>{{ results.group.order_value_2_title }}</th>{% endif %}
+                            {% if results.group.order_value_3_title %}<th>{{ results.group.order_value_3_title }}</th>{% endif %}
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results.success %}
+                        <tr>
+                            <td><code class="text-success">{{ item.filename }}</code></td>
+                            <td>{{ item.identifier }}</td>
+                            <td>{{ item.title }}</td>
+                            {% if results.group.order_value_1_title %}
+                                <td><small>{{ item.manifest.order_value_1|default:"-" }}</small></td>
+                            {% endif %}
+                            {% if results.group.order_value_2_title %}
+                                <td><small>{{ item.manifest.order_value_2|default:"-" }}</small></td>
+                            {% endif %}
+                            {% if results.group.order_value_3_title %}
+                                <td><small>{{ item.manifest.order_value_3|default:"-" }}</small></td>
+                            {% endif %}
+                            <td>
+                                <a href="{% url 'ndr_core:edit_manifest_upload' item.manifest.pk %}"
+                                   class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Failed Uploads -->
+    {% if results.errors %}
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="fa-regular fa-exclamation-triangle"></i> Failed Uploads ({{ results.errors|length }})
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Filename</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results.errors %}
+                        <tr>
+                            <td><code class="text-danger">{{ item.filename }}</code></td>
+                            <td class="text-danger">
+                                <i class="fa-regular fa-exclamation-circle"></i>
+                                {{ item.error }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-warning mt-3 mb-0">
+                <strong>Note:</strong> The files listed above were not uploaded due to validation errors.
+                Please check that they are valid IIIF manifest files and try again.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- No Results -->
+    {% if not results.success and not results.errors %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fa-regular fa-info-circle fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No files were processed</h5>
+            <p class="text-muted">The ZIP file may not contain any valid JSON files.</p>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
