@@ -707,6 +707,102 @@ class NdrCorePage(TranslatableMixin, models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     """The last time the page was modified. """
 
+    # Page Display Settings
+    show_navigation = models.BooleanField(
+        default=True,
+        help_text="Show navigation bar on this page"
+    )
+    """If False, the navigation bar will be hidden on this page."""
+
+    show_footer = models.BooleanField(
+        default=True,
+        help_text="Show footer on this page"
+    )
+    """If False, the footer will be hidden on this page."""
+
+    center_content = models.BooleanField(
+        default=False,
+        help_text="Vertically center the page content (useful for hero pages)"
+    )
+    """If True, the page content will be vertically centered in the viewport."""
+
+    # Background Image Settings
+    use_default_background = models.BooleanField(
+        default=True,
+        help_text="Use installation default background image settings"
+    )
+    """If True, the page will use the installation's default background settings."""
+
+    background_image = models.ForeignKey(
+        'NdrCoreImage',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='page_backgrounds',
+        help_text="Background image for this page"
+    )
+    """The background image to display on this page."""
+
+    background_image_dark = models.ForeignKey(
+        'NdrCoreImage',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='page_backgrounds_dark',
+        help_text="Background image for this page in dark mode (optional, falls back to light image if not set)"
+    )
+    """The background image to display on this page in dark mode."""
+
+    class BackgroundDisplayMode(models.TextChoices):
+        """Display modes for background images."""
+        NONE = 'NONE', 'No Background'
+        INHERIT = 'INHERIT', 'Use Default'
+        FULL_VIEWPORT = 'FULL_VIEWPORT', 'Full Viewport (Hero)'
+        HEADER_ONLY = 'HEADER_ONLY', 'Header Section Only'
+        FIXED_PARALLAX = 'FIXED_PARALLAX', 'Fixed with Parallax'
+
+    background_display_mode = models.CharField(
+        max_length=20,
+        choices=BackgroundDisplayMode.choices,
+        default=BackgroundDisplayMode.INHERIT,
+        help_text="How the background image should be displayed"
+    )
+    """Determines how the background image is displayed on the page."""
+
+    background_position = models.CharField(
+        max_length=20,
+        default='center',
+        help_text="CSS background-position value (e.g., 'center', 'top', 'bottom')"
+    )
+    """CSS background-position property."""
+
+    background_size = models.CharField(
+        max_length=20,
+        default='cover',
+        help_text="CSS background-size value (e.g., 'cover', 'contain', 'auto')"
+    )
+    """CSS background-size property."""
+
+    overlay_enabled = models.BooleanField(
+        default=False,
+        help_text="Enable semi-transparent overlay for better text readability"
+    )
+    """If True, adds a semi-transparent overlay over the background image."""
+
+    overlay_color = models.CharField(
+        max_length=7,
+        default='#000000',
+        help_text="Overlay color in hex format (e.g., #000000)"
+    )
+    """The color of the overlay (hex format)."""
+
+    overlay_opacity = models.FloatField(
+        default=0.5,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        help_text="Overlay opacity (0.0 = transparent, 1.0 = opaque)"
+    )
+    """Opacity of the overlay (0.0 to 1.0)."""
+
     def __getattribute__(self, item):
         """Returns the translated field for a given language. If no translation exists,
         the default value is returned. """
@@ -742,6 +838,85 @@ class NdrCorePage(TranslatableMixin, models.Model):
                 reverse_url = '#'
 
         return reverse_url
+
+    def get_resolved_background_settings(self):
+        """
+        Returns the resolved background settings for this page.
+        If the page uses default settings or INHERIT mode, returns default settings from NdrCoreValue.
+        Otherwise, returns page-specific settings.
+
+        Returns a dict with keys: bg_image, bg_image_dark, bg_mode, bg_position, bg_size,
+        overlay_enabled, overlay_color, overlay_opacity
+        """
+        # If page explicitly uses defaults or display mode is INHERIT, get defaults
+        if self.use_default_background or self.background_display_mode == self.BackgroundDisplayMode.INHERIT:
+            try:
+                # Get default background image ID
+                default_bg_id = NdrCoreValue.objects.get(value_name='default_bg_image_id').get_value()
+                default_bg_image = None
+                if default_bg_id and default_bg_id.strip():
+                    try:
+                        default_bg_image = NdrCoreImage.objects.get(pk=int(default_bg_id))
+                    except (NdrCoreImage.DoesNotExist, ValueError):
+                        pass
+
+                # Get default dark mode background image ID
+                default_bg_dark_id = NdrCoreValue.objects.get(value_name='default_bg_image_dark_id').get_value()
+                default_bg_image_dark = None
+                if default_bg_dark_id and default_bg_dark_id.strip():
+                    try:
+                        default_bg_image_dark = NdrCoreImage.objects.get(pk=int(default_bg_dark_id))
+                    except (NdrCoreImage.DoesNotExist, ValueError):
+                        pass
+
+                # Get default settings
+                default_mode = NdrCoreValue.objects.get(value_name='default_bg_display_mode').get_value()
+                default_position = NdrCoreValue.objects.get(value_name='default_bg_position').get_value()
+                default_size = NdrCoreValue.objects.get(value_name='default_bg_size').get_value()
+                default_overlay_enabled = NdrCoreValue.objects.get(value_name='default_overlay_enabled').get_value()
+                default_overlay_color = NdrCoreValue.objects.get(value_name='default_overlay_color').get_value()
+                default_overlay_opacity = NdrCoreValue.objects.get(value_name='default_overlay_opacity').get_value()
+
+                # Convert opacity string to float
+                try:
+                    overlay_opacity_float = float(default_overlay_opacity)
+                except (ValueError, TypeError):
+                    overlay_opacity_float = 0.5
+
+                return {
+                    'bg_image': default_bg_image,
+                    'bg_image_dark': default_bg_image_dark,
+                    'bg_mode': default_mode,
+                    'bg_position': default_position,
+                    'bg_size': default_size,
+                    'overlay_enabled': default_overlay_enabled,
+                    'overlay_color': default_overlay_color,
+                    'overlay_opacity': overlay_opacity_float,
+                }
+            except NdrCoreValue.DoesNotExist:
+                # If defaults don't exist, return no background
+                return {
+                    'bg_image': None,
+                    'bg_image_dark': None,
+                    'bg_mode': 'NONE',
+                    'bg_position': 'center',
+                    'bg_size': 'cover',
+                    'overlay_enabled': False,
+                    'overlay_color': '#000000',
+                    'overlay_opacity': 0.5,
+                }
+        else:
+            # Return page-specific settings
+            return {
+                'bg_image': self.background_image,
+                'bg_image_dark': self.background_image_dark,
+                'bg_mode': self.background_display_mode,
+                'bg_position': self.background_position,
+                'bg_size': self.background_size,
+                'overlay_enabled': self.overlay_enabled,
+                'overlay_color': self.overlay_color,
+                'overlay_opacity': self.overlay_opacity,
+            }
 
     def __str__(self):
         return f"{self.name}: {self.label}"

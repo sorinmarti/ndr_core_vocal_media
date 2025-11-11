@@ -374,5 +374,96 @@
       "value_value": "",
       "is_translatable": false
     }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_bg_image_id",
+      "value_label": "Default Background Image",
+      "value_help_text": "Default background image ID for all pages (leave blank for none)",
+      "value_type": "string",
+      "value_value": "",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_bg_image_dark_id",
+      "value_label": "Default Background Image (Dark Mode)",
+      "value_help_text": "Default background image ID for dark mode (leave blank to use light mode image)",
+      "value_type": "string",
+      "value_value": "",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_bg_display_mode",
+      "value_label": "Default Background Display Mode",
+      "value_help_text": "How the default background image should be displayed",
+      "value_type": "list",
+      "value_value": "NONE",
+      "value_options": "(NONE,No Background);(FULL_VIEWPORT,Full Viewport Hero);(HEADER_ONLY,Header Section Only);(FIXED_PARALLAX,Fixed with Parallax)",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_bg_position",
+      "value_label": "Default Background Position",
+      "value_help_text": "CSS background-position for default background",
+      "value_type": "list",
+      "value_value": "center",
+      "value_options": "(center,Center);(top,Top);(bottom,Bottom);(left,Left);(right,Right);(center top,Center Top);(center bottom,Center Bottom)",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_bg_size",
+      "value_label": "Default Background Size",
+      "value_help_text": "CSS background-size for default background",
+      "value_type": "list",
+      "value_value": "cover",
+      "value_options": "(cover,Cover);(contain,Contain);(auto,Auto)",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_overlay_enabled",
+      "value_label": "Default Overlay Enabled",
+      "value_help_text": "Enable semi-transparent overlay on default background for better text readability",
+      "value_type": "boolean",
+      "value_value": "false",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_overlay_color",
+      "value_label": "Default Overlay Color",
+      "value_help_text": "Hex color for default background overlay (e.g., #000000)",
+      "value_type": "string",
+      "value_value": "#000000",
+      "is_translatable": false
+    }
+  },
+  {
+    "model": "ndr_core.NdrCoreValue",
+    "fields": {
+      "value_name": "default_overlay_opacity",
+      "value_label": "Default Overlay Opacity",
+      "value_help_text": "Opacity of default background overlay (0.0 = transparent, 1.0 = opaque)",
+      "value_type": "string",
+      "value_value": "0.5",
+      "is_translatable": false
+    }
   }
 ]

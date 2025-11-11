@@ -11,9 +11,12 @@
         {% block custom_css %}
             <!-- custom css -->
         {% endblock %}
+
+        {% include 'ndr_core/includes/background_image_styles.html' %}
     </head>
 
     <body>
+        {% if page.show_navigation %}
         <nav class="navbar navbar-expand-md navbar-dark fixed-top accent-1-bg">
             {% block logo %}
                 <a class="navbar-brand" href="/">
@@ -37,10 +40,20 @@
                 </button>
             </div>
         </nav>
+        {% endif %}
 
-        <main role="main" class="container" style="padding-top: 7em;">
+        <div class="{% if page.center_content %}ndr-content-wrapper{% endif %}">
+        <main role="main" class="container" {% if page.show_navigation %}style="padding-top: 7em;"{% endif %}>
             {% block page_title %}
-                <h1>{{ page.name }}</h1>
+                {% if page_background.bg_mode == 'HEADER_ONLY' %}
+                    <div class="page-header-bg">
+                        {% if page.show_page_title == True %}
+                            <h1 class="text-center text-white">{{ page.name }}</h1>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <h1>{{ page.name }}</h1>
+                {% endif %}
             {% endblock %}
 
             {% block generated_content %}
@@ -50,9 +63,12 @@
                 {{ page.template_text|safe }}
             {% endblock %}
         </main>
+        </div>
+        {% if page.show_footer %}
         {% block footer %}
             NDR core
         {% endblock %}
+        {% endif %}
 
         <script src="{% static 'ndr_core/js/popper.min.js' %}"></script>
         <script src="{% static 'ndr_core/js/bootstrap.min.js' %}"></script>

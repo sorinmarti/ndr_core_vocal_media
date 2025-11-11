@@ -124,10 +124,14 @@ class _NdrCoreView(View):
         partner_ids = [x.strip() for x in partner_logos_setting.value_value.split(',') if x.strip()]
         partners = NdrCoreImage.objects.filter(pk__in=partner_ids, image_active=True) if partner_ids else []
 
+        # Get resolved background settings for this page
+        page_background = self.ndr_page.get_resolved_background_settings()
+
         context = {'page': self.ndr_page,
                    'rendered_text': self.pre_render_text(),
                    'navigation': NdrCorePage.objects.filter(parent_page=None).order_by('index'),
-                   'partners': partners}
+                   'partners': partners,
+                   'page_background': page_background}
         return context
 
     def pre_render_text(self):

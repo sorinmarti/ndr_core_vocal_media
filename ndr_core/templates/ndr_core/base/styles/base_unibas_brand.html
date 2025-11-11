@@ -17,9 +17,12 @@
     {% block custom_css %}
         <!-- custom css -->
     {% endblock %}
+
+    {% include 'ndr_core/includes/background_image_styles.html' %}
 </head>
 <body>
 
+{% if page.show_navigation %}
 <!-- Brand panel (top colored bar) -->
 <div class="brand-panel py-2">
     <div class="container d-flex align-items-center">
@@ -90,11 +93,21 @@
         </div>
     </div>
 </nav>
+{% endif %}
 
+<div class="{% if page.center_content %}ndr-content-wrapper{% endif %}">
 <div class="container my-4">
     {% block page_title %}
-        {% if page.show_page_title == True %}
-            <h1>{{ page.name }}</h1>
+        {% if page_background.bg_mode == 'HEADER_ONLY' %}
+            <div class="page-header-bg">
+                {% if page.show_page_title == True %}
+                    <h1 class="text-center text-white">{{ page.name }}</h1>
+                {% endif %}
+            </div>
+        {% else %}
+            {% if page.show_page_title == True %}
+                <h1>{{ page.name }}</h1>
+            {% endif %}
         {% endif %}
     {% endblock %}
 
@@ -105,7 +118,9 @@
     {% block generated_content %}
     {% endblock %}
 </div>
+</div>
 
+{% if page.show_footer %}
 <footer class="site-footer mt-5 py-4">
     <div class="container small">
         {% block footer %}
@@ -113,6 +128,7 @@
         {% endblock %}
     </div>
 </footer>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'ndr_core/js/jquery.min.js' %}"></script>

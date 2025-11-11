@@ -9,11 +9,13 @@ from django_select2 import forms as s2forms
 
 from ndr_core.admin_forms.settings_forms import SettingsListForm
 from ndr_core.admin_forms.admin_forms import get_form_buttons, get_info_box
+from ndr_core.admin_forms.ui_element_types.base_forms import ImageChoiceField
 from ndr_core.models import (
     NdrCoreSearchConfiguration,
     NdrCorePage,
     NdrCoreValue,
-    NdrCoreRichTextTranslation
+    NdrCoreRichTextTranslation,
+    NdrCoreImage
 )
 
 
@@ -42,11 +44,28 @@ class PageForm(forms.ModelForm):
                                          help_text="If you want this page to be a sub-page of another "
                                                    "one, you can choose the parent page here")
 
+    # Background image field with image picker
+    background_image = ImageChoiceField(
+        queryset=NdrCoreImage.objects.filter(image_active=True).order_by('-uploaded_at'),
+        required=False,
+        label='Background Image (Light Mode)',
+        help_text='Select a background image for this page'
+    )
+
+    background_image_dark = ImageChoiceField(
+        queryset=NdrCoreImage.objects.filter(image_active=True).order_by('-uploaded_at'),
+        required=False,
+        label='Background Image (Dark Mode)',
+        help_text='Optional: Select a different background image for dark mode (falls back to light mode image if not set)'
+    )
+
     class Meta:
         """Configure the model form. Provide model class and form fields."""
         model = NdrCorePage
-        fields = ['name', 'show_page_title', 'label', 'show_in_navigation', 'page_type', 'parent_page',
-                  'search_configs', 'view_name', 'template_text']
+        fields = ['name', 'show_page_title', 'label', 'show_in_navigation', 'show_navigation', 'show_footer',
+                  'center_content', 'page_type', 'parent_page', 'search_configs', 'view_name', 'template_text',
+                  'use_default_background', 'background_image', 'background_image_dark', 'background_display_mode',
+                  'background_position', 'background_size', 'overlay_enabled', 'overlay_color', 'overlay_opacity']
 
     def __init__(self, *args, **kwargs):
         """Init class and create form helper."""
@@ -130,6 +149,14 @@ class PageForm(forms.ModelForm):
         layout.append(form_row)
 
         form_row = Row(
+            Column("show_navigation", css_class="form-group col-md-4 mb-0"),
+            Column("show_footer", css_class="form-group col-md-4 mb-0"),
+            Column("center_content", css_class="form-group col-md-4 mb-0"),
+            css_class="form-row",
+        )
+        layout.append(form_row)
+
+        form_row = Row(
             Column('view_name', css_class='form-group col-md-6 mb-0'),
             Column('parent_page', css_class='form-group col-md-6 mb-0'),
             css_class='form-row'
@@ -152,11 +179,48 @@ class PageForm(forms.ModelForm):
         )
         layout.append(form_row)
 
+        # Background Image Settings Tab
+        background_tab_content = [
+            Row(
+                Column('use_default_background', css_class='form-group col-md-12 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column('background_image', css_class='form-group col-md-6 mb-0'),
+                Column('background_image_dark', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column('background_display_mode', css_class='form-group col-md-6 mb-0'),
+                Column('background_position', css_class='form-group col-md-3 mb-0'),
+                Column('background_size', css_class='form-group col-md-3 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column(
+                    HTML('<h5 class="mt-3 mb-2">Overlay Settings (for better text readability)</h5>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            ),
+            Row(
+                Column('overlay_enabled', css_class='form-group col-md-4 mb-0'),
+                Column('overlay_color', css_class='form-group col-md-4 mb-0'),
+                Column('overlay_opacity', css_class='form-group col-md-4 mb-0'),
+                css_class='form-row'
+            ),
+        ]
+
         if len(self.additional_languages) > 0:
-            # Tabs for additional languages
-            tab_holder = TabHolder(Tab(self.main_language, 'template_text'))
+            # Tabs for content and background
+            tab_holder = TabHolder(
+                Tab('Content (' + self.main_language + ')', 'template_text')
+            )
             for lang in self.additional_languages:
-                tab_holder.append(Tab(lang, f'template_text_{lang}'))
+                tab_holder.append(Tab('Content (' + lang + ')', f'template_text_{lang}'))
+
+            # Add Background tab with all background settings
+            tab_holder.append(Tab('Background Image', *background_tab_content))
 
             form_row = Row(
                 Column(tab_holder, css_class='form-group center col-md-12 mb-0'),
@@ -164,9 +228,13 @@ class PageForm(forms.ModelForm):
             )
             layout.append(form_row)
         else:
-            # No tabs needed
+            # Tabs for content and background (no multiple languages)
+            tab_holder = TabHolder(
+                Tab('Content', 'template_text'),
+                Tab('Background Image', *background_tab_content)
+            )
             form_row = Row(
-                Column('template_text', css_class='form-group col-md-12 mb-0'),
+                Column(tab_holder, css_class='form-group center col-md-12 mb-0'),
                 css_class='form-row'
             )
             layout.append(form_row)

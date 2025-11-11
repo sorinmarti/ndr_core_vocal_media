@@ -9,6 +9,11 @@
     {% url 'ndr_core:configure_pages' %}
 {% endblock %}
 
+{% block extra_css %}
+    {% include 'ndr_core/admin_views/includes/image_picker_init_css.html' %}
+{% endblock %}
+
 {% block page_js %}
     <script src="{% static 'ndr_core/js/admin/page_create_edit.js' %}"></script>
+    {% include 'ndr_core/admin_views/includes/image_picker_init_js.html' %}
 {% endblock %}
