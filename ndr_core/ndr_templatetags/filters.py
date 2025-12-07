@@ -26,6 +26,8 @@ def get_get_filter_class(filter_name):
         return BadgeTemplateFilter
     if filter_name == "img":
         return ImageTemplateFilter
+    if filter_name == "file_display":
+        return FileTemplateFilter
     if filter_name == "date":
         return DateFilter
     if filter_name == "format":
@@ -438,6 +440,269 @@ class ImageTemplateFilter(AbstractFilter):
                 url = url.replace(f'[{placeholder}]', '')
 
         return url
+
+
+class FileTemplateFilter(AbstractFilter):
+    """Filter for displaying text file content previews (txt, json, md, xml, csv, etc.)"""
+
+    def needed_attributes(self):
+        return []
+
+    def allowed_attributes(self):
+        return ["url", "type", "max_lines", "max_height", "class", "style", "show_line_numbers"]
+
+    def needed_options(self):
+        return []
+
+    def get_rendered_value(self):
+        # Check the base value first - this determines if we should show default
+        value = self.get_value()
+        if value == self.get_default_value():
+            # If the value is the default, return it
+            return value
+
+        # Determine the file URL/path
+        if self.get_configuration("url"):
+            # Use provided URL (with potential placeholders)
+            file_path = self.get_configuration("url")
+            if self.data_context:
+                file_path = self.replace_placeholders(file_path)
+        else:
+            # Use the filter value as path
+            file_path = str(value)
+
+        # Get file extension
+        file_ext = self.get_file_extension(file_path)
+
+        # Override file type if specified
+        if self.get_configuration("type"):
+            file_ext = self.get_configuration("type").lower()
+
+        # Generate preview based on file type
+        return self.generate_text_file_preview(file_path, file_ext)
+
+    def get_file_extension(self, file_path):
+        """Extract file extension from file path."""
+        import os
+        if file_path:
+            # Remove query parameters
+            path = file_path.split('?')[0]
+            return os.path.splitext(path)[1].lower().lstrip('.')
+        return ''
+
+    def read_file_content(self, file_path):
+        """Read file content from local path or URL."""
+        import os
+        from django.conf import settings
+
+        try:
+            # If it's a URL (starts with http/https), we can't read it directly server-side
+            if file_path.startswith('http://') or file_path.startswith('https://'):
+                # Return placeholder - actual content will be loaded via JavaScript
+                return None
+
+            # Handle Django file fields
+            if hasattr(file_path, 'read'):
+                file_path.seek(0)
+                content = file_path.read()
+                if isinstance(content, bytes):
+                    content = content.decode('utf-8', errors='ignore')
+                return content
+
+            # Handle file paths relative to MEDIA_ROOT
+            if not os.path.isabs(file_path):
+                file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+            # Read local file
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    max_lines = int(self.get_configuration("max_lines") or 1000)
+                    lines = []
+                    for i, line in enumerate(f):
+                        if i >= max_lines:
+                            lines.append(f"... (truncated after {max_lines} lines)")
+                            break
+                        lines.append(line.rstrip('\n'))
+                    return '\n'.join(lines)
+
+            return None
+
+        except Exception as e:
+            return f"Error reading file: {str(e)}"
+
+    def generate_text_file_preview(self, file_path, file_ext):
+        """Generate text file content preview."""
+
+        # Read file content
+        content = self.read_file_content(file_path)
+
+        if content is None:
+            # For URLs, use JavaScript to fetch content
+            return self.generate_ajax_preview(file_path, file_ext)
+
+        # Generate container
+        container = HTMLElement("div")
+        container.add_attribute("class", "file-preview file-preview-text")
+
+        if self.get_configuration("class"):
+            container.add_attribute("class", self.get_configuration("class"))
+
+        # Determine language/format for syntax highlighting
+        language = self.get_language_for_highlighting(file_ext)
+
+        # Generate header
+        filename = file_path.split('/')[-1]
+        header = f'<div style="padding: 8px 12px; background: #e9ecef; border-bottom: 1px solid #dee2e6; font-weight: bold; font-size: 0.9em;">{filename} <span style="color: #6c757d;">({file_ext.upper()})</span></div>'
+
+        # Generate content display
+        max_height = self.get_configuration("max_height") or "400px"
+        show_line_numbers = self.get_configuration("show_line_numbers")
+
+        if file_ext == 'json':
+            # Pretty print JSON
+            content_display = self.format_json_content(content, max_height, show_line_numbers)
+        else:
+            # Display as preformatted text
+            content_display = self.format_text_content(content, max_height, show_line_numbers, language)
+
+        container.add_content(header)
+        container.add_content(content_display)
+
+        # Add border and styling
+        container.add_attribute("style", "border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden;")
+        if self.get_configuration("style"):
+            container.add_attribute("style", self.get_configuration("style"))
+
+        return str(container)
+
+    def generate_ajax_preview(self, url, file_ext):
+        """Generate preview that loads content via JavaScript for remote URLs."""
+        preview_id = f"file-preview-{uuid.uuid4().hex[:8]}"
+
+        container = HTMLElement("div")
+        container.add_attribute("class", "file-preview file-preview-ajax")
+        container.add_attribute("id", preview_id)
+
+        filename = url.split('/')[-1]
+        header = f'<div style="padding: 8px 12px; background: #e9ecef; border-bottom: 1px solid #dee2e6; font-weight: bold; font-size: 0.9em;">{filename} <span style="color: #6c757d;">({file_ext.upper()})</span></div>'
+
+        loading = f'<div style="padding: 20px; text-align: center; color: #6c757d;">Loading file content...</div>'
+
+        max_height = self.get_configuration("max_height") or "400px"
+
+        script = f'''
+        <script>
+        (function() {{
+            fetch('{url}')
+                .then(response => response.text())
+                .then(content => {{
+                    const container = document.getElementById('{preview_id}');
+                    const contentDiv = container.querySelector('.file-content');
+                    contentDiv.innerHTML = '<pre style="margin: 0; padding: 12px; max-height: {max_height}; overflow: auto; background: #f8f9fa;"><code>' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>';
+                }})
+                .catch(error => {{
+                    const container = document.getElementById('{preview_id}');
+                    const contentDiv = container.querySelector('.file-content');
+                    contentDiv.innerHTML = '<div style="padding: 20px; color: #dc3545;">Error loading file: ' + error.message + '</div>';
+                }});
+        }})();
+        </script>
+        '''
+
+        container.add_content(header)
+        container.add_content('<div class="file-content">' + loading + '</div>')
+        container.add_content(script)
+
+        container.add_attribute("style", "border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden;")
+
+        return str(container)
+
+    def format_json_content(self, content, max_height, show_line_numbers):
+        """Format JSON content with pretty printing."""
+        try:
+            # Try to parse and pretty print JSON
+            parsed = json.loads(content)
+            formatted = json.dumps(parsed, indent=2, ensure_ascii=False)
+        except:
+            # If parsing fails, use original content
+            formatted = content
+
+        # Escape HTML
+        from html import escape
+        formatted = escape(formatted)
+
+        if show_line_numbers and show_line_numbers.lower() in ["true", "1", "yes"]:
+            lines = formatted.split('\n')
+            line_numbers = '\n'.join(str(i+1) for i in range(len(lines)))
+            return f'''
+            <div style="display: flex; max-height: {max_height}; overflow: auto; background: #f8f9fa;">
+                <pre style="margin: 0; padding: 12px; background: #e9ecef; color: #6c757d; text-align: right; user-select: none; border-right: 1px solid #dee2e6;"><code>{line_numbers}</code></pre>
+                <pre style="margin: 0; padding: 12px; flex: 1;"><code>{formatted}</code></pre>
+            </div>
+            '''
+        else:
+            return f'<pre style="margin: 0; padding: 12px; max-height: {max_height}; overflow: auto; background: #f8f9fa;"><code>{formatted}</code></pre>'
+
+    def format_text_content(self, content, max_height, show_line_numbers, language):
+        """Format text content with optional line numbers."""
+        from html import escape
+        content = escape(content)
+
+        if show_line_numbers and show_line_numbers.lower() in ["true", "1", "yes"]:
+            lines = content.split('\n')
+            line_numbers = '\n'.join(str(i+1) for i in range(len(lines)))
+            return f'''
+            <div style="display: flex; max-height: {max_height}; overflow: auto; background: #f8f9fa;">
+                <pre style="margin: 0; padding: 12px; background: #e9ecef; color: #6c757d; text-align: right; user-select: none; border-right: 1px solid #dee2e6;"><code>{line_numbers}</code></pre>
+                <pre style="margin: 0; padding: 12px; flex: 1;"><code>{content}</code></pre>
+            </div>
+            '''
+        else:
+            return f'<pre style="margin: 0; padding: 12px; max-height: {max_height}; overflow: auto; background: #f8f9fa;"><code>{content}</code></pre>'
+
+    def get_language_for_highlighting(self, file_ext):
+        """Map file extension to programming language for potential syntax highlighting."""
+        language_map = {
+            'py': 'python',
+            'js': 'javascript',
+            'html': 'html',
+            'css': 'css',
+            'json': 'json',
+            'xml': 'xml',
+            'md': 'markdown',
+            'yaml': 'yaml',
+            'yml': 'yaml',
+            'sql': 'sql',
+            'sh': 'bash',
+            'bash': 'bash',
+        }
+        return language_map.get(file_ext, 'text')
+
+    def replace_placeholders(self, text):
+        """Replace [variable] placeholders in the text with actual values."""
+        import re
+        from ndr_core.utils import get_nested_value
+
+        # Find all [variable] patterns
+        placeholders = re.findall(r'\[([^\]]+)\]', text)
+
+        # Replace each placeholder with its value
+        for placeholder in placeholders:
+            try:
+                # Get the value from the data context
+                placeholder_value = get_nested_value(self.data_context, placeholder)
+                if placeholder_value is not None:
+                    # Handle arrays - take first element if it's a list
+                    if isinstance(placeholder_value, list) and len(placeholder_value) > 0:
+                        placeholder_value = placeholder_value[0]
+                    text = text.replace(f'[{placeholder}]', str(placeholder_value))
+                else:
+                    text = text.replace(f'[{placeholder}]', '')
+            except:
+                # If placeholder can't be resolved, remove it
+                text = text.replace(f'[{placeholder}]', '')
+
+        return text
 
 
 class DateFilter(AbstractFilter):
