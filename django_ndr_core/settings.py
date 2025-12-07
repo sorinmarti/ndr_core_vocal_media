@@ -278,6 +278,12 @@ CKEDITOR_5_CONFIGS = {
                     'classes': True,
                     'styles': True,
                     'attributes': True
+                },
+                {
+                    'name': 'p',
+                    'classes': ['lead', 'lead-sm', 'lead-lg'],
+                    'styles': True,
+                    'attributes': True
                 }
             ]
         },
@@ -286,7 +292,10 @@ CKEDITOR_5_CONFIGS = {
                 {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
                 {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
                 {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
-                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'},
+                {'model': 'lead', 'view': {'name': 'p', 'classes': 'lead'}, 'title': 'Lead Text', 'class': 'ck-heading_lead'},
+                {'model': 'leadSmall', 'view': {'name': 'p', 'classes': ['lead', 'lead-sm']}, 'title': 'Lead Text (Small)', 'class': 'ck-heading_lead-sm'},
+                {'model': 'leadLarge', 'view': {'name': 'p', 'classes': ['lead', 'lead-lg']}, 'title': 'Lead Text (Large)', 'class': 'ck-heading_lead-lg'},
             ]
         }
     },
@@ -338,6 +347,12 @@ CKEDITOR_5_CONFIGS = {
                 {
                     'name': 'th',
                     'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'p',
+                    'classes': ['lead', 'lead-sm', 'lead-lg'],
                     'styles': True,
                     'attributes': True
                 }

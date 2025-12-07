@@ -1,2 +1,6 @@
-<!-- This template expects a NdrCorePage as data -->
-<a href="{{ data.url }}" target="_blank">{{ data.label }}</a>
+<!-- This template expects a NdrCorePage as data, with optional render_type, style, and size -->
+{% if render_type == 'btn' %}
+    <a href="{{ data.url }}" class="btn btn-{{ style|default:'primary' }}{% if size %} btn-{{ size }}{% endif %}">{{ data.label }}</a>
+{% else %}
+    <a href="{{ data.url }}"{% if style and style != 'secondary' %} class="link-{{ style }}"{% endif %}>{{ data.label }}</a>
+{% endif %}

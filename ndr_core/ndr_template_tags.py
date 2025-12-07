@@ -16,7 +16,8 @@ class TextPreRenderer:
 
     MAX_ITERATIONS = 50
     ui_element_regex = r'\[\[element\|([a-zA-Z0-9_-]+)\]\]'
-    link_element_regex = r'\[\[(file|page|orcid|plotly)\|([0-9a-zA-Z_ -]*)\]\]'
+    link_element_regex = r'\[\[(file|page|orcid|plotly)(?:-([a-z]+)-([a-z]+)(?:-([a-z]+))?)?\|([0-9a-zA-Z_ -]*)\]\]'
+    lead_text_regex = r'\[\[lead(?:-(sm|lg))?\|([^\]]+)\]\]'
     url_element_regex = r'\[\[url\|([0-9a-zA-Z_ -]*)\]\]'
     # Updated regex to capture both old syntax ([[start_block=Title]]) and new syntax ([[start_block:options]])
     container_regex = r'\[\[(start|end)_(block|cell)(?:[:=](.*?))?\]\]'
@@ -333,9 +334,18 @@ class TextPreRenderer:
         match = re.search(self.link_element_regex, rendered_text)
         security_breaker = 0
         while match:
-            template = match.groups()[0]
+            groups = match.groups()
+            template = groups[0]  # file, page, orcid, plotly
+            render_type = groups[1] if len(groups) > 1 else None  # btn, href, or None
+            style = groups[2] if len(groups) > 2 else None  # primary, secondary, etc
+            size = groups[3] if len(groups) > 3 else None  # sm, lg, or None
+            element_id = groups[4] if len(groups) > 4 else groups[1]  # identifier/viewname
+
             rendered_text = self.render_element(template=template,
-                                                element_id=match.groups()[1],
+                                                element_id=element_id,
+                                                render_type=render_type,
+                                                style=style,
+                                                size=size,
                                                 text=rendered_text)
 
             match = re.search(self.link_element_regex, rendered_text)
@@ -415,7 +425,10 @@ class TextPreRenderer:
             code_content = rendered_text[start_pos:end_pos]
 
             # Strip HTML tags (like <p>, <br>, etc.) inserted by WYSIWYG editor
-            # Remove all HTML tags but preserve the text content
+            # First, convert line break tags to newlines to preserve formatting
+            code_content = re.sub(r'<br\s*/?>', '\n', code_content, flags=re.IGNORECASE)
+            code_content = re.sub(r'</p>\s*<p>', '\n', code_content, flags=re.IGNORECASE)
+            # Remove remaining HTML tags but preserve the text content
             code_content = re.sub(r'<[^>]+>', '', code_content)
 
             # Unescape HTML entities that might be in the content
@@ -452,6 +465,37 @@ class TextPreRenderer:
             security_breaker += 1
             if security_breaker > self.MAX_ITERATIONS:
                 raise PreRenderError("Too many code block rendering iterations.")
+
+        return rendered_text
+
+    def create_lead_text(self):
+        """Creates styled lead text for hero/intro sections."""
+        rendered_text = self.text
+        match = re.search(self.lead_text_regex, rendered_text)
+        security_breaker = 0
+
+        while match:
+            size = match.group(1) if match.group(1) else None  # sm, lg, or None
+            text_content = match.group(2)  # The actual text
+
+            # Build CSS classes
+            classes = ['lead']
+            if size:
+                classes.append(f'lead-{size}')
+
+            # Create the lead paragraph HTML
+            lead_html = f'<p class="{" ".join(classes)}">{text_content}</p>'
+
+            # Replace the tag with the rendered HTML
+            full_tag = match.group(0)
+            rendered_text = rendered_text.replace(full_tag, lead_html, 1)
+
+            # Search for next lead tag
+            match = re.search(self.lead_text_regex, rendered_text)
+
+            security_breaker += 1
+            if security_breaker > self.MAX_ITERATIONS:
+                raise PreRenderError("Too many lead text rendering iterations.")
 
         return rendered_text
 
@@ -562,8 +606,8 @@ class TextPreRenderer:
 
         return None
 
-    def render_element(self, template, element_id,  text):
-        """Renders an element."""
+    def render_element(self, template, element_id, text, render_type=None, style=None, size=None):
+        """Renders an element with optional styling parameters."""
         if template == "orcid":
             # Validate ORCID format
             orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
@@ -617,7 +661,14 @@ class TextPreRenderer:
                 return text.replace(f"[[{template}|{element_id}]]", error_html)
 
         element = self.get_element(template, element_id)
-        context = {'data': element}
+
+        # Build context with element data and styling parameters
+        context = {
+            'data': element,
+            'render_type': render_type or ('href' if template == 'page' else None),
+            'style': style or ('secondary' if template == 'page' else None),
+            'size': size
+        }
 
         if isinstance(element, NdrCoreUIElement) and element.type == NdrCoreUIElement.UIElementType.MANIFEST_VIEWER:
             group_id = element.items().first().manifest_group if element and element.items().exists() else None
@@ -625,7 +676,23 @@ class TextPreRenderer:
 
         element_html_string = render_to_string(f'ndr_core/ui_elements/{template}.html',
                                                request=self.request, context=context)
-        text = text.replace(f'[[{template}|{element_id}]]', element_html_string)
+
+        # Build the original tag pattern to replace
+        if render_type or style or size:
+            # Complex tag with styling
+            tag_parts = [template]
+            if render_type:
+                tag_parts.append(render_type)
+            if style:
+                tag_parts.append(style)
+            if size:
+                tag_parts.append(size)
+            original_tag = f'[[{"-".join(tag_parts)}|{element_id}]]'
+        else:
+            # Simple tag
+            original_tag = f'[[{template}|{element_id}]]'
+
+        text = text.replace(original_tag, element_html_string)
 
         return text
 
@@ -657,6 +724,7 @@ class TextPreRenderer:
             return self.text
 
         try:
+            self.text = self.create_lead_text()
             self.text = self.create_code_blocks()
             self.text = self.create_containers()
             self.text = self.create_toc()
