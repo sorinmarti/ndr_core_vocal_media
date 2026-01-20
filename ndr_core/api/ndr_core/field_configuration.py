@@ -83,6 +83,13 @@ class FieldConfiguration:
             return int(value)
         elif self.field.data_field_type == "float":
             return float(value)
+        elif self.field.data_field_type == "boolean":
+            # Convert string boolean values to actual booleans
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                return value.lower() in ('true', '1', 'yes', 'on')
+            return bool(value)
         elif self.field.data_field_type == "string":
             # If the value should be transformed by regex
             if self.field.input_transformation_regex is not None and self.field.input_transformation_regex != '' and '{_value_}' in self.field.input_transformation_regex:

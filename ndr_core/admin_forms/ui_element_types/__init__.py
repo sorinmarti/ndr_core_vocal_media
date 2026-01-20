@@ -8,6 +8,7 @@ from .manifest_viewer_forms import ManifestViewerCreateForm, ManifestViewerEditF
 from .slides_forms import SlidesCreateForm, SlidesEditForm
 from .carousel_forms import CarouselCreateForm, CarouselEditForm
 from .data_object_forms import DataObjectCreateForm, DataObjectEditForm
+from .team_grid_forms import TeamGridCreateForm, TeamGridEditForm
 
 __all__ = [
     'BaseUIElementForm',
@@ -29,4 +30,6 @@ __all__ = [
     'CarouselEditForm',
     'DataObjectCreateForm',
     'DataObjectEditForm',
+    'TeamGridCreateForm',
+    'TeamGridEditForm',
 ]

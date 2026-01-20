@@ -64,7 +64,8 @@ from ndr_core.admin_views.search_views import (
     SearchConfigurationEditView,
     SearchConfigurationDeleteView,
     SearchConfigurationFormEditView,
-    SearchConfigurationCopyView
+    SearchConfigurationCopyView,
+    DataListFiltersEditView
 )
 from ndr_core.admin_views.color_views import (
     ConfigureColorPalettes,
@@ -122,6 +123,7 @@ from ndr_core.admin_views.ui_element_views import (
     VideoCreateView, VideoEditView,
     AudioCreateView, AudioEditView,
     AcademicAboutCreateView, AcademicAboutEditView,
+    TeamGridCreateView, TeamGridEditView,
     # Helper
     get_ndr_image_path
 )
@@ -282,6 +284,8 @@ urlpatterns = [
     path('configure/ui_elements/edit/audio/<str:pk>/', AudioEditView.as_view(), name='edit_ui_element_audio'),
     path('configure/ui_elements/create/academic_about/', AcademicAboutCreateView.as_view(), name='create_ui_element_academic_about'),
     path('configure/ui_elements/edit/academic_about/<str:pk>/', AcademicAboutEditView.as_view(), name='edit_ui_element_academic_about'),
+    path('configure/ui_elements/create/team_grid/', TeamGridCreateView.as_view(), name='create_ui_element_team_grid'),
+    path('configure/ui_elements/edit/team_grid/<str:pk>/', TeamGridEditView.as_view(), name='edit_ui_element_team_grid'),
 
     # SEARCH CONFIGURATIONS
     path('configure/search/', ConfigureSearch.as_view(), name='configure_search'),
@@ -299,6 +303,8 @@ urlpatterns = [
          name='edit_search_form'),
     path('configure/search/edit/card/<str:pk>/', SearchConfigurationResultEditView.as_view(),
          name='edit_result_card'),
+    path('configure/search/edit/data_list_filters/<str:pk>/', DataListFiltersEditView.as_view(),
+         name='edit_data_list_filters'),
     path('configure/search/edit/search_field/<str:pk>/', SearchFieldEditView.as_view(),
          name='edit_search_field'),
     path('configure/search/edit/result_field/<str:pk>/', ResultFieldEditView.as_view(),

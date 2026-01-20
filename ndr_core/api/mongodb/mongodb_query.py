@@ -116,7 +116,13 @@ class MongoDBQuery(BaseQuery):
                 else:
                     value = {"$all": field.value}
             elif field.field_type == 'boolean':
-                value = {'$eq': field.value}
+                # Handle boolean comparison operators
+                if field.operator == '=':
+                    value = field.value
+                elif field.operator == '!=':
+                    value = {"$ne": field.value}
+                else:
+                    value = field.value
             elif field.field_type == 'boolean_list':
                 for key, condition in field.value:
                     if field.condition == 'or':

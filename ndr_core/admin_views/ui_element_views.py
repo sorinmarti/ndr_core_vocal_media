@@ -19,6 +19,7 @@ from ndr_core.admin_forms.ui_element_types import (
 from ndr_core.admin_forms.ui_element_types.video_forms import VideoCreateForm, VideoEditForm
 from ndr_core.admin_forms.ui_element_types.audio_forms import AudioCreateForm, AudioEditForm
 from ndr_core.admin_forms.ui_element_types.academic_about_forms import AcademicAboutCreateForm, AcademicAboutEditForm
+from ndr_core.admin_forms.ui_element_types.team_grid_forms import TeamGridCreateForm, TeamGridEditForm, TeamGridItemFormSet
 from ndr_core.admin_forms.ui_element_types.slides_forms import SlidesItemFormSet
 from ndr_core.admin_forms.ui_element_types.carousel_forms import CarouselItemFormSet
 from ndr_core.admin_views.admin_views import AdminViewMixin
@@ -257,6 +258,100 @@ class CarouselEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
             context['formset'] = CarouselItemFormSet(self.request.POST, instance=self.object)
         else:
             context['formset'] = CarouselItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+
+            # Check if this was a rename operation (name is PK)
+            old_instance_to_delete = getattr(self.object, '_old_instance_to_delete', None)
+            if old_instance_to_delete:
+                # Clear PKs from formset items so they're created fresh on the new instance
+                for formset_form in formset.forms:
+                    if formset_form.instance.pk:
+                        formset_form.instance.pk = None
+
+            formset.instance = self.object
+            formset.save()
+
+            # Delete old instance after formset is saved
+            if old_instance_to_delete:
+                old_instance_to_delete.delete()
+
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class TeamGridCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """View to create a new Team Members Grid UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = TeamGridCreateForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/create/ui_element_team_grid_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = TeamGridItemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = TeamGridItemFormSet(instance=self.object)
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+            return redirect(self.success_url)
+        else:
+            # Print formset errors for debugging
+            print("=== TEAM GRID FORMSET VALIDATION FAILED ===")
+            for i, form_errors in enumerate(formset.errors):
+                if form_errors:
+                    print(f"Form {i} errors:", form_errors)
+            print("Non-form errors:", formset.non_form_errors())
+            return self.render_to_response(self.get_context_data(form=form))
+
+
+class TeamGridEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
+    """View to edit an existing Team Members Grid UI Element with formset."""
+    model = NdrCoreUIElement
+    form_class = TeamGridEditForm
+    success_url = reverse_lazy('ndr_core:configure_ui_elements')
+    template_name = 'ndr_core/admin_views/edit/ui_element_team_grid_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Create formset with extra=0 to not show empty forms when editing
+        from django.forms import inlineformset_factory
+        from ndr_core.admin_forms.ui_element_types.team_grid_forms import TeamGridItemForm
+        EditFormSet = inlineformset_factory(
+            NdrCoreUIElement,
+            NdrCoreUiElementItem,
+            form=TeamGridItemForm,
+            extra=0,  # No empty forms when editing
+            max_num=50,
+            can_delete=True,
+            can_order=True,
+            validate_min=False,
+            min_num=0
+        )
+
+        if self.request.POST:
+            context['formset'] = EditFormSet(self.request.POST, instance=self.object)
+        else:
+            # Order items by order_idx when loading for editing
+            context['formset'] = EditFormSet(
+                instance=self.object,
+                queryset=self.object.ndrcoreuielementitem_set.all().order_by('order_idx')
+            )
         return context
 
     def form_valid(self, form):

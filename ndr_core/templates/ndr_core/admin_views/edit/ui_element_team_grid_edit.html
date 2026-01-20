@@ -1,0 +1,418 @@
+{% extends 'ndr_core/admin_views/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_css %}
+    {% include 'ndr_core/admin_views/includes/image_picker_init_css.html' %}
+<style>
+    /* Formset item styling */
+    .formset-item {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: white;
+    }
+
+    .formset-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .formset-delete-btn {
+        min-width: 100px;
+    }
+
+    .collapse-icon {
+        transition: transform 0.2s;
+        margin-right: 8px;
+    }
+
+    .formset-item-header[aria-expanded="true"] .collapse-icon {
+        transform: rotate(180deg);
+    }
+
+    .formset-item-header:hover {
+        background-color: #f8f9fa;
+    }
+
+    .member-name-display {
+        color: #6c757d;
+        font-weight: normal;
+        margin-left: 8px;
+    }
+
+    .member-name-display:not(:empty):before {
+        content: "- ";
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h2><i class="fa-regular fa-users"></i> Edit Team Members Grid UI Element</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Main Form -->
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                {% for field in form %}
+                    {% if field.name != 'csrfmiddlewaretoken' %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Team Members Section -->
+        <div class="card bg-light mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Team Members</h5>
+            </div>
+            <div class="card-body">
+                {{ formset.management_form }}
+
+                <div id="formset-container">
+                    {% for form in formset %}
+                        <div class="formset-item">
+                            <div class="formset-item-header" style="cursor: pointer;" data-toggle="collapse" data-target="#collapse-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-chevron-down collapse-icon"></i>
+                                    <span class="member-number">Team Member #{{ forloop.counter }}</span>
+                                    <span class="member-name-display"></span>
+                                </h6>
+                                <div onclick="event.stopPropagation();">
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="moveFormsetItemUp(this)" title="Move Up">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="moveFormsetItemDown(this)" title="Move Down">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </button>
+                                    {% if formset.can_delete %}
+                                        <button type="button" class="btn btn-sm btn-danger formset-delete-btn" onclick="deleteFormsetItem(this)">
+                                            <i class="fa fa-trash"></i> Remove
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div style="display: none;">
+                                {{ form.id }}
+                                {{ form.ORDER }}
+                                {{ form.DELETE }}
+                            </div>
+
+                            <div id="collapse-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.member_image.label_tag }}
+                                        {{ form.member_image }}
+                                        {{ form.member_image.errors }}
+                                        {% if form.member_image.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_image.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.member_name.label_tag }}
+                                        {{ form.member_name }}
+                                        {{ form.member_name.errors }}
+                                        {% if form.member_name.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_name.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.member_orcid.label_tag }}
+                                        {{ form.member_orcid }}
+                                        {{ form.member_orcid.errors }}
+                                        {% if form.member_orcid.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_orcid.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.member_title.label_tag }}
+                                        {{ form.member_title }}
+                                        {{ form.member_title.errors }}
+                                        {% if form.member_title.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_title.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.member_website.label_tag }}
+                                        {{ form.member_website }}
+                                        {{ form.member_website.errors }}
+                                        {% if form.member_website.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_website.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.member_bio.label_tag }}
+                                        {{ form.member_bio }}
+                                        {{ form.member_bio.errors }}
+                                        {% if form.member_bio.help_text %}
+                                            <small class="form-text text-muted">{{ form.member_bio.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addFormsetItem()" id="add-form-btn">
+                    <i class="fa fa-plus"></i> Add Another Team Member
+                </button>
+            </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="text-center mb-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-save"></i> Save Team Grid
+            </button>
+            <a href="{% url 'ndr_core:configure_ui_elements' %}" class="btn btn-secondary">
+                <i class="fa-regular fa-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+{% endblock %}
+
+{% block page_js %}
+    {% include 'ndr_core/admin_views/includes/image_picker_init_js.html' %}
+    <script>
+        // Re-initialize image pickers for dynamically added formset items
+        // Initial page load initialization is handled by the included template
+        function initializeImagePickers() {
+            // Initialize image picker for any new select elements
+            $('select.image-picker').each(function() {
+                var $select = $(this);
+
+                // Skip if already has browse button (already initialized)
+                if ($select.siblings('.browse-images-btn').length > 0) {
+                    return;
+                }
+
+                // Initialize the plugin
+                $select.imagepicker({
+                    hide_select: false,
+                    show_label: false,
+                });
+
+                // Add collapsible grid
+                var $grid = $select.siblings('.image_picker_selector');
+                $grid.hide();
+
+                var $toggleBtn = $('<button type="button" class="btn btn-sm btn-outline-secondary mt-2 mb-2 browse-images-btn">' +
+                    '<i class="fa fa-images"></i> Browse Images</button>');
+                $select.after($toggleBtn);
+
+                $toggleBtn.on('click', function(e) {
+                    e.preventDefault();
+                    if ($grid.is(':visible')) {
+                        $grid.slideUp();
+                        $toggleBtn.html('<i class="fa fa-images"></i> Browse Images');
+                    } else {
+                        $('.image_picker_selector').slideUp();
+                        $('.browse-images-btn').html('<i class="fa fa-images"></i> Browse Images');
+                        $grid.slideDown();
+                        $toggleBtn.html('<i class="fa fa-times"></i> Close');
+                    }
+                });
+
+                // Add change handler
+                $select.on('change', function() {
+                    var selectedOptions = $select.find('option:selected');
+                    if (selectedOptions.length > 0 && selectedOptions.val()) {
+                        var $preview = $select.siblings('.current-selection');
+                        if ($preview.length === 0) {
+                            $preview = $('<div class="current-selection mt-2 p-2 border rounded bg-white"></div>');
+                            $select.before($preview);
+                        }
+                        var imgSrc = selectedOptions.attr('data-img-src');
+                        var imgLabel = selectedOptions.attr('data-img-label');
+                        if (imgSrc) {
+                            $preview.html('<strong>Selected:</strong> ' + imgLabel +
+                                '<img src="' + imgSrc + '" style="max-height: 60px; margin-left: 10px;">');
+                        }
+                    } else {
+                        $select.siblings('.current-selection').remove();
+                    }
+                });
+            });
+        }
+
+        function deleteFormsetItem(btn) {
+            var $item = $(btn).closest('.formset-item');
+            var $deleteCheckbox = $item.find('input[name$="-DELETE"]');
+
+            if ($deleteCheckbox.length > 0) {
+                $deleteCheckbox.prop('checked', true);
+                $item.hide();
+            } else {
+                $item.remove();
+            }
+
+            updateFormsetNumbers();
+        }
+
+        function addFormsetItem() {
+            var $container = $('#formset-container');
+            var totalForms = $('#id_ndrcoreuielementitem_set-TOTAL_FORMS');
+            var currentCount = parseInt(totalForms.val());
+            var maxForms = parseInt($('#id_ndrcoreuielementitem_set-MAX_NUM_FORMS').val());
+
+            if (currentCount >= maxForms) {
+                alert('Maximum number of team members reached (' + maxForms + ')');
+                return;
+            }
+
+            // Clone the last formset item
+            var $lastItem = $container.find('.formset-item').last();
+            var $newItem = $lastItem.clone();
+
+            // Update form indices
+            var newIndex = currentCount;
+            $newItem.find(':input').each(function() {
+                var name = $(this).attr('name');
+                if (name) {
+                    name = name.replace(/-\d+-/, '-' + newIndex + '-');
+                    $(this).attr('name', name);
+                    $(this).attr('id', 'id_' + name);
+                }
+
+                // Clear values
+                if ($(this).is(':checkbox') || $(this).is(':radio')) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).val('');
+                }
+            });
+
+            // Update labels
+            $newItem.find('label').each(function() {
+                var forAttr = $(this).attr('for');
+                if (forAttr) {
+                    forAttr = forAttr.replace(/-\d+-/, '-' + newIndex + '-');
+                    $(this).attr('for', forAttr);
+                }
+            });
+
+            // Remove old image picker elements
+            $newItem.find('.image_picker_selector, .browse-images-btn, .current-selection').remove();
+            $newItem.find('select.image-picker').data('image-picker-initialized', false);
+
+            $container.append($newItem);
+            totalForms.val(currentCount + 1);
+
+            // Reinitialize image pickers
+            initializeImagePickers();
+            updateFormsetNumbers();
+        }
+
+        function updateFormsetNumbers() {
+            $('#formset-container .formset-item:visible').each(function(index) {
+                // Update the number
+                $(this).find('.member-number').text('Team Member #' + (index + 1));
+
+                // Update the name display
+                var nameValue = $(this).find('input[name$="-member_name"]').val() || '';
+                $(this).find('.member-name-display').text(nameValue);
+            });
+        }
+
+        function updateMemberName(input) {
+            var $item = $(input).closest('.formset-item');
+            $item.find('.member-name-display').text($(input).val());
+        }
+
+        // Handle collapse icon rotation
+        $(document).ready(function() {
+            $('.formset-item-header').on('click', function() {
+                var expanded = $(this).attr('aria-expanded') === 'true';
+                $(this).attr('aria-expanded', !expanded);
+            });
+
+            // Initialize ORDER fields on page load
+            updateOrderFields();
+
+            // Initialize member names on page load
+            updateFormsetNumbers();
+
+            // Listen for name input changes
+            $(document).on('input', 'input[name$="-member_name"]', function() {
+                updateMemberName(this);
+            });
+        });
+
+        function moveFormsetItemUp(btn) {
+            var $item = $(btn).closest('.formset-item');
+            var $prev = $item.prevAll('.formset-item:visible').first();
+
+            console.log('Moving up - Previous items found:', $prev.length);
+
+            if ($prev.length > 0) {
+                $item.insertBefore($prev);
+                updateFormsetNumbers();
+                updateOrderFields();
+                console.log('Move up completed');
+            } else {
+                console.log('No previous item found - already at top');
+            }
+        }
+
+        function moveFormsetItemDown(btn) {
+            var $item = $(btn).closest('.formset-item');
+            var $next = $item.nextAll('.formset-item:visible').first();
+
+            if ($next.length > 0) {
+                $item.insertAfter($next);
+                updateFormsetNumbers();
+                updateOrderFields();
+            }
+        }
+
+        function updateOrderFields() {
+            $('#formset-container .formset-item:visible').each(function(index) {
+                var $orderInput = $(this).find('input[name$="-ORDER"]');
+                $orderInput.val(index);
+                console.log('Set ORDER for item', index, 'to', index, '- Input name:', $orderInput.attr('name'));
+            });
+        }
+    </script>
+{% endblock %}

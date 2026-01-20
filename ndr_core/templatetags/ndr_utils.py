@@ -341,3 +341,11 @@ def url_deparse(value):
 
     # return urllib.parse.unquote(value)
     return value.replace("_sl_", "/")
+
+
+@register.filter
+def get_item(dictionary, key):
+    """Get an item from a dictionary by key in a template."""
+    if dictionary is None:
+        return None
+    return dictionary.get(key)

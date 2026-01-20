@@ -4,6 +4,7 @@ import json
 import html
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
+from django.templatetags.static import static
 
 from ndr_core.exceptions import PreRenderError
 from ndr_core.forms.forms_manifest import ManifestSelectionForm
@@ -19,6 +20,7 @@ class TextPreRenderer:
     link_element_regex = r'\[\[(file|page|orcid|plotly)(?:-([a-z]+)-([a-z]+)(?:-([a-z]+))?)?\|([0-9a-zA-Z_ -]*)\]\]'
     lead_text_regex = r'\[\[lead(?:-(sm|lg))?\|([^\]]+)\]\]'
     url_element_regex = r'\[\[url\|([0-9a-zA-Z_ -]*)\]\]'
+    setting_regex = r'\[\[setting\|([a-zA-Z0-9_-]+)\]\]'
     # Updated regex to capture both old syntax ([[start_block=Title]]) and new syntax ([[start_block:options]])
     container_regex = r'\[\[(start|end)_(block|cell)(?:[:=](.*?))?\]\]'
     code_start_regex = r'\[\[start_code(?:=(.*?))?\]\]'
@@ -376,6 +378,29 @@ class TextPreRenderer:
                 raise PreRenderError("Too many URL rendering iterations.")
         return rendered_text
 
+    def create_settings(self):
+        """Replaces [[setting|setting_name]] with custom setting values."""
+        from ndr_core.models import NdrCoreValue
+
+        rendered_text = self.text
+        match = re.search(self.setting_regex, rendered_text)
+        security_breaker = 0
+        while match:
+            setting_name = match.groups()[0]
+            try:
+                setting = NdrCoreValue.objects.get(value_name=setting_name)
+                value = setting.get_value()
+            except NdrCoreValue.DoesNotExist:
+                value = f"[Setting '{setting_name}' not found]"
+
+            rendered_text = rendered_text.replace(f'[[setting|{setting_name}]]', str(value))
+            match = re.search(self.setting_regex, rendered_text)
+
+            security_breaker += 1
+            if security_breaker > self.MAX_ITERATIONS:
+                raise PreRenderError("Too many setting rendering iterations.")
+        return rendered_text
+
     def create_toc(self):
         """Creates table of contents with anchor links to titled blocks."""
         rendered_text = self.text
@@ -576,6 +601,13 @@ class TextPreRenderer:
                 context['website'] = item.url
                 context['orcid_id'] = item.object_id
 
+        # Special handling for TEAM_GRID type
+        if element.type == NdrCoreUIElement.UIElementType.TEAM_GRID:
+            context['team_members'] = element.items()  # Already ordered by order_idx
+            context['columns_layout'] = getattr(element, '_columns_layout', 'auto')
+            context['show_bios'] = getattr(element, '_show_bios', True)
+            context['card_style'] = getattr(element, '_card_style', 'standard')
+
         # Render the template
         try:
             element_html_string = render_to_string(f'ndr_core/ui_elements/{template_name}.html',
@@ -617,9 +649,10 @@ class TextPreRenderer:
 
             # Generate ORCID link
             orcid_url = f"https://orcid.org/{element_id}"
+            orcid_icon_url = static('ndr_core/images/orcid.svg')
             orcid_html = f"""
             <a href="{orcid_url}" target="_blank" class="orcid-link" rel="noopener noreferrer">
-                <img src="/static/ndr_core/images/orcid.svg" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
+                <img src="{orcid_icon_url}" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
                 {element_id}
             </a>
             """
@@ -729,6 +762,7 @@ class TextPreRenderer:
             self.text = self.create_containers()
             self.text = self.create_toc()
             self.text = self.create_ui_elements()
+            self.text = self.create_settings()
             self.text = self.create_urls()
             self.text = self.create_links()
         except PreRenderError as e:

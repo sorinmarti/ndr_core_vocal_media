@@ -10,6 +10,7 @@ from ndr_core.admin_forms.search_config_forms import (
     SearchConfigurationEditForm
 )
 from ndr_core.admin_forms.search_form_forms import SearchConfigurationFormEditForm
+from ndr_core.admin_forms.data_list_filter_forms import DataListFiltersEditForm
 from ndr_core.admin_views.admin_views import AdminViewMixin
 from ndr_core.models import (
     NdrCoreSearchField,
@@ -28,9 +29,34 @@ class ConfigureSearch(AdminViewMixin, LoginRequiredMixin, View):
         search_fields = NdrCoreSearchField.objects.all().order_by('field_label')
         result_fields = NdrCoreResultField.objects.all().order_by('label')
         searches = NdrCoreSearchConfiguration.objects.all()
+
+        # Build a mapping of which search configurations use each search field
+        search_field_usage = {}
+        for field in search_fields:
+            # Find all SearchFieldFormConfigurations that use this field
+            form_configs = NdrCoreSearchFieldFormConfiguration.objects.filter(search_field=field)
+            # Find all SearchConfigurations that use these form configs
+            used_by = []
+            for search_config in searches:
+                if search_config.search_form_fields.filter(search_field=field).exists():
+                    used_by.append(search_config)
+            search_field_usage[field.pk] = used_by
+
+        # Build a mapping of which search configurations use each result field
+        result_field_usage = {}
+        for field in result_fields:
+            # Find all SearchConfigurations that use this result field
+            used_by = []
+            for search_config in searches:
+                if search_config.result_card_fields.filter(result_field=field).exists():
+                    used_by.append(search_config)
+            result_field_usage[field.pk] = used_by
+
         context = {'search_fields': search_fields,
                    'result_fields': result_fields,
-                   'searches': searches}
+                   'searches': searches,
+                   'search_field_usage': search_field_usage,
+                   'result_field_usage': result_field_usage}
 
         return render(self.request, template_name='ndr_core/admin_views/overview/configure_search.html',
                       context=context)
@@ -130,4 +156,38 @@ class SearchConfigurationFormEditView(AdminViewMixin, LoginRequiredMixin, FormVi
                         field_column=form.cleaned_data[f'column_field_{row}'],
                         field_size=form.cleaned_data[f'size_field_{row}'])
                     conf_object.search_form_fields.add(new_field)
+        return response
+
+
+class DataListFiltersEditView(AdminViewMixin, LoginRequiredMixin, FormView):
+    """View to configure data list filters for a search configuration."""
+
+    form_class = DataListFiltersEditForm
+    template_name = 'ndr_core/admin_views/edit/data_list_filters_edit.html'
+    success_url = reverse_lazy('ndr_core:configure_search')
+
+    def get_form(self, form_class=None):
+        """Returns the form with initial data from the search configuration."""
+        form = super().get_form(form_class=form_class)
+        search_config = NdrCoreSearchConfiguration.objects.get(pk=self.kwargs['pk'])
+
+        # Set initial selected filters
+        form.fields['data_list_filters'].initial = search_config.data_list_filters.all()
+
+        return form
+
+    def get_context_data(self, **kwargs):
+        """Add search configuration to context."""
+        context = super().get_context_data(**kwargs)
+        context['search_config'] = NdrCoreSearchConfiguration.objects.get(pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form):
+        """Save the selected data list filters to the search configuration."""
+        response = super().form_valid(form)
+        search_config = NdrCoreSearchConfiguration.objects.get(pk=self.kwargs['pk'])
+
+        # Update the data list filters
+        search_config.data_list_filters.set(form.cleaned_data['data_list_filters'])
+
         return response

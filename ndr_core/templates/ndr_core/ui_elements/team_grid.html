@@ -1,0 +1,133 @@
+<!-- This template renders TEAM_GRID UI elements -->
+{% load static %}
+{% load i18n %}
+
+<div class="team-grid-container mb-4">
+    {% if team_members %}
+        <div class="row">
+            {% for member in team_members %}
+                <div class="{% if columns_layout == '2' %}col-12 col-md-6{% elif columns_layout == '3' %}col-12 col-md-6 col-lg-4{% elif columns_layout == '4' %}col-12 col-sm-6 col-lg-3{% elif columns_layout == '6' %}col-12 col-sm-6 col-md-4 col-lg-2{% else %}col-12 col-sm-6 col-md-4 col-lg-3{% endif %} mb-4">
+                    <div class="card h-100 team-member-card {% if card_style == 'bordered' %}border-primary{% elif card_style == 'minimal' %}border-0 shadow-sm{% endif %}">
+                        <div class="card-body d-flex flex-column">
+                            {% comment %}Profile Photo{% endcomment %}
+                            {% if member.ndr_image %}
+                                <div class="text-center mb-3">
+                                    <img src="{{ member.ndr_image.image.url }}"
+                                         alt="{{ member.ndr_image.alt_text|default:member.title }}"
+                                         class="img-fluid rounded-circle team-member-photo"
+                                         style="max-width: 150px; width: 100%;">
+                                </div>
+                            {% endif %}
+
+                            {% comment %}Name{% endcomment %}
+                            {% if member.title %}
+                                <h5 class="text-center mb-2">{{ member.title }}</h5>
+                            {% endif %}
+
+                            {% comment %}Title/Position{% endcomment %}
+                            {% if member.text %}
+                                <p class="text-center text-muted mb-3"><em>{{ member.text }}</em></p>
+                            {% endif %}
+
+                            {% comment %}Biography (if enabled){% endcomment %}
+                            {% if show_bios and member.rich_text %}
+                                <div class="team-member-bio mb-3 flex-grow-1">
+                                    {{ member.rich_text|safe }}
+                                </div>
+                            {% endif %}
+
+                            {% comment %}Links Section{% endcomment %}
+                            <div class="team-member-links mt-auto">
+                                {% if member.object_id %}
+                                    <div class="mb-2 text-center">
+                                        <a href="https://orcid.org/{{ member.object_id }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="orcid-link"
+                                           title="ORCID iD: {{ member.object_id }}">
+                                            <img src="{% static 'ndr_core/images/orcid.svg' %}"
+                                                 alt="ORCID iD"
+                                                 style="width: 16px; height: 16px; vertical-align: text-bottom;">
+                                            {{ member.object_id }}
+                                        </a>
+                                    </div>
+                                {% endif %}
+
+                                {% if member.url %}
+                                    <div class="mb-2 text-center">
+                                        <a href="{{ member.url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="team-member-website">
+                                            <i class="fa fa-globe"></i> Website
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fa fa-info-circle"></i> No team members to display.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .team-grid-container {
+        width: 100%;
+    }
+
+    .team-member-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .team-member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .team-member-photo {
+        object-fit: cover;
+        aspect-ratio: 1;
+    }
+
+    .team-member-bio {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        text-align: justify;
+    }
+
+    .team-member-bio p:last-child {
+        margin-bottom: 0;
+    }
+
+    .orcid-link {
+        color: #338934;
+        text-decoration: none;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+    .orcid-link:hover {
+        text-decoration: underline;
+    }
+
+    .team-member-website {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .team-member-website:hover {
+        text-decoration: underline;
+    }
+
+    .team-member-links {
+        border-top: 1px solid #dee2e6;
+        padding-top: 10px;
+    }
+</style>

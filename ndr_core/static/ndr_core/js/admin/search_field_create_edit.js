@@ -74,8 +74,9 @@ function setTextBox(select_value) {
             info_text.text("Generates a True/False switch.")
             info_text_detail.html("<ul>" +
                                   "  <li>Search for <b>True</b> or <b>False</b>.</li>" +
+                                  "  <li>Supports comparison operators (=, !=)</li>" +
                                   "  <li>Valid initial values: <b>true</b> or <b>false</b></li>" +
-                                  "  <li>Field Type setting returns 'true'/'false' (string) or 0/1 (int)</li>" +
+                                  "  <li>Set <b>Data Field Type</b> to <b>Boolean</b> for proper conversion</li>" +
                                   "</ul>");
             break;
         case '6':       // Date
@@ -194,6 +195,7 @@ function selectType(select_value) {
             input_transformation_regex.attr('disabled', 'disabled');
             break;
         case '5':       // Boolean
+            comparison_operator.removeAttr('disabled');
             field_required.attr('disabled', 'disabled');
             input_transformation_regex.attr('disabled', 'disabled');
             break;

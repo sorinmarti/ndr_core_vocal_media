@@ -260,7 +260,7 @@ class NdrCoreSearchField(TranslatableMixin, models.Model):
     data_field_type = models.CharField(max_length=100,
                                        blank=True,
                                        default='',
-                                       choices=(('int', 'Integer'), ('float', 'Float'), ('string', 'String')),
+                                       choices=(('int', 'Integer'), ('float', 'Float'), ('string', 'String'), ('boolean', 'Boolean')),
                                        help_text="Type of the field in the data source. This may change "
                                                  "the way data is queried.")
 
@@ -524,6 +524,12 @@ class NdrCoreSearchConfiguration(TranslatableMixin, models.Model):
     search_form_fields = models.ManyToManyField(NdrCoreSearchFieldFormConfiguration,
                                                 help_text="Fields associated with this configuration")
     """Fields associated with this configuration """
+
+    data_list_filters = models.ManyToManyField(NdrCoreSearchField,
+                                               related_name='used_in_data_lists',
+                                               blank=True,
+                                               help_text="Search fields used as pre-filters for data list pages (using their initial values)")
+    """Search fields that will be applied as filters in data list pages using their initial values"""
 
     search_id_field = models.CharField(max_length=100, blank=False, default='id',
                                        help_text="The ID field to identify an entry.")
@@ -1599,6 +1605,7 @@ class NdrCoreUIElement(models.Model):
         VIDEO = "video", "Video"
         AUDIO = "audio", "Audio Player"
         ACADEMIC_ABOUT = "academic_about", "About Me"
+        TEAM_GRID = "team_grid", "Team Members Grid"
 
     type = models.CharField(max_length=100,
                             choices=UIElementType.choices,

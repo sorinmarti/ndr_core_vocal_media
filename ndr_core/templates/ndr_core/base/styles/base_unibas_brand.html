@@ -28,8 +28,8 @@
     <div class="container d-flex align-items-center">
         {% block brand_title %}
         <div class="brand-title fw-semibold text-uppercase">
-            {% config_value 'brand_panel_title' as brand_title %}
-            {{ brand_title }}
+            {% config_value 'project_title' as project_title %}
+            {{ project_title }}
         </div>
         {% endblock %}
         <div class="ms-auto small d-flex align-items-center gap-2">

@@ -468,11 +468,20 @@ class DataListView(_NdrCoreSearchView):
             if request.GET.get('id',''):
                 detail_page_id = request.GET.get('id','').strip()
 
-        # Get query string - use simple query if search term provided, otherwise get all items
+        # Apply data list filters (pre-filters with initial values)
+        data_list_filters = search_config.data_list_filters.all()
+        for filter_field in data_list_filters:
+            if filter_field.initial_value:
+                query_obj.set_value(filter_field.field_name, filter_field.initial_value)
+
+        # Get query string - use appropriate query based on context
         if detail_page_id:
             query_string = query_obj.get_record_query(detail_page_id)
         elif search_term:
             query_string = query_obj.get_simple_query(search_term)
+        elif data_list_filters.exists():
+            # If we have data list filters, use advanced query to apply them
+            query_string = query_obj.get_advanced_query()
         else:
             query_string = query_obj.get_all_items_query()
 

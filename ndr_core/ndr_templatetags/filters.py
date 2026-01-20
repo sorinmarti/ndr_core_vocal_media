@@ -3,6 +3,7 @@ from datetime import datetime
 import uuid
 import json
 from urllib.parse import urlparse
+from django.templatetags.static import static
 
 from ndr_core.models import NdrCoreSearchField, NdrCorePage
 from ndr_core.ndr_templatetags.abstract_filter import AbstractFilter
@@ -790,9 +791,10 @@ class LinkifyFilter(AbstractFilter):
             orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
             if re.match(orcid_pattern, orcid):
                 orcid_url = f"https://orcid.org/{orcid}"
+                orcid_icon_url = static('ndr_core/images/orcid.svg')
                 return f"""
                         <a href="{orcid_url}" target="_blank" class="orcid-link" rel="noopener noreferrer">
-                            <img src="/static/ndr_core/images/orcid.svg" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
+                            <img src="{orcid_icon_url}" alt="ORCID" style="width: 16px; height: 16px; vertical-align: middle;">
                             {orcid}
                         </a>
                         """
@@ -983,7 +985,8 @@ class WeblinksFilter(AbstractFilter):
         link_target = self.get_configuration("target") or "_blank"
         link_class = self.get_configuration("class") or "weblink"
         link_style = self.get_configuration("style") or ""
-        default_icon = self.get_configuration("default_icon") or "/static/ndr_core/images/not-found-favicon.ico"
+        default_icon_config = self.get_configuration("default_icon")
+        default_icon = default_icon_config if default_icon_config else static('ndr_core/images/not-found-favicon.ico')
 
         # Generate HTML for each URL
         links_html = []
@@ -2379,6 +2382,10 @@ class DatatableFilter(TableTemplateFilter):
         pagination_config = "true" if options['paginate'] else "false"
         pagination_size = options['pagesize']
 
+        # Resolve static file URLs using Django's static template tag
+        tabulator_css_url = static('ndr_core/plugins/tabulator/css/tabulator.min.css')
+        tabulator_js_url = static('ndr_core/plugins/tabulator/js/tabulator.min.js')
+
         script = f"""
         <script>
             (function() {{
@@ -2386,14 +2393,14 @@ class DatatableFilter(TableTemplateFilter):
                 if (!document.querySelector('link[href*="tabulator"]')) {{
                     var link = document.createElement('link');
                     link.rel = 'stylesheet';
-                    link.href = '/static/ndr_core/plugins/tabulator/css/tabulator.min.css';
+                    link.href = '{tabulator_css_url}';
                     document.head.appendChild(link);
                 }}
 
                 // Ensure Tabulator JS is loaded
                 if (typeof Tabulator === 'undefined') {{
                     var script = document.createElement('script');
-                    script.src = '/static/ndr_core/plugins/tabulator/js/tabulator.min.js';
+                    script.src = '{tabulator_js_url}';
                     script.onload = function() {{ initTable_{func_id}(); }};
                     document.head.appendChild(script);
                 }} else {{
