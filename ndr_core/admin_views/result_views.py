@@ -9,7 +9,10 @@ from django.shortcuts import redirect
 from ndr_core.admin_forms.result_card_forms import SearchConfigurationResultEditForm
 from ndr_core.admin_views.admin_views import AdminViewMixin
 from ndr_core.form_preview import PreviewImage
-from ndr_core.admin_forms.result_field_forms import ResultFieldCreateForm, ResultFieldEditForm
+from ndr_core.admin_forms.result_field_forms import (
+    ResultFieldCreateForm, ResultFieldEditForm,
+    TabFieldCreateForm, TabFieldEditForm
+)
 from ndr_core.models import (
     NdrCoreResultField,
     NdrCoreSearchConfiguration
@@ -34,6 +37,30 @@ class ResultFieldCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
         return response
 
 
+class TabFieldCreateView(AdminViewMixin, LoginRequiredMixin, CreateView):
+    """ View to create a new Tab Container Field """
+
+    model = NdrCoreResultField
+    form_class = TabFieldCreateForm
+    success_url = reverse_lazy('ndr_core:configure_search')
+    template_name = 'ndr_core/admin_views/create/result_field_create.html'
+
+    def form_valid(self, form):
+        """Handle form submission."""
+        response = super().form_valid(form)
+        messages.success(self.request, "Tab container field saved successfully.")
+        if 'submit_and_continue' in self.request.POST:
+            # Redirect to the edit page for the newly created object
+            return redirect('ndr_core:edit_result_field', pk=self.object.pk)
+        return response
+
+    def get_context_data(self, **kwargs):
+        """Add context to indicate this is a tab field creation."""
+        context = super().get_context_data(**kwargs)
+        context['is_tab_field'] = True
+        return context
+
+
 class ResultFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     """ View to edit an existing Search field """
 
@@ -42,10 +69,17 @@ class ResultFieldEditView(AdminViewMixin, LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('ndr_core:configure_search')
     template_name = 'ndr_core/admin_views/edit/result_field_edit.html'
 
+    def get_form_class(self):
+        """Return the appropriate form class based on whether this is a tab container."""
+        if self.object and self.object.is_tab_container:
+            return TabFieldEditForm
+        return ResultFieldEditForm
+
     def form_valid(self, form):
         """Handle form submission and check which button was clicked."""
         response = super().form_valid(form)
-        messages.success(self.request, "Result field updated successfully.")
+        field_type = "Tab container field" if self.object.is_tab_container else "Result field"
+        messages.success(self.request, f"{field_type} updated successfully.")
         if 'submit_and_continue' in self.request.POST:
             # Redirect back to the same edit page
             return redirect('ndr_core:edit_result_field', pk=self.object.pk)
@@ -74,7 +108,9 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 (f'row_field_{row}', 'field_row'),
                 (f'column_field_{row}', 'field_column'),
                 (f'column_span_field_{row}', 'field_column_span'),
-                (f'row_span_field_{row}', 'field_row_span')]
+                (f'row_span_field_{row}', 'field_row_span'),
+                (f'tab_name_field_{row}', 'tab_name'),
+                (f'tab_order_field_{row}', 'tab_order')]
 
     @staticmethod
     def get_compact_row_fields(row):
@@ -83,7 +119,9 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 (f'cpct_row_field_{row}', 'field_row'),
                 (f'cpct_column_field_{row}', 'field_column'),
                 (f'cpct_column_span_field_{row}', 'field_column_span'),
-                (f'cpct_row_span_field_{row}', 'field_row_span')]
+                (f'cpct_row_span_field_{row}', 'field_row_span'),
+                (f'cpct_tab_name_field_{row}', 'tab_name'),
+                (f'cpct_tab_order_field_{row}', 'tab_order')]
 
     def get_context_data(self, **kwargs):
         """Adds the search configuration to the context. """
@@ -139,8 +177,10 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
 
                 conf_line.field_row = form.cleaned_data[f'row_field_{row}']
                 conf_line.field_column = form.cleaned_data[f'column_field_{row}']
-                conf_line.field_column_span = form.cleaned_data[f'column_span_field_{row}']  # Add this
-                conf_line.field_row_span = form.cleaned_data[f'row_span_field_{row}']  # Add this
+                conf_line.field_column_span = form.cleaned_data[f'column_span_field_{row}']
+                conf_line.field_row_span = form.cleaned_data[f'row_span_field_{row}']
+                conf_line.tab_name = form.cleaned_data.get(f'tab_name_field_{row}', None) or None
+                conf_line.tab_order = form.cleaned_data.get(f'tab_order_field_{row}', 1) or 1
                 conf_line.result_card_group = 'normal'
                 conf_line.save()
 
@@ -161,8 +201,10 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
 
                 conf_line.field_row = form.cleaned_data[f'cpct_row_field_{row}']
                 conf_line.field_column = form.cleaned_data[f'cpct_column_field_{row}']
-                conf_line.field_column_span = form.cleaned_data[f'cpct_column_span_field_{row}']  # Add this
-                conf_line.field_row_span = form.cleaned_data[f'cpct_row_span_field_{row}']  # Add this
+                conf_line.field_column_span = form.cleaned_data[f'cpct_column_span_field_{row}']
+                conf_line.field_row_span = form.cleaned_data[f'cpct_row_span_field_{row}']
+                conf_line.tab_name = form.cleaned_data.get(f'cpct_tab_name_field_{row}', None) or None
+                conf_line.tab_order = form.cleaned_data.get(f'cpct_tab_order_field_{row}', 1) or 1
                 conf_line.result_card_group = 'compact'
                 conf_line.save()
 

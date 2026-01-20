@@ -108,6 +108,19 @@ class NdrCoreResultField(TranslatableMixin, models.Model):
                                     help_text="Label text to display on the top border of the field box")
     """Label text to display on the top border of the field box"""
 
+    is_tab_container = models.BooleanField(
+        default=False,
+        help_text="If true, this field acts as a tab container and displays child fields as tabs"
+    )
+    """Marks this field as a tab container. When true, rich_expression is ignored and tab_children is rendered."""
+
+    tab_children = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="JSON array of tab configurations: [{'tab_label': 'Info', 'result_field_id': 123, 'tab_order': 1}, ...]"
+    )
+    """Configuration for tabs. Each entry should have 'tab_label', 'result_field_id', and optional 'tab_order'."""
+
     def __getattribute__(self, item):
         """Returns the translated field for a given language. If no translation exists,
         the default value is returned. """
@@ -411,6 +424,17 @@ class NdrCoreResultFieldCardConfiguration(models.Model):
                                          default='normal',
                                          help_text="The group of the result card. Normal is the default group.")
     """The group of the result card. Normal is the default group."""
+
+    tab_name = models.CharField(max_length=100,
+                                blank=True,
+                                null=True,
+                                help_text="Tab name to group this field under. Leave empty for no tabs.")
+    """Tab name to group this field under. Leave empty to display field outside of tabs."""
+
+    tab_order = models.IntegerField(default=1,
+                                    validators=[MinValueValidator(1), MaxValueValidator(20)],
+                                    help_text="Order of tabs (1 = first tab). Only applies if tab_name is set.")
+    """Order of tabs. Lower numbers appear first."""
 
 
 class NdrCoreSearchFieldFormConfiguration(models.Model):

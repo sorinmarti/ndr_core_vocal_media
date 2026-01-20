@@ -7,6 +7,7 @@ from ndr_core.admin_forms.translation_forms import TranslatePageForm, TranslateF
     TranslateFormForm, TranslateUIElementsForm, TranslateResultForm
 from ndr_core.admin_views.result_views import (
     ResultFieldCreateView,
+    TabFieldCreateView,
     ResultFieldEditView,
     preview_result_card_image,
     ResultFieldDeleteView,
@@ -296,6 +297,8 @@ urlpatterns = [
          name='create_search_field'),
     path('configure/search/create/new/result_field/', ResultFieldCreateView.as_view(),
          name='create_result_field'),
+    path('configure/search/create/new/tab_field/', TabFieldCreateView.as_view(),
+         name='create_tab_field'),
 
     path('configure/search/edit/config/<str:pk>/', SearchConfigurationEditView.as_view(),
          name='edit_search_config'),

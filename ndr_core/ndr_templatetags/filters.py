@@ -1277,6 +1277,9 @@ class MapFilter(AbstractFilter):
         else:
             # Regular extraction for backward compatibility
             if isinstance(value, dict):
+                # Initialize is_object_subs flag
+                is_object_subs = False
+
                 # Check for direct latitude/longitude coordinates first
                 if "latitude" in value and "longitude" in value:
                     # Single coordinate dict - create marker directly
@@ -1301,11 +1304,43 @@ class MapFilter(AbstractFilter):
                         })
                     except (ValueError, TypeError):
                         pass  # Continue to other extraction methods
+                # Check for nested coordinates structure
+                elif "coordinates" in value and isinstance(value["coordinates"], dict):
+                    coords = value["coordinates"]
+                    try:
+                        lat, lng = None, None
+                        if "lat" in coords and "lon" in coords:
+                            lat = float(coords["lat"])
+                            lng = float(coords["lon"])
+                        elif "latitude" in coords and "longitude" in coords:
+                            lat = float(coords["latitude"])
+                            lng = float(coords["longitude"])
+
+                        if lat is not None and lng is not None:
+                            # Create popup with available info
+                            popup_parts = []
+                            if "name" in value:
+                                popup_parts.append(f"Name: {value['name']}")
+                            if "city" in value:
+                                popup_parts.append(f"City: {value['city']}")
+                            if "country" in value:
+                                popup_parts.append(f"Country: {value['country']}")
+                            if "transcription" in value:
+                                popup_parts.append(f"Transcription: {value['transcription']}")
+                            popup_text = " | ".join(popup_parts) if popup_parts else f"Coordinates: {lat}, {lng}"
+
+                            markers.append({
+                                "latitude": lat,
+                                "longitude": lng,
+                                "popup": popup_text,
+                                "group": "default",
+                                "color": default_colors[0]
+                            })
+                    except (ValueError, TypeError):
+                        pass  # Continue to other extraction methods
                 # Check if this looks like object_subs structure with multiple groups
                 elif all(isinstance(v, list) for v in value.values() if isinstance(v, (list, dict))):
                     is_object_subs = True
-                else:
-                    is_object_subs = False
 
                 if "type" in value and "coordinates" in value:
                     # Single geometry object
@@ -1461,12 +1496,26 @@ class MapFilter(AbstractFilter):
                     return float(value["latitude"]), float(value["longitude"])
                 except (ValueError, TypeError):
                     return None, None
-            elif "coordinates" in value and isinstance(value["coordinates"], list) and len(value["coordinates"]) >= 2:
-                try:
-                    # GeoJSON format: [longitude, latitude]
-                    return float(value["coordinates"][1]), float(value["coordinates"][0])
-                except (ValueError, TypeError, IndexError):
-                    return None, None
+            elif "coordinates" in value:
+                coords = value["coordinates"]
+                # Check if coordinates is a dict with lat/lon or latitude/longitude
+                if isinstance(coords, dict):
+                    try:
+                        # Support lat/lon format
+                        if "lat" in coords and "lon" in coords:
+                            return float(coords["lat"]), float(coords["lon"])
+                        # Support latitude/longitude format
+                        elif "latitude" in coords and "longitude" in coords:
+                            return float(coords["latitude"]), float(coords["longitude"])
+                    except (ValueError, TypeError):
+                        return None, None
+                # Check if coordinates is a list (GeoJSON format)
+                elif isinstance(coords, list) and len(coords) >= 2:
+                    try:
+                        # GeoJSON format: [longitude, latitude]
+                        return float(coords[1]), float(coords[0])
+                    except (ValueError, TypeError, IndexError):
+                        return None, None
         elif isinstance(value, list) and len(value) >= 2:
             try:
                 # Assume [latitude, longitude] or [longitude, latitude]

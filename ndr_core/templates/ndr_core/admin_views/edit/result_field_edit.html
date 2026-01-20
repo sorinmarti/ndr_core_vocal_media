@@ -1,10 +1,22 @@
 {% extends 'ndr_core/admin_views/edit/_edit.html' %}
+{% load static %}
 
 {% block back_url %}
     {% url 'ndr_core:configure_search' %}
 {% endblock %}
 
 {% block title %}
-    Update Result Field
+    {% if object.is_tab_container %}
+        Update Tab Container Field
+    {% else %}
+        Update Result Field
+    {% endif %}
+{% endblock %}
+
+{% block page_js %}
+    {{ block.super }}
+    {% if object.is_tab_container %}
+        <script src="{% static 'ndr_core/js/widgets/tab_children_widget.js' %}"></script>
+    {% endif %}
 {% endblock %}
 

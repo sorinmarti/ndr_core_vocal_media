@@ -41,3 +41,35 @@
 :disabled {
     background: #cccccc !important;
 }
+
+/* Tab Children Widget Styles */
+.tab-children-widget {
+    margin-top: 10px;
+}
+
+.tab-children-widget .table {
+    margin-bottom: 10px;
+}
+
+.tab-children-widget .table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.tab-children-widget .table td {
+    vertical-align: middle;
+}
+
+.tab-children-widget .tab-row input,
+.tab-children-widget .tab-row select {
+    font-size: 0.875rem;
+}
+
+.tab-children-widget .add-tab-row {
+    margin-top: 5px;
+}
+
+.tab-children-widget .remove-tab-row {
+    padding: 0.25rem 0.5rem;
+}

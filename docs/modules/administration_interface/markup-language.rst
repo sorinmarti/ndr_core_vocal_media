@@ -119,32 +119,95 @@ code for an image tag with the value as the src attribute.
 
    * - Tag
      - Description
+
+   * - **String Filters**
+     -
    * - ``lower``
      - Converts the value to lowercase. Has no impact on numbers.
    * - ``upper``
      - Converts the value to uppercase. Has no impact on numbers.
    * - ``title``
-     - Converts the value to title case. This means that the first letter of every word is
-       capitalized. Has no impact on numbers.
+     - Converts the value to title case. This means that the first letter of every word is capitalized. Has no impact on numbers.
    * - ``capitalize``
-     - Converts the value to capitalize case. This means that the first letter of the first
-       word is capitalized.
-   * - ``fieldify:<field_name>``
-     - Takes a value and looks up the search field with the supplied field name.
-       Returns the (translated) value of the field.
-   * - ``badge:field=,color=,bg=``
-     - Takes a value and looks up the search field with the supplied field name. Returns the
-       value of the field wrapped in the HTML code for a badge. If the field parameter
-       is supplied, the filter will look up the field with the supplied name (like fieldify). Both
-       color fields (color is for the text color, bg for the background color) can be supplied with
-       a color value. See below how color values are handled.
-   * - ``img:iiif_resize=``
-     - Takes a value and returns the HTML code for an image tag with the value as the src attribute.
-       If the image source is a IIIF image, the option iiif_resize can be applied. The value of this
-       option needs to be a number between 0 and 100 and means the percentage of the original size.
-   * - ``bool:<true_val>,<false_val>``
-     - Takes a boolean value (or 0/1, on/off) and returns the true_val if the value is true and
-       the false_val if the value is false.
+     - Converts the value to capitalize case. This means that the first letter of the first word is capitalized.
+
+   * - **Boolean & Default Values**
+     -
+   * - ``bool:o0=<true_val>,o1=<false_val>``
+     - Takes a boolean value (or 0/1, on/off) and returns the true_val if the value is true and the false_val if the value is false.
+   * - ``default:value=<default>``
+     - Returns the value as-is or a default value if the main value is empty.
+
+   * - **Field Lookup Filters**
+     -
+   * - ``fieldify:o0=<field_name>``
+     - Takes a value and looks up the search field with the supplied field name. Returns the (translated) value of the field.
+   * - ``fieldinfo:o0=<field_name>``
+     - Takes a value and gets the info text from the search field with the supplied field name.
+
+   * - **Visual Styling Filters**
+     -
+   * - ``badge:field=,color=,bg=,tt=``
+     - Renders the value as a Bootstrap badge. If the field parameter is supplied, the filter will look up the field with the supplied name (like fieldify). Both color fields (color is for the text color, bg for the background color) can be supplied. The tt parameter adds a tooltip (use "__field__" to show field info). The bg parameter supports gradient values.
+   * - ``pill:field=,color=,bg=,tt=``
+     - Same as badge but with pill styling.
+   * - ``list:type=,class=``
+     - Renders lists as HTML ul or ol elements. Type can be "ul" (default) or "ol". The class parameter adds CSS classes.
+
+   * - **Image & File Display**
+     -
+   * - ``img:url=,iiif_resize=,width=,height=,class=,alt=``
+     - Renders images with IIIF support. The iiif_resize parameter is a percentage (0-100). Supports [placeholder] syntax for dynamic URLs. Default class is "img-fluid".
+   * - ``file_display:url=,type=,max_lines=,show_line_numbers=``
+     - Displays text file content previews (txt, json, md, xml, csv, etc.) with syntax highlighting. The max_lines parameter defaults to 1000.
+
+   * - **Date & Number Formatting**
+     -
+   * - ``date:format=<input_fmt>,o0=<output_fmt>``
+     - Formats dates from one format to another using strftime format codes. The format parameter specifies the input format (default: "%Y-%m-%d"), and o0 specifies the output format.
+   * - ``relative:format=<fallback_fmt>``
+     - Formats dates as relative time (today, yesterday, 2 days ago, etc.). The format parameter is used as a fallback for older dates.
+   * - ``format:o0=<format_spec>``
+     - Formats numbers using Python format specifications (e.g., ".2f" for 2 decimals, ",d" for thousands separator).
+   * - ``readable:separator=<sep>``
+     - Formats numbers with thousands separators for readability. Default separator is apostrophe (').
+   * - ``compact:precision=<digits>``
+     - Formats numbers in compact form with K, M, B suffixes (e.g., 21438 → 21.4K). Default precision is 1.
+
+   * - **Links & Navigation**
+     -
+   * - ``linkify:url=,page=,params=,target=,class=``
+     - Wraps content in anchor tags. The url parameter supports [placeholder] syntax. The page parameter accepts NdrCorePage view_name or ID. The params parameter accepts format "param1=value1,param2=value2". The display parameter can be set to "button" for Bootstrap button styling.
+   * - ``orcid``
+     - Validates and formats ORCID IDs with icon linking to orcid.org.
+   * - ``weblinks:class=,target=``
+     - Generates list of favicons linking to provided URLs. Processes entire lists. Default target is "_blank".
+
+   * - **Embedded Content**
+     -
+   * - ``iframe:src=,width=,height=,allowfullscreen=``
+     - Embeds content in iframe tags with security options. Default width is "100%", height is "400". Supports sandbox, loading, and referrerpolicy attributes.
+
+   * - **Maps & Visualization**
+     -
+   * - ``map:width=,height=,zoom=,marker=,groups=,legend=``
+     - Displays coordinates as interactive Leaflet map with markers. Supports GeoJSON, coordinate pairs, nested structures (lat/lon or latitude/longitude), and multiple markers with groups. The groups parameter uses format "Name:key:color,Name2:key2:color2". Default width is "300px", height is "200px", zoom is "10". The marker parameter can be set to "false" to hide markers. The legend parameter can be set to "false" to hide the legend. Coordinates can be provided as floats or strings.
+   * - ``plotly:height=,width=,responsive=``
+     - Renders Plotly interactive visualizations with dark mode support. Requires Plotly.js library. Default height is 400px, width is "100%". Input should be dict with 'plotly_figure' or 'data'/'layout' keys.
+
+   * - **Text Formatting**
+     -
+   * - ``truncate:length=,expandable=,expand_text=,collapse_text=``
+     - Truncates long text with optional expand/collapse functionality. Default length is 200 characters. The expandable parameter defaults to true.
+   * - ``code:lang=,linenumbers=,maxheight=,wrap=``
+     - Renders code blocks with optional syntax highlighting. Supports languages: python, json, javascript, html, css, etc. The linenumbers parameter defaults to false. The wrap parameter enables word wrapping.
+
+   * - **Tables**
+     -
+   * - ``table:cols=,headers=,expr=,tstyle=,limit=``
+     - Renders list data as HTML table. The cols parameter is an array of column keys (supports dot-notation). The headers parameter is an array of header labels. The expr parameter is an array of filter expressions (separated by semicolons) to apply to each column. The tstyle parameter can be: plain, small, striped, bordered, hover, sm-striped. The limit parameter restricts rows displayed. Processes entire lists.
+   * - ``datatable:cols=,headers=,expr=,paginate=,pagesize=,filterable=,sortable=``
+     - Renders interactive data tables using Tabulator with pagination, filtering, and sorting. Extends table filter with interactive features. The paginate parameter defaults to true, pagesize to 10. The filterable and sortable parameters default to true. The layout parameter can be: fitData, fitColumns, fitDataFill. Processes entire lists.
 
 Filters can be added to NDRCore by implementing the AbstractFilter class of the
 system. The methods which need to be implemented define the number of mandatory

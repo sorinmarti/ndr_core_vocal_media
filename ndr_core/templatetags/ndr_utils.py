@@ -1,6 +1,8 @@
 """Template tags for the ndr_core app."""
 import json
 import re
+import uuid
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 from django import template
@@ -55,20 +57,18 @@ class RenderSingleNode(template.Node):
         """Creates a CSS Grid of result fields - copied from RenderResultNode."""
         result_card_fields = self.search_config.resolve(
             context
-        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('tab_order', 'tab_name', 'field_row', 'field_column')
 
         if not result_card_fields.exists():
             return ""
 
-        # Create CSS Grid container
-        grid_html = '<div class="result-grid">'
+        # Check if any fields have tab_name set
+        has_tabs = any(field.tab_name for field in result_card_fields)
 
-        for field_config in result_card_fields:
-            field_html = self.create_field(field_config, data)
-            grid_html += field_html
-
-        grid_html += '</div>'
-        return mark_safe(grid_html)
+        if has_tabs:
+            return RenderResultNode.create_tabbed_grid(result_card_fields, data)
+        else:
+            return RenderResultNode.create_simple_grid(result_card_fields, data)
 
     @staticmethod
     def create_field(field_config, data):
@@ -142,20 +142,18 @@ class RenderDataListNode(template.Node):
         """Creates a CSS Grid of result fields using the compact configuration."""
         result_card_fields = self.search_config.resolve(
             context
-        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('tab_order', 'tab_name', 'field_row', 'field_column')
 
         if not result_card_fields.exists():
             return ""
 
-        # Create CSS Grid container
-        grid_html = '<div class="result-grid">'
+        # Check if any fields have tab_name set
+        has_tabs = any(field.tab_name for field in result_card_fields)
 
-        for field_config in result_card_fields:
-            field_html = self.create_field(field_config, data)
-            grid_html += field_html
-
-        grid_html += '</div>'
-        return mark_safe(grid_html)
+        if has_tabs:
+            return RenderResultNode.create_tabbed_grid(result_card_fields, data)
+        else:
+            return RenderResultNode.create_simple_grid(result_card_fields, data)
 
     @staticmethod
     def create_field(field_config, data):
@@ -231,23 +229,156 @@ class RenderResultNode(template.Node):
         return mark_safe(citation)
 
     def create_grid(self, context, data, compact_view):
-        """Creates a CSS Grid of result fields."""
+        """Creates a CSS Grid of result fields, with tab support."""
         result_card_fields = self.search_config.resolve(
             context
-        ).result_card_fields.filter(result_card_group=compact_view).order_by('field_row', 'field_column')
+        ).result_card_fields.filter(result_card_group=compact_view).order_by('tab_order', 'tab_name', 'field_row', 'field_column')
 
         if not result_card_fields.exists():
             return ""
 
-        # Create CSS Grid container
+        # Check if any fields have tab_name set
+        has_tabs = any(field.tab_name for field in result_card_fields)
+
+        if has_tabs:
+            return self.create_tabbed_grid(result_card_fields, data)
+        else:
+            return self.create_simple_grid(result_card_fields, data)
+
+    @staticmethod
+    def create_simple_grid(field_configs, data):
+        """Creates a simple CSS Grid container without tabs (backward compatible)."""
         grid_html = '<div class="result-grid">'
 
-        for field_config in result_card_fields:
-            field_html = self.create_field(field_config, data)
+        for field_config in field_configs:
+            field_html = RenderResultNode.create_field(field_config, data)
             grid_html += field_html
 
         grid_html += '</div>'
         return mark_safe(grid_html)
+
+    @staticmethod
+    def create_tabbed_grid(field_configs, data):
+        """Creates a tabbed interface for result fields."""
+        # Group fields by tab_name
+        tabs = defaultdict(list)
+        no_tab_fields = []
+
+        for field_config in field_configs:
+            if field_config.tab_name:
+                tabs[field_config.tab_name].append(field_config)
+            else:
+                no_tab_fields.append(field_config)
+
+        # Generate unique ID for this card's tabs
+        tab_id = f"result-tabs-{uuid.uuid4().hex[:8]}"
+
+        # Build tab navigation
+        tab_html = '<div class="result-card-tabs">'
+        tab_html += '<ul class="nav nav-tabs" role="tablist">'
+
+        # Sort tabs by tab_order of first field in each tab
+        sorted_tabs = sorted(tabs.items(), key=lambda x: x[1][0].tab_order if x[1] else 999)
+
+        for idx, (tab_name, _) in enumerate(sorted_tabs):
+            active = 'active' if idx == 0 else ''
+            tab_html += f'''
+                <li class="nav-item">
+                    <a class="nav-link {active}" data-bs-toggle="tab"
+                       href="#{tab_id}-{idx}" role="tab">{tab_name}</a>
+                </li>
+            '''
+
+        tab_html += '</ul>'
+        tab_html += '<div class="tab-content">'
+
+        # Build tab panes with grids
+        for idx, (tab_name, fields) in enumerate(sorted_tabs):
+            active = 'show active' if idx == 0 else ''
+            tab_html += f'<div class="tab-pane fade {active}" id="{tab_id}-{idx}" role="tabpanel">'
+            tab_html += '<div class="result-grid">'
+
+            for field_config in fields:
+                tab_html += RenderResultNode.create_field(field_config, data)
+
+            tab_html += '</div></div>'
+
+        tab_html += '</div>'
+
+        # Add non-tabbed fields below tabs (if any)
+        if no_tab_fields:
+            tab_html += '<div class="result-grid result-grid-below-tabs">'
+            for field_config in no_tab_fields:
+                tab_html += RenderResultNode.create_field(field_config, data)
+            tab_html += '</div>'
+
+        tab_html += '</div>'
+
+        return mark_safe(tab_html)
+
+    @staticmethod
+    def render_tab_container(result_field, data):
+        """Renders a tab container with child result fields as tabs."""
+        from ndr_core.models import NdrCoreResultField
+
+        if not result_field.tab_children:
+            return "<div class='alert alert-warning'>Tab container has no children configured</div>"
+
+        # Generate unique ID for this tab container
+        tab_id = f"tab-container-{uuid.uuid4().hex[:8]}"
+
+        # Sort tabs by tab_order (default to 999 if not set)
+        sorted_tabs = sorted(
+            result_field.tab_children,
+            key=lambda x: x.get('tab_order', 999)
+        )
+
+        # Build tab navigation
+        tab_html = '<div class="tab-container-field">'
+        tab_html += '<ul class="nav nav-tabs" role="tablist">'
+
+        for idx, tab_config in enumerate(sorted_tabs):
+            tab_label = tab_config.get('tab_label', f'Tab {idx + 1}')
+            active = 'active' if idx == 0 else ''
+            tab_html += f'''
+                <li class="nav-item">
+                    <a class="nav-link {active}" data-bs-toggle="tab"
+                       href="#{tab_id}-{idx}" role="tab">{tab_label}</a>
+                </li>
+            '''
+
+        tab_html += '</ul>'
+        tab_html += '<div class="tab-content">'
+
+        # Build tab panes with child field content
+        for idx, tab_config in enumerate(sorted_tabs):
+            active = 'show active' if idx == 0 else ''
+            tab_html += f'<div class="tab-pane fade {active}" id="{tab_id}-{idx}" role="tabpanel">'
+
+            # Get the child result field
+            child_field_id = tab_config.get('result_field_id')
+            if child_field_id:
+                try:
+                    child_field = NdrCoreResultField.objects.get(pk=child_field_id)
+
+                    # Render the child field's content
+                    template_string = TemplateString(
+                        child_field.rich_expression, data, show_errors=True
+                    )
+                    child_content = template_string.get_formatted_string()
+                    child_content = template_string.sanitize_html(child_content)
+
+                    tab_html += f'<div class="tab-pane-content">{child_content}</div>'
+                except NdrCoreResultField.DoesNotExist:
+                    tab_html += f'<div class="alert alert-danger">Result field {child_field_id} not found</div>'
+            else:
+                tab_html += '<div class="alert alert-warning">No result field configured for this tab</div>'
+
+            tab_html += '</div>'
+
+        tab_html += '</div></div>'
+
+        return mark_safe(tab_html)
 
     @staticmethod
     def create_field(field_config, data):
@@ -255,11 +386,15 @@ class RenderResultNode(template.Node):
         field_template = "ndr_core/result_renderers/elements/result_field.html"
         result_field = field_config.result_field
 
-        template_string = TemplateString(
-            result_field.rich_expression, data, show_errors=True
-        )
-        field_content = template_string.get_formatted_string()
-        field_content = template_string.sanitize_html(field_content)
+        # Check if this is a tab container field
+        if result_field.is_tab_container and result_field.tab_children:
+            field_content = RenderResultNode.render_tab_container(result_field, data)
+        else:
+            template_string = TemplateString(
+                result_field.rich_expression, data, show_errors=True
+            )
+            field_content = template_string.get_formatted_string()
+            field_content = template_string.sanitize_html(field_content)
 
         field_context = {
             # Remove old Bootstrap size, add CSS Grid properties
@@ -329,6 +464,9 @@ def url_parse(value):
     """Returns a url safe string."""
     if value is None:
         return ""
+
+    if isinstance(value, int):
+        value = str(value)
 
     return value.replace("/", "_sl_")
 

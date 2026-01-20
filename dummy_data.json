@@ -1,0 +1,317 @@
+[
+  {
+    "id": 1,
+    "title": "The Clockwork Orchard",
+    "authors": ["Mira Langen"],
+    "genre": "sci_fi",
+    "hardback": true,
+    "publication_date": "2019-03-14",
+    "abstract": "In a city powered by timekeeping machines, a botanist discovers an orchard that grows gears instead of fruit. As the clockwork ecosystem begins to fail, she must choose between restoring the old order and letting something new evolve.",
+    "publisher": {
+      "publisher_id": 101,
+      "name": "Brass Lantern Press",
+      "location": {
+        "city": "Zurich",
+        "country": "Switzerland",
+        "coordinates": {
+          "lat": 47.3769,
+          "lon": 8.5417
+        }
+      }
+    }
+  },
+  {
+    "id": 2,
+    "title": "Ashes of the North Wind",
+    "authors": ["Jonas Feld", "Rina Kato"],
+    "genre": "fantasy",
+    "hardback": false,
+    "publication_date": "2021-10-02",
+    "abstract": "After a winter that never ends, a caravan of survivors follows a map drawn in soot and ash. Two unlikely companions uncover a forgotten pact between the mountains and the wind, and the cost of breaking it.",
+    "publisher": {
+      "publisher_id": 102,
+      "name": "Northwind Editions",
+      "location": {
+        "city": "Reykjavik",
+        "country": "Iceland",
+        "coordinates": {
+          "lat": 64.1466,
+          "lon": -21.9426
+        }
+      }
+    }
+  },
+  {
+    "id": 3,
+    "title": "The Silent Archivist",
+    "authors": ["Elena Marchand"],
+    "genre": "mystery",
+    "hardback": true,
+    "publication_date": "2017-06-28",
+    "abstract": "A university archive receives a box of unsigned letters that seem to predict small tragedies across the city. When a librarian traces the paper to a vanished collection, she finds herself solving a case that everyone else prefers to keep buried.",
+    "publisher": {
+      "publisher_id": 103,
+      "name": "Caligo House",
+      "location": {
+        "city": "Paris",
+        "country": "France",
+        "coordinates": {
+          "lat": 48.8566,
+          "lon": 2.3522
+        }
+      }
+    }
+  },
+  {
+    "id": 4,
+    "title": "Beneath the Marble Sky",
+    "authors": ["Samuel Ortega"],
+    "genre": "hist_fic",
+    "hardback": false,
+    "publication_date": "2015-11-09",
+    "abstract": "In the final weeks of a fading empire, a stonecutter is commissioned to carve a monument nobody will ever see. Between politics, patronage, and quiet rebellion, he learns how history is shaped by what is built and what is erased.",
+    "publisher": {
+      "publisher_id": 104,
+      "name": "Marble & Ink",
+      "location": {
+        "city": "Rome",
+        "country": "Italy",
+        "coordinates": {
+          "lat": 41.9028,
+          "lon": 12.4964
+        }
+      }
+    }
+  },
+  {
+    "id": 5,
+    "title": "A Small Theory of Rain",
+    "authors": ["Nadia Petrov"],
+    "genre": "lit_fic",
+    "hardback": true,
+    "publication_date": "2020-01-21",
+    "abstract": "A physicist returns to her coastal hometown to settle her father's estate and finds notebooks full of weather observations and unfinished poems. As storms gather, she pieces together a family story told through forecasts, omissions, and love.",
+    "publisher": {
+      "publisher_id": 105,
+      "name": "Coastal Drift Publishing",
+      "location": {
+        "city": "Lisbon",
+        "country": "Portugal",
+        "coordinates": {
+          "lat": 38.7223,
+          "lon": -9.1393
+        }
+      }
+    }
+  },
+  {
+    "id": 6,
+    "title": "The Last Train to Saffron City",
+    "authors": ["Hannah Weiss"],
+    "genre": "mystery",
+    "hardback": false,
+    "publication_date": "2018-09-05",
+    "abstract": "A night train departs on schedule, but the passenger list changes after every stop. With communications down and an unseen threat onboard, a journalist races to identify who is missing and why the destination doesn't appear on any map.",
+    "publisher": {
+      "publisher_id": 106,
+      "name": "Midnight Platform Books",
+      "location": {
+        "city": "Berlin",
+        "country": "Germany",
+        "coordinates": {
+          "lat": 52.52,
+          "lon": 13.405
+        }
+      }
+    }
+  },
+  {
+    "id": 7,
+    "title": "Counting Stars in the Laboratory",
+    "authors": ["David Chen"],
+    "genre": "non_fic",
+    "hardback": true,
+    "publication_date": "2022-04-30",
+    "abstract": "Blending memoir with science writing, this book explores the obsession behind measurement and discovery. From late-night experiments to failed prototypes, it tells the story of how curiosity survives deadlines, funding, and doubt.",
+    "publisher": {
+      "publisher_id": 107,
+      "name": "Signal & Method Press",
+      "location": {
+        "city": "Boston",
+        "country": "United States",
+        "coordinates": {
+          "lat": 42.3601,
+          "lon": -71.0589
+        }
+      }
+    }
+  },
+  {
+    "id": 8,
+    "title": "The Garden of Forgotten Names",
+    "authors": ["Aisha Al-Mansour"],
+    "genre": "lit_fic",
+    "hardback": false,
+    "publication_date": "2016-02-17",
+    "abstract": "A community garden stands on land once used as a hospital cemetery, and the past refuses to stay quiet. When a new caretaker uncovers faded markers, neighbors confront old promises, new grief, and the fragile art of forgiveness.",
+    "publisher": {
+      "publisher_id": 108,
+      "name": "Cedar Gate Publishing",
+      "location": {
+        "city": "Beirut",
+        "country": "Lebanon",
+        "coordinates": {
+          "lat": 33.8938,
+          "lon": 35.5018
+        }
+      }
+    }
+  },
+  {
+    "id": 9,
+    "title": "Neon Harbor",
+    "authors": ["Kai Nakamura"],
+    "genre": "sci_fi",
+    "hardback": true,
+    "publication_date": "2023-07-12",
+    "abstract": "In a port city where shipping containers hold secrets and data is traded like spice, a courier steals the wrong package. Hunted by corporate divers and street hackers alike, they must decode a message that could sink the entire harbor economy.",
+    "publisher": {
+      "publisher_id": 109,
+      "name": "Neon Quay Media",
+      "location": {
+        "city": "Yokohama",
+        "country": "Japan",
+        "coordinates": {
+          "lat": 35.4437,
+          "lon": 139.638
+        }
+      }
+    }
+  },
+  {
+    "id": 10,
+    "title": "Songs for a Distant Coast",
+    "authors": ["Lea Bruckner"],
+    "genre": "lit_fic",
+    "hardback": false,
+    "publication_date": "2014-05-26",
+    "abstract": "A touring musician and a lighthouse keeper strike a bargain to share stories until the summer ends. What begins as a quiet exchange becomes a love shaped by tides, departures, and the fear of returning to ordinary life.",
+    "publisher": {
+      "publisher_id": 110,
+      "name": "Harborlight Books",
+      "location": {
+        "city": "Edinburgh",
+        "country": "United Kingdom",
+        "coordinates": {
+          "lat": 55.9533,
+          "lon": -3.1883
+        }
+      }
+    }
+  },
+  {
+    "id": 11,
+    "title": "Paper Moons and Granite Streets",
+    "authors": ["Oscar Lindholm"],
+    "genre": "lit_fic",
+    "hardback": true,
+    "publication_date": "2021-12-08",
+    "abstract": "A graphic designer inherits a box of street photographs taken by an unknown relative decades earlier. Following the images through a rapidly changing city, he discovers how memory can be preserved, edited, and accidentally rewritten.",
+    "publisher": {
+      "publisher_id": 111,
+      "name": "Granite Street Collective",
+      "location": {
+        "city": "Stockholm",
+        "country": "Sweden",
+        "coordinates": {
+          "lat": 59.3293,
+          "lon": 18.0686
+        }
+      }
+    }
+  },
+  {
+    "id": 12,
+    "title": "The Philosopher's Shortcut",
+    "authors": ["Priya Desai"],
+    "genre": "non_fic",
+    "hardback": false,
+    "publication_date": "2013-08-19",
+    "abstract": "A series of sharp, accessible essays about thinking in public and making peace with uncertainty. Using everyday examples, the author shows how philosophical questions hide inside routines, arguments, and the stories we tell ourselves.",
+    "publisher": {
+      "publisher_id": 112,
+      "name": "Clear Reason Publications",
+      "location": {
+        "city": "New Delhi",
+        "country": "India",
+        "coordinates": {
+          "lat": 28.6139,
+          "lon": 77.209
+        }
+      }
+    }
+  },
+  {
+    "id": 13,
+    "title": "When the River Remembers",
+    "authors": ["Matteo Ricci"],
+    "genre": null,
+    "hardback": true,
+    "publication_date": "2020-10-11",
+    "abstract": "A river begins returning objects that were lost generations ago, and the town gathers along its banks to watch. As the water reveals secrets, one family must decide what to reclaim and what to let drift away forever.",
+    "publisher": {
+      "publisher_id": 113,
+      "name": "Riverbend Press",
+      "location": {
+        "city": "Florence",
+        "country": "Italy",
+        "coordinates": {
+          "lat": 43.7696,
+          "lon": 11.2558
+        }
+      }
+    }
+  },
+  {
+    "id": 14,
+    "title": "The Brass Compass",
+    "authors": ["Ines Novak"],
+    "genre": "fantasy",
+    "hardback": false,
+    "publication_date": "2012-03-03",
+    "abstract": "A scavenger finds a compass that points not north, but toward the owner's greatest mistake. Chasing its pull across deserts and ruined libraries, she assembles a crew and learns that treasure is rarely the real destination.",
+    "publisher": {
+      "publisher_id": 114,
+      "name": "Compass & Co.",
+      "location": {
+        "city": "Prague",
+        "country": "Czech Republic",
+        "coordinates": {
+          "lat": 50.0755,
+          "lon": 14.4378
+        }
+      }
+    }
+  },
+  {
+    "id": 15,
+    "title": "An Algorithm for Ghosts",
+    "authors": ["Robert Hale"],
+    "genre": null,
+    "hardback": true,
+    "publication_date": "2024-02-29",
+    "abstract": "A startup trains a model on voice recordings of the dead to comfort the grieving, but the outputs start answering questions nobody asked. As the boundary between simulation and haunting dissolves, an engineer investigates what the system is truly learning.",
+    "publisher": {
+      "publisher_id": 115,
+      "name": "Spectral Logic Publishing",
+      "location": {
+        "city": "San Francisco",
+        "country": "United States",
+        "coordinates": {
+          "lat": 37.7749,
+          "lon": -122.4194
+        }
+      }
+    }
+  }
+]

@@ -2,7 +2,11 @@
 {% load static %}
 
 {% block card_title %}
-    Create New Result Field
+    {% if is_tab_field %}
+        Create New Tab Container Field
+    {% else %}
+        Create New Result Field
+    {% endif %}
 {% endblock %}
 
 {% block back_url %}
@@ -11,4 +15,7 @@
 
 {% block page_js %}
     <script src="{% static 'ndr_core/js/admin/result_field_create_edit.js' %}"></script>
+    {% if is_tab_field %}
+        <script src="{% static 'ndr_core/js/widgets/tab_children_widget.js' %}"></script>
+    {% endif %}
 {% endblock %}

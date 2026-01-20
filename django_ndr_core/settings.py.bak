@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "^p3xik#*w8p6yd0l-kr115c46@woc&*71h2ohlf!5464pqjb9^"
+SECRET_KEY = "(%(0a$8+0ju*w0^92(!!ju^rn(+ypfv6b7@ync)ewxb7jw6hb+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -148,7 +148,6 @@ LOGIN_REDIRECT_URL = reverse_lazy('ndr_core:dashboard')
 """Overwrites the default urls for the django authentication system."""
 
 # NDR FORMS SETTINGS
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 """Django crispy forms - used to render forms."""
 
@@ -196,33 +195,182 @@ CORS_ALLOW_HEADERS = [
 GEOIP_PATH = os.path.join('geoip/')
 """Needed for the geoip functionality."""
 
-# CKEDITOR SETTINGS
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-"""Needed for the ck-editor"""
+customColorPalette = [
+        {
+            'color': 'hsl(4, 90%, 58%)',
+            'label': 'Red'
+        },
+        {
+            'color': 'hsl(340, 82%, 52%)',
+            'label': 'Pink'
+        },
+        {
+            'color': 'hsl(291, 64%, 42%)',
+            'label': 'Purple'
+        },
+        {
+            'color': 'hsl(262, 52%, 47%)',
+            'label': 'Deep Purple'
+        },
+        {
+            'color': 'hsl(231, 48%, 48%)',
+            'label': 'Indigo'
+        },
+        {
+            'color': 'hsl(207, 90%, 54%)',
+            'label': 'Blue'
+        },
+    ]
+
+# CKEDITOR 5 SETTINGS
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote'],
+    },
+    'page_editor': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'outdent', 'indent', '|',
+            'blockQuote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+            'code', 'subscript', 'superscript', 'highlight', '|',
+            'removeFormat', 'sourceEditing'
+        ],
+        'table': {
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+                'defaultProperties': {
+                    'borderStyle': 'solid',
+                    'borderWidth': '1px',
+                    'borderColor': 'hsl(0, 0%, 90%)',
+                },
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+            }
+        },
+        'htmlSupport': {
+            'allow': [
+                {
+                    'name': 'table',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'td',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'th',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'p',
+                    'classes': ['lead', 'lead-sm', 'lead-lg'],
+                    'styles': True,
+                    'attributes': True
+                }
+            ]
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'},
+                {'model': 'lead', 'view': {'name': 'p', 'classes': 'lead'}, 'title': 'Lead Text', 'class': 'ck-heading_lead'},
+                {'model': 'leadSmall', 'view': {'name': 'p', 'classes': ['lead', 'lead-sm']}, 'title': 'Lead Text (Small)', 'class': 'ck-heading_lead-sm'},
+                {'model': 'leadLarge', 'view': {'name': 'p', 'classes': ['lead', 'lead-lg']}, 'title': 'Lead Text (Large)', 'class': 'ck-heading_lead-lg'},
+            ]
+        }
+    },
+    'result_editor': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'outdent', 'indent', '|',
+            'blockQuote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+            'code', 'subscript', 'superscript', 'highlight', '|',
+            'removeFormat', 'sourceEditing'
+        ],
+        'table': {
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+                'defaultProperties': {
+                    'borderStyle': 'solid',
+                    'borderWidth': '1px',
+                    'borderColor': 'hsl(0, 0%, 90%)',
+                },
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette,
+            }
+        },
+        'htmlSupport': {
+            'allow': [
+                {
+                    'name': 'table',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'td',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'th',
+                    'classes': True,
+                    'styles': True,
+                    'attributes': True
+                },
+                {
+                    'name': 'p',
+                    'classes': ['lead', 'lead-sm', 'lead-lg'],
+                    'styles': True,
+                    'attributes': True
+                }
+            ]
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        }
+    }
+}
 
 # RECAPTCHA SETTINGS
 SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 RECAPTCHA_PUBLIC_KEY = 'y0uR3c4PtCh4pUbL1cK3y'
 RECAPTCHA_PRIVATE_KEY = 'y0uR3c4PtCh4pr1v4t3K3y'
 """Recaptcha key to use for the captcha functionality for the contact form.. """
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-        },
-        'django.template': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-            'propagate': False,
-        },
-    },
-}
