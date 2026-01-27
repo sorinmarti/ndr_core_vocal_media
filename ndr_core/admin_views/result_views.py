@@ -108,9 +108,7 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 (f'row_field_{row}', 'field_row'),
                 (f'column_field_{row}', 'field_column'),
                 (f'column_span_field_{row}', 'field_column_span'),
-                (f'row_span_field_{row}', 'field_row_span'),
-                (f'tab_name_field_{row}', 'tab_name'),
-                (f'tab_order_field_{row}', 'tab_order')]
+                (f'row_span_field_{row}', 'field_row_span')]
 
     @staticmethod
     def get_compact_row_fields(row):
@@ -119,9 +117,7 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 (f'cpct_row_field_{row}', 'field_row'),
                 (f'cpct_column_field_{row}', 'field_column'),
                 (f'cpct_column_span_field_{row}', 'field_column_span'),
-                (f'cpct_row_span_field_{row}', 'field_row_span'),
-                (f'cpct_tab_name_field_{row}', 'tab_name'),
-                (f'cpct_tab_order_field_{row}', 'tab_order')]
+                (f'cpct_row_span_field_{row}', 'field_row_span')]
 
     def get_context_data(self, **kwargs):
         """Adds the search configuration to the context. """
@@ -179,8 +175,6 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 conf_line.field_column = form.cleaned_data[f'column_field_{row}']
                 conf_line.field_column_span = form.cleaned_data[f'column_span_field_{row}']
                 conf_line.field_row_span = form.cleaned_data[f'row_span_field_{row}']
-                conf_line.tab_name = form.cleaned_data.get(f'tab_name_field_{row}', None) or None
-                conf_line.tab_order = form.cleaned_data.get(f'tab_order_field_{row}', 1) or 1
                 conf_line.result_card_group = 'normal'
                 conf_line.save()
 
@@ -203,8 +197,6 @@ class SearchConfigurationResultEditView(AdminViewMixin, LoginRequiredMixin, Form
                 conf_line.field_column = form.cleaned_data[f'cpct_column_field_{row}']
                 conf_line.field_column_span = form.cleaned_data[f'cpct_column_span_field_{row}']
                 conf_line.field_row_span = form.cleaned_data[f'cpct_row_span_field_{row}']
-                conf_line.tab_name = form.cleaned_data.get(f'cpct_tab_name_field_{row}', None) or None
-                conf_line.tab_order = form.cleaned_data.get(f'cpct_tab_order_field_{row}', 1) or 1
                 conf_line.result_card_group = 'compact'
                 conf_line.save()
 

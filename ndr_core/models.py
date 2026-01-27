@@ -425,17 +425,6 @@ class NdrCoreResultFieldCardConfiguration(models.Model):
                                          help_text="The group of the result card. Normal is the default group.")
     """The group of the result card. Normal is the default group."""
 
-    tab_name = models.CharField(max_length=100,
-                                blank=True,
-                                null=True,
-                                help_text="Tab name to group this field under. Leave empty for no tabs.")
-    """Tab name to group this field under. Leave empty to display field outside of tabs."""
-
-    tab_order = models.IntegerField(default=1,
-                                    validators=[MinValueValidator(1), MaxValueValidator(20)],
-                                    help_text="Order of tabs (1 = first tab). Only applies if tab_name is set.")
-    """Order of tabs. Lower numbers appear first."""
-
 
 class NdrCoreSearchFieldFormConfiguration(models.Model):
     """Search fields can be used in forms. In order to place them, they can be configured to fit in a grid with
