@@ -1,0 +1,122 @@
+{% extends 'ndr/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load ndr_utils %}
+{% load ndr_values %}
+{% load i18n %}
+
+{% block generated_content %}
+
+    {% if rendered_text %}
+        <div class="row bg-white mb-3">
+            <div class="col-12 p-3">
+                {{ rendered_text|safe }}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <h4 class="mt-4">
+            {% translate 'Search Results' %}
+            <div class="btn-group float-right">
+                <a href="{{ result.form_links.compact }}" type="button" class="btn btn-sm btn-secondary ">
+                    {% translate result.form_links.compact_label %}
+                </a>
+                <a href="{{ result.form_links.refine }}" type="button" class="btn btn-sm btn-secondary ">
+                    {% translate 'Refine Search' %}
+                </a>
+                <a href="{{ result.form_links.new }}" type="button" class="btn btn-sm btn-secondary">
+                    {% translate 'New Search' %}
+                </a>
+                {% config_value 'search_allow_download_list_json' as allow_json %}
+                {% config_value 'search_allow_download_list_csv' as allow_csv %}
+                {% if allow_json or allow_csv %}
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {% translate 'Download' %}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% if allow_json %}
+                                <a class="dropdown-item" href="{{ result.form_links.bulk_download_json }}" target="_blank">{% translate 'Download JSON' %}</a>
+                            {% endif %}
+                            {% if allow_csv %}
+                                <a class="dropdown-item" href="{{ result.form_links.bulk_download_csv }}">{% translate 'Download CSV' %}</a>
+                            {% endif %}
+                            {% config_value 'search_download_max_results' as max_results %}
+                            {% if result.total > max_results %}
+                                <span class="dropdown-item small font-italic">{% blocktranslate %}(Downloads are limited to {{ max_results }} results.){% endblocktranslate %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </h4>
+        {% include 'ndr_core/messages.html' %}
+
+        <div class="mb-2">
+            {% blocktranslate with total=result.total page=result.page num_pages=result.num_pages search_desc=search_explanation %}
+                Your search for {{ search_desc }} returned {{ total }} results, showing page {{ page }} of {{ num_pages }}.
+            {% endblocktranslate %}
+        </div>
+
+        {% render_result result search_config %}
+
+        {% include 'ndr_core/pagination.html' %}
+
+    {% else %}
+        {% include 'ndr_core/messages.html' %}
+        <div class="row bg-white">
+            <div class="col-12 p-3">
+                {% crispy form %}
+            </div>
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block page_js %}
+    <script src="{% static 'ndr_core/js/ui_js/copy_to_clipboard.js' %}"></script>
+    {% if not result %}
+        <script>
+            $(document).ready(function () {
+                var url_params = new URLSearchParams(window.location.search);
+                if (url_params.has('tab')) {
+                     $('a[href="#' + url_params.get('tab') + '"]').tab('show');
+                }
+                {% if requested_search %}
+                    $('a[href="#{{ requested_search }}"]').tab('show');
+                {% endif %}
+
+                $('form').bind("keypress", function(e) {
+                  if (e.keyCode == 13) {
+                      let my_id = $('.tab-content .active').attr('id');
+                      let formButton = $('#submit-id-search_button_' + my_id);
+                        formButton.click();
+                      console.log(my_id);
+                      e.preventDefault();
+                      return false;
+                  }
+                });
+            });
+        </script>
+    {% else %}
+        <script type="text/javascript">
+         document.addEventListener('DOMContentLoaded', function() {
+              const cardFields = document.querySelectorAll('.result-card-field');
+
+              cardFields.forEach(field => {
+                  const column = field.dataset.column || 1;
+                  const row = field.dataset.row || 'auto';
+                  const colspan = field.dataset.colspan || 1;
+                  const rowspan = field.dataset.rowspan || 1;
+
+                  field.style.setProperty('--grid-column-start', column);
+                  field.style.setProperty('--grid-column-span', colspan);
+                  field.style.setProperty('--grid-row-start', row);
+                  field.style.setProperty('--grid-row-span', rowspan);
+              });
+          });
+        </script>
+    {% endif %}
+{% endblock %}
