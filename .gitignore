@@ -1,9 +1,9 @@
-/ndr/
+!/ndr/
 /venv/
 /docs/_build/
 /.idea
 !db.sqlite3
 /static/
-/media/
+!/media/
 /geoip/
 /.venv/
