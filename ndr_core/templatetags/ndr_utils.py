@@ -409,3 +409,13 @@ def get_item(dictionary, key):
     if dictionary is None:
         return None
     return dictionary.get(key)
+
+
+@register.filter
+def has_content(html):
+    """Check if HTML has actual content beyond empty tags and whitespace entities."""
+    if not html:
+        return False
+    text = re.sub(r'<[^>]+>', '', html)
+    text = text.replace('&nbsp;', '').replace('&#160;', '')
+    return bool(text.strip())

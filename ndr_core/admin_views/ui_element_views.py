@@ -23,7 +23,7 @@ from ndr_core.admin_forms.ui_element_types.team_grid_forms import TeamGridCreate
 from ndr_core.admin_forms.ui_element_types.slides_forms import SlidesItemFormSet
 from ndr_core.admin_forms.ui_element_types.carousel_forms import CarouselItemFormSet
 from ndr_core.admin_views.admin_views import AdminViewMixin
-from ndr_core.models import NdrCoreUIElement, NdrCoreImage
+from ndr_core.models import NdrCoreUIElement, NdrCoreImage, NdrCoreUiElementItem
 
 
 class ConfigureUIElements(AdminViewMixin, LoginRequiredMixin, View):

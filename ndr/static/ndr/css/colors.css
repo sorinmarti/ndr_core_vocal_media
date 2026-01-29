@@ -2,77 +2,77 @@
 
 /* Root CSS Variables for Light Mode */
 :root {
-    --background-color: #FFFFFF;
-    --container-bg-color: #FFFFFF;
-    --text-color: #212529;
-    --title-color: #212529;
-    --button-color: #00b0b9;
-    --button-hover-color: #008a92;
-    --button-text-color: #FFFFFF;
-    --button-border-color: #00b0b9;
-    --second-button-color: #6c757d;
-    --second-button-hover-color: #5c636a;
-    --second-button-text-color: #FFFFFF;
-    --second-button-border-color: #6c757d;
-    --link-color: #00b0b9;
-    --nav-link-color: #212529;
-    --nav-active-color: #00b0b9;
-    --tab-title-color: #6c757d;
-    --tab-active-title-color: #00b0b9;
-    --form-field-bg: #FFFFFF;
-    --form-field-fg: #212529;
-    --footer-bg: #f8f9fa;
-    --footer-link-color: #6c757d;
-    --footer-link-hover-color: #00b0b9;
-    --powered-by-color: #6c757d;
-    --accent-color-1: #00b0b9;
-    --accent-color-2: #00d4df;
-    --info-color: #0dcaf0;
-    --success-color: #198754;
-    --error-color: #dc3545;
-    --brand-panel-bg: #00b0b9;
-    --brand-panel-text: #FFFFFF;
+    --background-color: #fef8f3;
+    --container-bg-color: #ffffff;
+    --text-color: #4a4a4a;
+    --title-color: #2d2d2d;
+    --button-color: #e67e22;
+    --button-hover-color: #d35400;
+    --button-text-color: #ffffff;
+    --button-border-color: #e67e22;
+    --second-button-color: #95a5a6;
+    --second-button-hover-color: #7f8c8d;
+    --second-button-text-color: #ffffff;
+    --second-button-border-color: #95a5a6;
+    --link-color: #e67e22;
+    --nav-link-color: #4a4a4a;
+    --nav-active-color: #e67e22;
+    --tab-title-color: #7f8c8d;
+    --tab-active-title-color: #e67e22;
+    --form-field-bg: #ffffff;
+    --form-field-fg: #4a4a4a;
+    --footer-bg: #f9f4ef;
+    --footer-link-color: #7f8c8d;
+    --footer-link-hover-color: #e67e22;
+    --powered-by-color: #95a5a6;
+    --accent-color-1: #e67e22;
+    --accent-color-2: #f39c12;
+    --info-color: #3498db;
+    --success-color: #27ae60;
+    --error-color: #c0392b;
+    --brand-panel-bg: #e67e22;
+    --brand-panel-text: #ffffff;
 }
 
 /* Dark Mode CSS Variables */
 [data-theme="dark"] {
-    --background-color: #121212;
-    --container-bg-color: #1e1e1e;
-    --text-color: #e9ecef;
-    --title-color: #FFFFFF;
-    --button-color: #00b0b9;
-    --button-hover-color: #00d4df;
-    --button-text-color: #FFFFFF;
-    --button-border-color: #00b0b9;
-    --second-button-color: #6c757d;
-    --second-button-hover-color: #5c636a;
-    --second-button-text-color: #FFFFFF;
-    --second-button-border-color: #6c757d;
-    --link-color: #00d4df;
-    --nav-link-color: #e9ecef;
-    --nav-active-color: #00d4df;
-    --tab-title-color: #adb5bd;
-    --tab-active-title-color: #00d4df;
-    --form-field-bg: #2a2a2a;
-    --form-field-fg: #e9ecef;
-    --footer-bg: #212529;
-    --footer-link-color: #adb5bd;
-    --footer-link-hover-color: #00d4df;
-    --powered-by-color: #6c757d;
-    --accent-color-1: #008a92;
-    --accent-color-2: #00d4df;
-    --info-color: #0dcaf0;
-    --success-color: #198754;
-    --error-color: #dc3545;
-    --brand-panel-bg: #008a92;
-    --brand-panel-text: #FFFFFF;
+    --background-color: #1a1614;
+    --container-bg-color: #2a2420;
+    --text-color: #f5ebe0;
+    --title-color: #ffffff;
+    --button-color: #e67e22;
+    --button-hover-color: #f39c12;
+    --button-text-color: #ffffff;
+    --button-border-color: #e67e22;
+    --second-button-color: #7f8c8d;
+    --second-button-hover-color: #95a5a6;
+    --second-button-text-color: #ffffff;
+    --second-button-border-color: #7f8c8d;
+    --link-color: #f39c12;
+    --nav-link-color: #f5ebe0;
+    --nav-active-color: #f39c12;
+    --tab-title-color: #95a5a6;
+    --tab-active-title-color: #f39c12;
+    --form-field-bg: #2a2420;
+    --form-field-fg: #f5ebe0;
+    --footer-bg: #1a1614;
+    --footer-link-color: #95a5a6;
+    --footer-link-hover-color: #f39c12;
+    --powered-by-color: #7f8c8d;
+    --accent-color-1: #d35400;
+    --accent-color-2: #f39c12;
+    --info-color: #3498db;
+    --success-color: #27ae60;
+    --error-color: #c0392b;
+    --brand-panel-bg: #d35400;
+    --brand-panel-text: #ffffff;
 }
 
 /* BODY */
 body {
     background: var(--background-color) !important;
     color: var(--text-color) !important;
-    font-family: 'Open Sans', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -90,7 +90,7 @@ h3 {
 }
 
 h4 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
 }
 
 /* Containers */
