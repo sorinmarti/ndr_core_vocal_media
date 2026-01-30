@@ -1,0 +1,10 @@
+{
+  "message": "This file was extracted from the media/ folder in the package",
+  "items": [
+    "Image files",
+    "Data files",
+    "Documents",
+    "Any media assets"
+  ],
+  "note": "Access this via options.mediaBasePath + 'sample-data.json'"
+}
