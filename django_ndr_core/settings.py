@@ -147,15 +147,17 @@ LOGOUT_URL = reverse_lazy('ndr_core:logout')
 LOGIN_REDIRECT_URL = reverse_lazy('ndr_core:dashboard')
 """Overwrites the default urls for the django authentication system."""
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
 # NDR FORMS SETTINGS
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 """Django crispy forms - used to render forms."""
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 """This renderer gives you complete control of how form and widget templates are sourced."""
 
 # NDR TABLES SETTINGS
-DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5.html"
 """Django tables2 - used to render tables."""
 
 # MESSAGE TAGS SETTINGS
@@ -172,7 +174,7 @@ MESSAGE_TAGS = {
 CORS_ALLOW_ALL_ORIGINS = True  # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    'https://avisblatt.dg-basel.hasdai.org',
+
 ]
 
 CORS_ORIGIN_WHITELIST = (

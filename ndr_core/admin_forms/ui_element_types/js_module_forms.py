@@ -124,7 +124,7 @@ class JSModuleForm(BaseUIElementForm):
         # Configuration section
         layout.append(Row(
             Column(HTML('<h5 class="mt-3 mb-3">Module Configuration</h5>'), css_class='col-12'),
-            css_class='form-row'
+            css_class='row g-2'
         ))
 
         # Package upload
@@ -154,7 +154,7 @@ class JSModuleForm(BaseUIElementForm):
                     '''),
                     css_class='col-md-12'
                 ),
-                css_class='form-row'
+                css_class='row g-2'
             )
         )
 
