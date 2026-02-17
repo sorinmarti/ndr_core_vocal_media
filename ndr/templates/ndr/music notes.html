@@ -1,0 +1,43 @@
+{% extends 'ndr/base.html' %}
+{% load ndr_utils %}
+{% load crispy_forms_tags %}
+{% load ndr_values %}
+{% load i18n %}
+
+{# block page_title #}
+{# endblock #}
+
+{% block content %}
+    {% if detail_page_id %}
+        {% render_single result search_config %}
+    {% else %}
+        {% if rendered_text|has_content %}
+            {{ rendered_text|safe }}
+        {% endif %}
+
+        {% crispy form %}
+        {% render_data_list result search_config %}
+        <br/>
+        {% include 'ndr_core/pagination.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block page_js %}
+    <script type="text/javascript">
+     document.addEventListener('DOMContentLoaded', function() {
+          const cardFields = document.querySelectorAll('.result-card-field');
+
+          cardFields.forEach(field => {
+              const column = field.dataset.column || 1;
+              const row = field.dataset.row || 'auto';
+              const colspan = field.dataset.colspan || 1;
+              const rowspan = field.dataset.rowspan || 1;
+
+              field.style.setProperty('--grid-column-start', column);
+              field.style.setProperty('--grid-column-span', colspan);
+              field.style.setProperty('--grid-row-start', row);
+              field.style.setProperty('--grid-row-span', rowspan);
+          });
+      });
+    </script>
+{% endblock %}

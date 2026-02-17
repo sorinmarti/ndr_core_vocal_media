@@ -25,7 +25,7 @@
 
 /* Controls */
 .pv-controls {
-    position: fixed;
+    position: absolute;
     top: 20px;
     left: 20px;
     background: rgba(255, 255, 255, 0.95);
@@ -109,7 +109,7 @@ select {
 
 /* Legend */
 .pv-legend {
-    position: fixed;
+    position: absolute;
     bottom: 20px;
     left: 20px;
     background: rgba(255, 255, 255, 0.95);
@@ -151,11 +151,11 @@ select {
 
 /* Info Panel */
 .pv-info-panel {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 20px;
     width: 380px;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100% - 40px);
     background: rgba(255, 255, 255, 0.98);
     box-shadow: -4px 0 12px rgba(0,0,0,0.2);
     z-index: 900;
